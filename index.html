@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Симулятор кейсов | ФИНАЛЬНАЯ ВЕРСИЯ</title>
+    <title>Симулятор кейсов | ГРАФИЧЕСКАЯ ВЕРСИЯ</title>
     <style>
         * {
             box-sizing: border-box;
@@ -222,18 +222,20 @@
             align-items: center;
         }
         
+        .slot-img {
+            width: 85%;
+            height: auto;
+            max-height: 90px;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
+        
         .slot-item.rarity-common { border-left: 4px solid #dee3f2; }
         .slot-item.rarity-rare { border-left: 4px solid #184cff; }
         .slot-item.rarity-superRare { border-left: 4px solid #8e18ff; }
         .slot-item.rarity-epic { border-left: 4px solid #ff18ab; }
         .slot-item.rarity-mythic { border-left: 4px solid #ff1414; }
         .slot-item.rarity-legendary { border-left: 4px solid #ffc800; }
-        
-        .slot-item .icon {
-            font-size: 3rem;
-            display: block;
-            margin-bottom: 8px;
-        }
         
         .slot-item .name {
             font-size: 0.65rem;
@@ -286,10 +288,12 @@
             100% { transform: scale(1); opacity: 1; }
         }
         
-        .final-item .icon {
-            font-size: 6rem;
-            display: block;
+        .final-img {
+            width: 220px;
+            height: auto;
+            object-fit: contain;
             margin-bottom: 16px;
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.15));
         }
         
         .final-item .name {
@@ -368,11 +372,14 @@
         .item-card.rarity-mythic { border-left: 6px solid #ff1414; }
         .item-card.rarity-legendary { border-left: 6px solid #ffc800; box-shadow: 0 0 10px rgba(255,200,0,0.3); }
 
-        .item-icon {
-            font-size: 3.2rem;
-            display: block;
+        .grid-img {
+            width: 85%;
+            height: auto;
+            max-height: 90px;
+            object-fit: contain;
             margin-bottom: 8px;
         }
+        
         .item-name {
             font-weight: bold;
             font-size: 0.85rem;
@@ -527,21 +534,21 @@
     };
 
     const ITEMS = [
-        { id: 0, name: "★ Нож-бабочка", icon: "🔪✨", rarityKey: "legendary" },
-        { id: 1, name: "AWP | Dragon Lore", icon: "🐉🔫", rarityKey: "mythic" },
-        { id: 2, name: "AK-47 | Fire Serpent", icon: "🐍🔥", rarityKey: "mythic" },
-        { id: 3, name: "M4A4 | Howl", icon: "🐺🎨", rarityKey: "mythic" },
-        { id: 4, name: "Desert Eagle | Blaze", icon: "🌵💥", rarityKey: "epic" },
-        { id: 5, name: "SSG 08 | Blood in the Water", icon: "🦈🌊", rarityKey: "epic" },
-        { id: 6, name: "USP-S | Kill Confirmed", icon: "✔️🔫", rarityKey: "superRare" },
-        { id: 7, name: "Glock-18 | Fade", icon: "✨🔫", rarityKey: "superRare" },
-        { id: 8, name: "P250 | Splash", icon: "💧🎨", rarityKey: "rare" },
-        { id: 9, name: "MP7 | Nemesis", icon: "😈🔫", rarityKey: "rare" },
-        { id: 10, name: "Galil AR | Chatterbox", icon: "🗣️🔫", rarityKey: "rare" },
-        { id: 11, name: "Tec-9 | Ice Cap", icon: "🧊🔫", rarityKey: "common" },
-        { id: 12, name: "MAG-7 | Hazard", icon: "⚠️🔫", rarityKey: "common" },
-        { id: 13, name: "Negev | Lionfish", icon: "🦁🐟", rarityKey: "common" },
-        { id: 14, name: "★ Перчатки (Crimson Web)", icon: "🧤🩸", rarityKey: "legendary" }
+        { id: 0, name: "★ Нож-бабочка", img: "images/item0.png", rarityKey: "legendary" },
+        { id: 1, name: "AWP | Dragon Lore", img: "images/item1.png", rarityKey: "mythic" },
+        { id: 2, name: "AK-47 | Fire Serpent", img: "images/item2.png", rarityKey: "mythic" },
+        { id: 3, name: "M4A4 | Howl", img: "images/item3.png", rarityKey: "mythic" },
+        { id: 4, name: "Desert Eagle | Blaze", img: "images/item4.png", rarityKey: "epic" },
+        { id: 5, name: "SSG 08 | Blood in the Water", img: "images/item5.png", rarityKey: "epic" },
+        { id: 6, name: "USP-S | Kill Confirmed", img: "images/item6.png", rarityKey: "superRare" },
+        { id: 7, name: "Glock-18 | Fade", img: "images/item7.png", rarityKey: "superRare" },
+        { id: 8, name: "P250 | Splash", img: "images/item8.png", rarityKey: "rare" },
+        { id: 9, name: "MP7 | Nemesis", img: "images/item9.png", rarityKey: "rare" },
+        { id: 10, name: "Galil AR | Chatterbox", img: "images/item10.png", rarityKey: "rare" },
+        { id: 11, name: "Tec-9 | Ice Cap", img: "images/item11.png", rarityKey: "common" },
+        { id: 12, name: "MAG-7 | Hazard", img: "images/item12.png", rarityKey: "common" },
+        { id: 13, name: "Negev | Lionfish", img: "images/item13.png", rarityKey: "common" },
+        { id: 14, name: "★ Перчатки (Crimson Web)", img: "images/item14.png", rarityKey: "legendary" }
     ];
 
     const itemsCountByRarity = {};
@@ -715,7 +722,7 @@
         win.innerHTML = `
             <div class="final-container">
                 <div class="final-item ${rarityClass}">
-                    <div class="icon">${item.icon}</div>
+                    <img src="${item.img}" class="final-img" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
                     <div class="name">${escapeHtml(item.name)}</div>
                     <div class="rarity-badge ${textClass}">${rarity.name}</div>
                 </div>
@@ -779,7 +786,7 @@
                 html += `
                     <div class="slot-cell ${isCenter ? 'center' : ''}">
                         <div class="slot-item ${rarityClass}">
-                            <div class="icon">${item.icon}</div>
+                            <img src="${item.img}" class="slot-img" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
                             <div class="name">${escapeHtml(item.name.substring(0, 18))}</div>
                             <div class="rarity-badge ${textClass}">${rarity.name}</div>
                         </div>
@@ -911,7 +918,7 @@
             let rarity = getItemRarity(i);
             let rarityClass = getRarityClass(i.rarityKey);
             let textClass = getRarityTextClass(i.rarityKey);
-            return `<div class="item-card ${rarityClass}"><div class="item-icon">${i.icon}</div><div class="item-name">${escapeHtml(i.name)}</div><div class="badge ${textClass}">${rarity.name}</div></div>`;
+            return `<div class="item-card ${rarityClass}"><img src="${i.img}" class="grid-img" alt="${escapeHtml(i.name)}" onerror="this.style.display='none'"><div class="item-name">${escapeHtml(i.name)}</div><div class="badge ${textClass}">${rarity.name}</div></div>`;
         }).join('');
         
         let collDiv = document.getElementById("collectionContainer");
@@ -921,7 +928,7 @@
             let rarity = getItemRarity(i);
             let rarityClass = getRarityClass(i.rarityKey);
             let textClass = getRarityTextClass(i.rarityKey);
-            return `<div class="item-card ${rarityClass}" style="filter:grayscale(1);"><div class="item-icon">${i.icon}</div><div class="item-name">${escapeHtml(i.name)}</div><div class="badge ${textClass}">${rarity.name}</div><div style="font-size:10px;">⚫ НЕ ВЫПАДАЛО</div></div>`;
+            return `<div class="item-card ${rarityClass}" style="filter:grayscale(1);"><img src="${i.img}" class="grid-img" alt="${escapeHtml(i.name)}" onerror="this.style.display='none'"><div class="item-name">${escapeHtml(i.name)}</div><div class="badge ${textClass}">${rarity.name}</div><div style="font-size:10px;">⚫ НЕ ВЫПАДАЛО</div></div>`;
         }).join('')}</div>`;
         
         document.getElementById("totalItemsCount").innerText = inventory.length;
