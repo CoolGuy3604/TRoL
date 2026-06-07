@@ -503,7 +503,7 @@
         <h2>🏆 Коллекция</h2>
         <div id="collectionContainer"></div>
     </div>
-    <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | СО ЗВУКОМ</footer>
+    <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ ДЛЯ ЛЕНТЫ</footer>
 </div>
 
 <script>
@@ -547,6 +547,7 @@
     const itemsCountByRarity = {};
     for (const item of ITEMS) itemsCountByRarity[item.rarityKey] = (itemsCountByRarity[item.rarityKey] || 0) + 1;
 
+    // РЕАЛЬНЫЕ ШАНСЫ ДЛЯ ВЫИГРЫША (НЕ ТРОГАТЬ!)
     const cumulativeItems = [];
     let cumulativeSum = 0;
     for (const item of ITEMS) {
@@ -563,18 +564,41 @@
         return ITEMS[0];
     }
 
+    // ВИЗУАЛЬНЫЕ ШАНСЫ ДЛЯ ЛЕНТЫ ПРОКРУТКИ (НОВЫЕ, БОЛЕЕ ЩЕДРЫЕ)
     function getRandomItemByRarity() {
         const rand = Math.random() * 100;
-        let cumulative = 0;
-        for (const [rarityKey, rarity] of Object.entries(RARITIES)) {
-            cumulative += rarity.totalChance;
-            if (rand <= cumulative) {
-                const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === rarityKey);
-                if (itemsOfThisRarity.length === 0) return ITEMS[0];
-                return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
-            }
+        // Визуальные шансы для крутки (создают иллюзию близкого выигрыша)
+        if (rand < 35) {
+            // Обычный - 35%
+            const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'common');
+            if (itemsOfThisRarity.length === 0) return ITEMS[0];
+            return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
+        } else if (rand < 65) {
+            // Редкий - 30% (35+30=65)
+            const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'rare');
+            if (itemsOfThisRarity.length === 0) return ITEMS[0];
+            return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
+        } else if (rand < 83) {
+            // Сверхредкий - 18% (65+18=83)
+            const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'superRare');
+            if (itemsOfThisRarity.length === 0) return ITEMS[0];
+            return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
+        } else if (rand < 95) {
+            // Эпический - 12% (83+12=95)
+            const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'epic');
+            if (itemsOfThisRarity.length === 0) return ITEMS[0];
+            return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
+        } else if (rand < 99) {
+            // Мифический - 4% (95+4=99)
+            const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'mythic');
+            if (itemsOfThisRarity.length === 0) return ITEMS[0];
+            return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
+        } else {
+            // Легендарный - 1% (99-100)
+            const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'legendary');
+            if (itemsOfThisRarity.length === 0) return ITEMS[0];
+            return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
         }
-        return ITEMS[0];
     }
 
     function getItemChance(item) {
@@ -599,16 +623,16 @@
     let stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
 
     function loadData() {
-        let saved = localStorage.getItem("inventory_final_sound");
+        let saved = localStorage.getItem("inventory_final_visual");
         if (saved) inventory = JSON.parse(saved);
         else inventory = [];
-        let savedStats = localStorage.getItem("stats_final_sound");
+        let savedStats = localStorage.getItem("stats_final_visual");
         if (savedStats) stats = JSON.parse(savedStats);
         updateUI();
         updateStatsDisplay();
     }
-    function saveData() { localStorage.setItem("inventory_final_sound", JSON.stringify(inventory)); }
-    function saveStats() { localStorage.setItem("stats_final_sound", JSON.stringify(stats)); }
+    function saveData() { localStorage.setItem("inventory_final_visual", JSON.stringify(inventory)); }
+    function saveStats() { localStorage.setItem("stats_final_visual", JSON.stringify(stats)); }
     function hasItem(id) { return inventory.includes(id); }
     function addItem(item) {
         if (!hasItem(item.id)) {
@@ -719,7 +743,7 @@
         return chance;
     }
 
-    // МАТЕМАТИЧЕСКИ ТОЧНАЯ АНИМАЦИЯ СО ЗВУКОМ
+    // МАТЕМАТИЧЕСКИ ТОЧНАЯ АНИМАЦИЯ
     async function startSpin(finalItem) {
         let win = document.getElementById("slotWindow");
         const SLOTS_COUNT = 7;
@@ -792,7 +816,6 @@
                     delay = 500;
                 }
                 
-                // Сдвиг ячеек
                 for (let i = 0; i < SLOTS_COUNT - 1; i++) {
                     currentItems[i] = currentItems[i + 1];
                 }
@@ -801,7 +824,6 @@
                 
                 renderSlots();
                 
-                // ВОСПРОИЗВЕДЕНИЕ ЗВУКА КЛИКА (через клонирование для наложения)
                 if (!isMuted) {
                     let clone = clickAudio.cloneNode();
                     clone.volume = currentVolume;
@@ -832,7 +854,6 @@
         
         await startSpin(won);
         
-        // ЗВУК ПОБЕДЫ (после драматической паузы)
         if (!isMuted) {
             winAudio.currentTime = 0;
             winAudio.play().catch(() => {});
@@ -925,7 +946,6 @@
         });
     }
 
-    // ==================== УПРАВЛЕНИЕ ЗВУКОМ ====================
     function initAudioControls() {
         const muteBtn = document.getElementById('muteBtn');
         const volumeSlider = document.getElementById('volumeSlider');
