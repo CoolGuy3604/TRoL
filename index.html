@@ -503,7 +503,7 @@
         <h2>🏆 Коллекция</h2>
         <div id="collectionContainer"></div>
     </div>
-    <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 76.5/15/5/2.5/0.5/0.5</footer>
+    <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
 </div>
 
 <script>
@@ -568,33 +568,33 @@
     function getRandomItemByRarity() {
         const rand = Math.random() * 100;
         // Визуальные шансы для крутки
-        if (rand < 76.5) {
-            // Обычный - 76.5%
+        if (rand < 79.6) {
+            // Обычный - 79.6%
             const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'common');
             if (itemsOfThisRarity.length === 0) return ITEMS[0];
             return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
-        } else if (rand < 91.5) {
-            // Редкий - 15.0% (76.5+15=91.5)
+        } else if (rand < 94.6) {
+            // Редкий - 15.0% (79.6+15=94.6)
             const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'rare');
             if (itemsOfThisRarity.length === 0) return ITEMS[0];
             return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
-        } else if (rand < 96.5) {
-            // Сверхредкий - 5.0% (91.5+5=96.5)
+        } else if (rand < 97.6) {
+            // Сверхредкий - 3.0% (94.6+3=97.6)
             const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'superRare');
             if (itemsOfThisRarity.length === 0) return ITEMS[0];
             return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
-        } else if (rand < 99.0) {
-            // Эпический - 2.5% (96.5+2.5=99.0)
+        } else if (rand < 99.4) {
+            // Эпический - 1.8% (97.6+1.8=99.4)
             const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'epic');
             if (itemsOfThisRarity.length === 0) return ITEMS[0];
             return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
-        } else if (rand < 99.5) {
-            // Мифический - 0.5% (99.0+0.5=99.5)
+        } else if (rand < 99.7) {
+            // Мифический - 0.3% (99.4+0.3=99.7)
             const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'mythic');
             if (itemsOfThisRarity.length === 0) return ITEMS[0];
             return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
         } else {
-            // Легендарный - 0.5% (99.5-100)
+            // Легендарный - 0.3% (99.7-100)
             const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'legendary');
             if (itemsOfThisRarity.length === 0) return ITEMS[0];
             return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
