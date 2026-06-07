@@ -503,7 +503,7 @@
         <h2>🏆 Коллекция</h2>
         <div id="collectionContainer"></div>
     </div>
-    <footer>💖 200 ШАГОВ | ВИЗУАЛЬНЫЕ ШАНСЫ: Обычный 76.5% | Редкий 15% | Сверхредкий 5% | Эпический 2.5% | Мифический 0.5% | Легендарный 0.5%</footer>
+    <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 76.5/15/5/2.5/0.5/0.5</footer>
 </div>
 
 <script>
@@ -564,7 +564,7 @@
         return ITEMS[0];
     }
 
-    // ВИЗУАЛЬНЫЕ ШАНСЫ ДЛЯ ЛЕНТЫ ПРОКРУТКИ (ФИНАЛЬНЫЕ)
+    // ВИЗУАЛЬНЫЕ ШАНСЫ ДЛЯ ЛЕНТЫ ПРОКРУТКИ (обновлённые)
     function getRandomItemByRarity() {
         const rand = Math.random() * 100;
         // Визуальные шансы для крутки
@@ -623,16 +623,16 @@
     let stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
 
     function loadData() {
-        let saved = localStorage.getItem("inventory_final_fixed");
+        let saved = localStorage.getItem("inventory_final_balanced");
         if (saved) inventory = JSON.parse(saved);
         else inventory = [];
-        let savedStats = localStorage.getItem("stats_final_fixed");
+        let savedStats = localStorage.getItem("stats_final_balanced");
         if (savedStats) stats = JSON.parse(savedStats);
         updateUI();
         updateStatsDisplay();
     }
-    function saveData() { localStorage.setItem("inventory_final_fixed", JSON.stringify(inventory)); }
-    function saveStats() { localStorage.setItem("stats_final_fixed", JSON.stringify(stats)); }
+    function saveData() { localStorage.setItem("inventory_final_balanced", JSON.stringify(inventory)); }
+    function saveStats() { localStorage.setItem("stats_final_balanced", JSON.stringify(stats)); }
     function hasItem(id) { return inventory.includes(id); }
     function addItem(item) {
         if (!hasItem(item.id)) {
@@ -740,4 +740,235 @@
         
         if (isNew) addEternalGlow(item);
         
-        return chance
+        return chance;
+    }
+
+    // МАТЕМАТИЧЕСКИ ТОЧНАЯ АНИМАЦИЯ
+    async function startSpin(finalItem) {
+        let win = document.getElementById("slotWindow");
+        const SLOTS_COUNT = 7;
+        const CENTER_INDEX = 3;
+        const TOTAL_STEPS = 200;
+        
+        let fullSequence = [];
+        for (let i = 0; i < 10000; i++) {
+            fullSequence.push(getRandomItemByRarity());
+        }
+        
+        const targetQueuePosition = CENTER_INDEX + TOTAL_STEPS;
+        const insertIndex = targetQueuePosition % fullSequence.length;
+        fullSequence[insertIndex] = finalItem;
+        
+        let currentItems = [];
+        for (let i = 0; i < SLOTS_COUNT; i++) {
+            currentItems.push(fullSequence[i % fullSequence.length]);
+        }
+        
+        let currentStep = 0;
+        let queueIndex = SLOTS_COUNT;
+        
+        function renderSlots() {
+            let html = `<div class="slots-container">`;
+            for (let i = 0; i < SLOTS_COUNT; i++) {
+                let item = currentItems[i];
+                if (!item) continue;
+                let rarity = getItemRarity(item);
+                let rarityClass = getRarityClass(item.rarityKey);
+                let textClass = getRarityTextClass(item.rarityKey);
+                let isCenter = (i === CENTER_INDEX);
+                html += `
+                    <div class="slot-cell ${isCenter ? 'center' : ''}">
+                        <div class="slot-item ${rarityClass}">
+                            <div class="icon">${item.icon}</div>
+                            <div class="name">${escapeHtml(item.name.substring(0, 18))}</div>
+                            <div class="rarity-badge ${textClass}">${rarity.name}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            html += `</div>`;
+            win.innerHTML = `<div class="center-highlight"></div><div class="center-indicator"></div>${html}`;
+        }
+        
+        renderSlots();
+        
+        return new Promise((resolve) => {
+            function step() {
+                if (currentStep >= TOTAL_STEPS) {
+                    renderSlots();
+                    setTimeout(() => {
+                        resolve(finalItem);
+                    }, 1000);
+                    return;
+                }
+                
+                const progress = currentStep / TOTAL_STEPS;
+                let delay;
+                if (progress < 0.5) {
+                    delay = 12;
+                } else if (progress < 0.75) {
+                    delay = 35;
+                } else if (progress < 0.88) {
+                    delay = 90;
+                } else if (progress < 0.95) {
+                    delay = 220;
+                } else {
+                    delay = 500;
+                }
+                
+                for (let i = 0; i < SLOTS_COUNT - 1; i++) {
+                    currentItems[i] = currentItems[i + 1];
+                }
+                currentItems[SLOTS_COUNT - 1] = fullSequence[queueIndex % fullSequence.length];
+                queueIndex++;
+                
+                renderSlots();
+                
+                if (!isMuted) {
+                    let clone = clickAudio.cloneNode();
+                    clone.volume = currentVolume;
+                    clone.play().catch(() => {});
+                }
+                
+                currentStep++;
+                setTimeout(step, delay);
+            }
+            
+            step();
+        });
+    }
+
+    async function openCase() {
+        let btn = document.getElementById("openCaseBtn");
+        if (isSpinning || btn.disabled) return;
+        if (isComplete()) {
+            document.getElementById("rollResult").innerHTML = "🎉 ПОЗДРАВЛЯЮ! ВСЕ СОБРАНО! 🎉";
+            return;
+        }
+        isSpinning = true;
+        btn.disabled = true;
+        removeGlow();
+        
+        let won = getRandomItem();
+        let isNew = !hasItem(won.id);
+        
+        await startSpin(won);
+        
+        if (!isMuted) {
+            winAudio.currentTime = 0;
+            winAudio.play().catch(() => {});
+        }
+        
+        showResult(won, isNew);
+        addItem(won);
+        
+        stats.total++;
+        if (won.rarityKey === 'common') stats.common++;
+        else if (won.rarityKey === 'rare') stats.rare++;
+        else if (won.rarityKey === 'superRare') stats.superRare++;
+        else if (won.rarityKey === 'epic') stats.epic++;
+        else if (won.rarityKey === 'mythic') stats.mythic++;
+        else if (won.rarityKey === 'legendary') stats.legendary++;
+        saveStats();
+        updateStatsDisplay();
+        
+        let resDiv = document.getElementById("rollResult");
+        let color = getItemRarity(won).color;
+        resDiv.style.background = hexToRgba(color, 0.2);
+        
+        if (isNew) {
+            resDiv.innerHTML = `✨ НОВЫЙ ПРЕДМЕТ! ✨<br>🎉 ${won.icon} ${won.name} [${getRarityName(won.rarityKey)}] 🎉<br>📊 Шанс: ${getItemChance(won)}%`;
+        } else {
+            resDiv.innerHTML = `🔄 ПОВТОР 🔄<br>📦 ${won.icon} ${won.name} [${getRarityName(won.rarityKey)}]<br>📊 Шанс: ${getItemChance(won)}%`;
+            setTimeout(() => { if(resDiv) resDiv.style.background = "#00000099"; }, 2000);
+        }
+        
+        updateUI();
+        btn.disabled = false;
+        isSpinning = false;
+    }
+
+    function resetGame() {
+        if (confirm("Сбросить прогресс?")) {
+            inventory = [];
+            stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+            saveData();
+            saveStats();
+            removeGlow();
+            updateUI();
+            updateStatsDisplay();
+            document.getElementById("rollResult").innerHTML = "✨ Прогресс сброшен! ✨";
+            let win = document.getElementById("slotWindow");
+            win.innerHTML = `<div class="center-highlight"></div><div class="center-indicator"></div><div style="text-align: center; color: #aaa; z-index: 1;">🎰 Нажми "ОТКРЫТЬ" 🎰</div>`;
+        }
+    }
+
+    function updateUI() {
+        let invDiv = document.getElementById("inventoryGrid");
+        let collected = getCollected();
+        if (collected.length === 0) invDiv.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;">🧸 Инвентарь пуст...</div>';
+        else invDiv.innerHTML = collected.map(i => {
+            let rarity = getItemRarity(i);
+            let rarityClass = getRarityClass(i.rarityKey);
+            let textClass = getRarityTextClass(i.rarityKey);
+            return `<div class="item-card ${rarityClass}"><div class="item-icon">${i.icon}</div><div class="item-name">${escapeHtml(i.name)}</div><div class="badge ${textClass}">${rarity.name}</div></div>`;
+        }).join('');
+        
+        let collDiv = document.getElementById("collectionContainer");
+        let missing = getMissing();
+        if (missing.length === 0) collDiv.innerHTML = `<div class="celebration"><h1>🏆 ВСЕ СОБРАНО! 🏆</h1><button class="small-reset" id="resetC">Начать заново</button></div>`;
+        else collDiv.innerHTML = `<div class="items-grid">${missing.map(i => {
+            let rarity = getItemRarity(i);
+            let rarityClass = getRarityClass(i.rarityKey);
+            let textClass = getRarityTextClass(i.rarityKey);
+            return `<div class="item-card ${rarityClass}" style="filter:grayscale(1);"><div class="item-icon">${i.icon}</div><div class="item-name">${escapeHtml(i.name)}</div><div class="badge ${textClass}">${rarity.name}</div><div style="font-size:10px;">⚫ НЕ ВЫПАДАЛО</div></div>`;
+        }).join('')}</div>`;
+        
+        document.getElementById("totalItemsCount").innerText = inventory.length;
+        document.getElementById("remainingCount").innerText = missing.length;
+        let resetBtn = document.getElementById("resetC");
+        if (resetBtn) resetBtn.onclick = resetGame;
+    }
+
+    function initTabs() {
+        let btns = document.querySelectorAll(".tab-btn");
+        btns.forEach(btn => {
+            btn.onclick = () => {
+                let id = btn.getAttribute("data-tab");
+                btns.forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                document.getElementById("caseTab").classList.remove("active");
+                document.getElementById("inventoryTab").classList.remove("active");
+                document.getElementById("collectionTab").classList.remove("active");
+                document.getElementById(id + "Tab").classList.add("active");
+                updateUI();
+            };
+        });
+    }
+
+    function initAudioControls() {
+        const muteBtn = document.getElementById('muteBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        
+        volumeSlider.addEventListener('input', (e) => {
+            currentVolume = parseFloat(e.target.value);
+            clickAudio.volume = currentVolume;
+            winAudio.volume = currentVolume;
+        });
+        
+        muteBtn.addEventListener('click', () => {
+            isMuted = !isMuted;
+            muteBtn.textContent = isMuted ? '🔇' : '🔊';
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        initTabs();
+        loadData();
+        initAudioControls();
+        document.getElementById("openCaseBtn").onclick = openCase;
+        document.getElementById("resetProgressBtn").onclick = resetGame;
+    });
+</script>
+</body>
+</html>
