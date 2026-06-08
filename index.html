@@ -1117,7 +1117,8 @@
         let rarity = getItemRarity(item);
         let rarityClass = getRarityClass(item.rarityKey);
         let textClass = getRarityTextClass(item.rarityKey);
-        let color = rarity.color;
+        // Для обычных предметов используем черный цвет для переливания, для остальных - цвет редкости
+        let color = item.rarityKey === 'common' ? '#000000' : rarity.color;
         
         hideArrows();
         hideCenterHighlight();
