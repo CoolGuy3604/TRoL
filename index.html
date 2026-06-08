@@ -451,7 +451,7 @@
             -webkit-background-clip: text !important;
             background-clip: text !important;
             
-            /* Дорогой, идеально сбалансированный узкий блеск на белых буквах */
+            /* Идеально сбалансированный узкий блеск на белых буквах */
             background: linear-gradient(90deg, 
                 #ffffff 0%, 
                 #ffffff 40%, 
@@ -462,19 +462,22 @@
             );
             background-size: 200% 100%;
             
-            /* Анимации: плавный блеск 0.5 сек + пауза 3.5 сек / неоновое свечение */
-            animation: shimmer 4s linear infinite, neonGlow 4s ease-in-out infinite;
+            /* Раздельная логика анимаций: 
+               shimmer длится 3с и ЖДЕТ 1 секунду перед первым стартом.
+               neonGlow длится 4с и запускается мгновенно без задержек. */
+            animation: shimmer 3s linear infinite, neonGlow 4s ease-in-out infinite;
+            animation-delay: 1s, 0s;
         }
         
-        /* Бесшовная анимация: быстрый блик за 0.5 сек + пауза 3.5 сек */
+        /* Молниеносный бесшовный блик ~0.25 сек + пауза */
         @keyframes shimmer {
             0% {
                 background-position: 150% 0;
             }
-            12.5% { /* 12.5% от 4 секунд = ровно 0.5 секунды на пробежку блеска */
+            8.3% { /* Сверхбыстрый пролет блика по слову */
                 background-position: -50% 0;
             }
-            100% { /* Остальное время блик стоит за пределами текста (пауза) */
+            100% { /* Удержание блика за экраном до конца цикла (пауза) */
                 background-position: -50% 0;
             }
         }
