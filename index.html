@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Симулятор кейсов | ФИНАЛЬНАЯ ВЕРСИЯ</title>
+    <title>Симулятор кейсов | CS2 СТИЛЬ</title>
     <style>
         * {
             box-sizing: border-box;
@@ -256,10 +256,10 @@
             padding: 10px;
             width: 210px;
             min-width: 210px;
-            border: none;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
         
+        /* Базовые стили для карточек (без левых полосок) */
         .slot-item {
             background: linear-gradient(135deg, #1a1f30, #151a28);
             border-radius: 16px;
@@ -272,6 +272,40 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        /* Редкости для карточек крутки и инвентаря (рамка со всех 4 сторон + фон) */
+        .slot-item.rarity-common, .item-card.rarity-common {
+            border: 2px solid #dee3f2;
+            background: linear-gradient(135deg, rgba(222,227,242,0.05), rgba(222,227,242,0.02));
+        }
+        
+        .slot-item.rarity-rare, .item-card.rarity-rare {
+            border: 2px solid #184cff;
+            background: linear-gradient(135deg, rgba(24,76,255,0.08), rgba(24,76,255,0.02));
+        }
+        
+        .slot-item.rarity-superRare, .item-card.rarity-superRare {
+            border: 2px solid #8e18ff;
+            background: linear-gradient(135deg, rgba(142,24,255,0.08), rgba(142,24,255,0.02));
+        }
+        
+        .slot-item.rarity-epic, .item-card.rarity-epic {
+            border: 2px solid #ff18ab;
+            background: linear-gradient(135deg, rgba(255,24,171,0.08), rgba(255,24,171,0.02));
+        }
+        
+        .slot-item.rarity-mythic, .item-card.rarity-mythic {
+            border: 2px solid #ff1414;
+            background: linear-gradient(135deg, rgba(255,20,20,0.08), rgba(255,20,20,0.02));
+        }
+        
+        .slot-item.rarity-legendary, .item-card.rarity-legendary {
+            border: 2px solid #ffc800;
+            background: linear-gradient(135deg, rgba(255,200,0,0.08), rgba(255,200,0,0.02));
+            box-shadow: inset 0 0 15px rgba(255,200,0,0.1);
         }
         
         .slot-img {
@@ -281,13 +315,6 @@
             object-fit: contain;
             margin-bottom: 8px;
         }
-        
-        .slot-item.rarity-common { border-left: 4px solid #dee3f2; }
-        .slot-item.rarity-rare { border-left: 4px solid #184cff; }
-        .slot-item.rarity-superRare { border-left: 4px solid #8e18ff; }
-        .slot-item.rarity-epic { border-left: 4px solid #ff18ab; }
-        .slot-item.rarity-mythic { border-left: 4px solid #ff1414; }
-        .slot-item.rarity-legendary { border-left: 4px solid #ffc800; }
         
         .slot-item .name {
             font-size: 0.7rem;
@@ -422,19 +449,13 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            border: 2px solid transparent;
         }
         
         .item-card:hover {
             transform: scale(1.05);
             background: #1e2540;
         }
-        
-        .item-card.rarity-common { border-left: 6px solid #dee3f2; }
-        .item-card.rarity-rare { border-left: 6px solid #184cff; }
-        .item-card.rarity-superRare { border-left: 6px solid #8e18ff; }
-        .item-card.rarity-epic { border-left: 6px solid #ff18ab; }
-        .item-card.rarity-mythic { border-left: 6px solid #ff1414; }
-        .item-card.rarity-legendary { border-left: 6px solid #ffc800; box-shadow: 0 0 10px rgba(255,200,0,0.3); }
 
         .grid-img {
             width: 85%;
@@ -1205,7 +1226,7 @@
             let rarity = getItemRarity(i);
             let rarityClass = getRarityClass(i.rarityKey);
             let textClass = getRarityTextClass(i.rarityKey);
-            return `<div class="item-card ${rarityClass}" style="filter:grayscale(1);">
+            return `<div class="item-card ${rarityClass}" style="filter: grayscale(1); opacity: 0.4;">
                         <img src="${i.img}" class="grid-img" alt="${escapeHtml(i.name)}" onerror="this.style.display='none'">
                         <div class="item-name">${escapeHtml(i.name)}</div>
                         <div class="badge ${textClass}">${rarity.name}</div>
