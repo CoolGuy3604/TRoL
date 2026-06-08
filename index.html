@@ -259,8 +259,8 @@
             box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
         
-        /* Базовые стили для карточек (без левых полосок) */
-        .slot-item {
+        /* Базовые стили для карточек крутки, инвентаря, коллекции - рамка 8px */
+        .slot-item, .item-card {
             border-radius: 16px;
             padding: 10px;
             text-align: center;
@@ -271,38 +271,83 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            border: 4px solid transparent;
+            border: 8px solid transparent;
             transition: all 0.2s ease;
         }
         
-        /* Редкости для карточек крутки, инвентаря и финального экрана - рамки 4px */
-        .slot-item.rarity-common, .item-card.rarity-common, .final-item.rarity-common {
-            border: 4px solid #dee3f2;
+        /* Редкости для карточек крутки, инвентаря и коллекции - рамка 8px */
+        .slot-item.rarity-common, .item-card.rarity-common {
+            border: 8px solid #dee3f2;
             background: linear-gradient(135deg, rgba(222,227,242,0.05), rgba(222,227,242,0.02));
         }
         
-        .slot-item.rarity-rare, .item-card.rarity-rare, .final-item.rarity-rare {
-            border: 4px solid #184cff;
+        .slot-item.rarity-rare, .item-card.rarity-rare {
+            border: 8px solid #184cff;
             background: linear-gradient(135deg, rgba(24,76,255,0.08), rgba(24,76,255,0.02));
         }
         
-        .slot-item.rarity-superRare, .item-card.rarity-superRare, .final-item.rarity-superRare {
-            border: 4px solid #8e18ff;
+        .slot-item.rarity-superRare, .item-card.rarity-superRare {
+            border: 8px solid #8e18ff;
             background: linear-gradient(135deg, rgba(142,24,255,0.08), rgba(142,24,255,0.02));
         }
         
-        .slot-item.rarity-epic, .item-card.rarity-epic, .final-item.rarity-epic {
-            border: 4px solid #ff18ab;
+        .slot-item.rarity-epic, .item-card.rarity-epic {
+            border: 8px solid #ff18ab;
             background: linear-gradient(135deg, rgba(255,24,171,0.08), rgba(255,24,171,0.02));
         }
         
-        .slot-item.rarity-mythic, .item-card.rarity-mythic, .final-item.rarity-mythic {
-            border: 4px solid #ff1414;
+        .slot-item.rarity-mythic, .item-card.rarity-mythic {
+            border: 8px solid #ff1414;
             background: linear-gradient(135deg, rgba(255,20,20,0.08), rgba(255,20,20,0.02));
         }
         
-        .slot-item.rarity-legendary, .item-card.rarity-legendary, .final-item.rarity-legendary {
-            border: 4px solid #ffc800;
+        .slot-item.rarity-legendary, .item-card.rarity-legendary {
+            border: 8px solid #ffc800;
+            background: linear-gradient(135deg, rgba(255,200,0,0.08), rgba(255,200,0,0.02));
+            box-shadow: inset 0 0 15px rgba(255,200,0,0.1);
+        }
+        
+        /* Базовые стили для карточки выигрыша - рамка 5px */
+        .final-item {
+            border-radius: 32px;
+            padding: 32px 40px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            animation: finalPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            z-index: 20;
+            border: 5px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        /* Редкости для карточки выигрыша - рамка 5px */
+        .final-item.rarity-common {
+            border: 5px solid #dee3f2;
+            background: linear-gradient(135deg, rgba(222,227,242,0.05), rgba(222,227,242,0.02));
+        }
+        
+        .final-item.rarity-rare {
+            border: 5px solid #184cff;
+            background: linear-gradient(135deg, rgba(24,76,255,0.08), rgba(24,76,255,0.02));
+        }
+        
+        .final-item.rarity-superRare {
+            border: 5px solid #8e18ff;
+            background: linear-gradient(135deg, rgba(142,24,255,0.08), rgba(142,24,255,0.02));
+        }
+        
+        .final-item.rarity-epic {
+            border: 5px solid #ff18ab;
+            background: linear-gradient(135deg, rgba(255,24,171,0.08), rgba(255,24,171,0.02));
+        }
+        
+        .final-item.rarity-mythic {
+            border: 5px solid #ff1414;
+            background: linear-gradient(135deg, rgba(255,20,20,0.08), rgba(255,20,20,0.02));
+        }
+        
+        .final-item.rarity-legendary {
+            border: 5px solid #ffc800;
             background: linear-gradient(135deg, rgba(255,200,0,0.08), rgba(255,200,0,0.02));
             box-shadow: inset 0 0 15px rgba(255,200,0,0.1);
         }
@@ -330,7 +375,7 @@
         .rarity-text-mythic { color: #ff1414; }
         .rarity-text-legendary { color: #ffc800; text-shadow: 0 0 3px rgba(255,200,0,0.5); }
         
-        .slot-item .rarity-badge {
+        .slot-item .rarity-badge, .item-card .badge {
             font-size: 0.6rem;
             margin-top: 6px;
             padding: 2px 6px;
@@ -347,18 +392,6 @@
             height: 100%;
             position: relative;
             z-index: 10;
-        }
-        
-        .final-item {
-            border-radius: 32px;
-            padding: 32px 40px;
-            text-align: center;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
-            animation: finalPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            position: relative;
-            z-index: 20;
-            border: 4px solid transparent;
-            transition: all 0.2s ease;
         }
         
         @keyframes finalPop {
@@ -438,18 +471,8 @@
         .item-card {
             background: #141a2c;
             border-radius: 24px;
-            padding: 14px 8px;
-            text-align: center;
-            transition: 0.1s;
             cursor: pointer;
-            width: 210px;
-            min-width: 210px;
-            height: 210px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border: 4px solid transparent;
+            transition: 0.1s;
         }
         
         .item-card:hover {
