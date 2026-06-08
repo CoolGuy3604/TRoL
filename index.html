@@ -443,54 +443,61 @@
             letter-spacing: 4px;
             text-transform: uppercase;
             
-            /* Тонкий черный контур текста 2px */
-            -webkit-text-stroke: 2px #000000;
+            /* Строго черный контур 1px */
+            -webkit-text-stroke: 1px #000000;
             
-            /* Бликующий текст */
-            background: linear-gradient(90deg, var(--rarity-color) 0%, var(--rarity-color) 40%, #ffffff 50%, var(--rarity-color) 60%, var(--rarity-color) 100%);
+            /* Базовый цвет ВСЕГДА залитый непрозрачный белый */
+            color: #ffffff;
+            
+            /* Ультра-выраженное цветное переливание (белый фон + сочный цвет редкости) */
+            background: linear-gradient(90deg, 
+                #ffffff 0%, 
+                #ffffff 35%, 
+                var(--rarity-color) 45%, 
+                #ffffff 50%, 
+                var(--rarity-color) 55%, 
+                #ffffff 65%, 
+                #ffffff 100%
+            );
             background-size: 200% 100%;
             -webkit-background-clip: text;
             background-clip: text;
-            color: transparent;
             
-            /* Анимации: блик 6 сек / неон 6 сек синхронно */
-            animation: shimmer 6s linear infinite, neonGlow 6s ease-in-out infinite;
+            /* Сверх-яркое неоновое свечение вокруг букв */
+            animation: shimmer 4s linear infinite, neonGlow 4s ease-in-out infinite;
         }
         
-        /* Анимация медленного сочного блика */
+        /* Анимация быстрого сочного блика */
         @keyframes shimmer {
             0% {
                 background-position: 200% 0;
             }
-            50% {
-                background-position: -100% 0;
-            }
             100% {
-                background-position: 200% 0;
+                background-position: -100% 0;
             }
         }
         
-        /* Анимация неонового свечения, синхронизированная с бликом */
+        /* Анимация сверх-яркого неонового свечения */
         @keyframes neonGlow {
             0% {
-                filter: drop-shadow(0 0 5px var(--rarity-color));
-                opacity: 0.8;
+                filter: drop-shadow(0 0 2px var(--rarity-color));
+                opacity: 0.9;
             }
             25% {
-                filter: drop-shadow(0 0 22px var(--rarity-color));
+                filter: drop-shadow(0 0 18px var(--rarity-color));
                 opacity: 1;
             }
             50% {
-                filter: drop-shadow(0 0 22px var(--rarity-color));
+                filter: drop-shadow(0 0 25px var(--rarity-color));
                 opacity: 1;
             }
             75% {
-                filter: drop-shadow(0 0 5px var(--rarity-color));
-                opacity: 0.8;
+                filter: drop-shadow(0 0 10px var(--rarity-color));
+                opacity: 1;
             }
             100% {
-                filter: drop-shadow(0 0 5px var(--rarity-color));
-                opacity: 0.8;
+                filter: drop-shadow(0 0 2px var(--rarity-color));
+                opacity: 0.9;
             }
         }
         
@@ -1121,7 +1128,7 @@
         let content = `
             <div class="center-indicator"></div>
             <div class="final-container">
-                <div class="final-item ${rarityClass}">
+                <div class="final-item ${isNew ? 'rarity-common' : rarityClass}">
                     ${isNew ? `<div class="new-rarity-title" style="--rarity-color: ${color};">${rarityName}!</div>` : ''}
                     <img src="${item.img}" class="final-img" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
                     <div class="name">${escapeHtml(item.name)}</div>
