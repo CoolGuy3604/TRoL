@@ -443,44 +443,26 @@
             letter-spacing: 4px;
             text-transform: uppercase;
             
+            /* Черный контур букв */
             -webkit-text-stroke: 1px #000000;
             
-            color: transparent !important;
-            -webkit-background-clip: text !important;
-            background-clip: text !important;
+            /* Чистый стабильный белый цвет вместо проблемных бликов */
+            color: #ffffff !important;
             
-            background: linear-gradient(90deg, 
-                #ffffff 0%, 
-                #ffffff 42%, 
-                var(--rarity-color) 48%, 
-                var(--rarity-color) 52%, 
-                #ffffff 58%, 
-                #ffffff 100%
-            );
-            
-            /* Расширяем границы фона в 6 раз, уводя старт и финиш блика от букв */
-            background-size: 600% 100%;
-            
-            animation: shimmer 6s linear infinite, neonGlow 4s ease-in-out infinite;
+            /* Запуск анимации: резкий выезд (0.4с) и затем бесконечная неоновая пульсация (4с) */
+            animation: titleSpawn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, 
+                       neonGlow 4s ease-in-out infinite 0.4s;
         }
         
-        /* Перерасчет 6-секундного цикла: 4 секунды покоя (66.66%) + 0.25 секунды сверхбыстрый пролет (до 70.82%) + пауза до конца цикла */
-        @keyframes shimmer {
+        /* Новая анимация: резкое уменьшение из огромного размера до текущего */
+        @keyframes titleSpawn {
             0% {
-                /* Блик надежно спрятан далеко справа за пределами текста */
-                background-position: 300% 0; 
+                transform: rotate(12deg) scale(5);
+                opacity: 0;
             }
-            66.66% { 
-                /* Ровно 4 секунды (66.66% от 6с) текст остается просто белым, блик удерживается в скрытом состоянии */
-                background-position: 300% 0; 
-            }
-            70.82% { 
-                /* Блик молниеносно пролетает сквозь слово далеко налево (~0.25 секунды) через расширенное в 6 раз пространство */
-                background-position: -300% 0; 
-            }
-            100% { 
-                /* Блик остается скрытым слева до самого конца 6-секундного цикла, суммируясь со стартом следующего шага в 4 секунды тишины */
-                background-position: -300% 0; 
+            100% {
+                transform: rotate(12deg) scale(1);
+                opacity: 1;
             }
         }
         
