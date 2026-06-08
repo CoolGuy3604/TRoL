@@ -261,7 +261,6 @@
         
         /* Базовые стили для карточек (без левых полосок) */
         .slot-item {
-            background: linear-gradient(135deg, #1a1f30, #151a28);
             border-radius: 16px;
             padding: 10px;
             text-align: center;
@@ -276,33 +275,33 @@
             transition: all 0.2s ease;
         }
         
-        /* Редкости для карточек крутки и инвентаря (рамка со всех 4 сторон + фон) */
-        .slot-item.rarity-common, .item-card.rarity-common {
+        /* Редкости для карточек крутки, инвентаря и финального экрана */
+        .slot-item.rarity-common, .item-card.rarity-common, .final-item.rarity-common {
             border: 2px solid #dee3f2;
             background: linear-gradient(135deg, rgba(222,227,242,0.05), rgba(222,227,242,0.02));
         }
         
-        .slot-item.rarity-rare, .item-card.rarity-rare {
+        .slot-item.rarity-rare, .item-card.rarity-rare, .final-item.rarity-rare {
             border: 2px solid #184cff;
             background: linear-gradient(135deg, rgba(24,76,255,0.08), rgba(24,76,255,0.02));
         }
         
-        .slot-item.rarity-superRare, .item-card.rarity-superRare {
+        .slot-item.rarity-superRare, .item-card.rarity-superRare, .final-item.rarity-superRare {
             border: 2px solid #8e18ff;
             background: linear-gradient(135deg, rgba(142,24,255,0.08), rgba(142,24,255,0.02));
         }
         
-        .slot-item.rarity-epic, .item-card.rarity-epic {
+        .slot-item.rarity-epic, .item-card.rarity-epic, .final-item.rarity-epic {
             border: 2px solid #ff18ab;
             background: linear-gradient(135deg, rgba(255,24,171,0.08), rgba(255,24,171,0.02));
         }
         
-        .slot-item.rarity-mythic, .item-card.rarity-mythic {
+        .slot-item.rarity-mythic, .item-card.rarity-mythic, .final-item.rarity-mythic {
             border: 2px solid #ff1414;
             background: linear-gradient(135deg, rgba(255,20,20,0.08), rgba(255,20,20,0.02));
         }
         
-        .slot-item.rarity-legendary, .item-card.rarity-legendary {
+        .slot-item.rarity-legendary, .item-card.rarity-legendary, .final-item.rarity-legendary {
             border: 2px solid #ffc800;
             background: linear-gradient(135deg, rgba(255,200,0,0.08), rgba(255,200,0,0.02));
             box-shadow: inset 0 0 15px rgba(255,200,0,0.1);
@@ -351,7 +350,6 @@
         }
         
         .final-item {
-            background: linear-gradient(135deg, #1a1f30, #121725);
             border-radius: 32px;
             padding: 32px 40px;
             text-align: center;
@@ -359,6 +357,8 @@
             animation: finalPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             position: relative;
             z-index: 20;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
         }
         
         @keyframes finalPop {
