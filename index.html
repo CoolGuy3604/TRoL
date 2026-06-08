@@ -630,25 +630,143 @@
     let stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
 
     function loadData() {
-        let saved = localStorage.getItem("inventory_final_balanced");
-        if (saved) inventory = JSON.parse(saved);
-        else inventory = [];
-        let savedStats = localStorage.getItem("stats_final_balanced");
-        if (savedStats) stats = JSON.parse(savedStats);
+        // Загрузка инвентаря (новый ключ v3)
+        let savedInventory = localStorage.getItem("case_sim_inventory_v3");
+        if (savedInventory) {
+            try {
+                const parsed = JSON.parse(savedInventory);
+                if (Array.isArray(parsed) && parsed.every(record => record && typeof record === 'object' && 'id' in record && 'date' in record)) {
+                    inventory = parsed;
+                } else {
+                    // Неверный формат - очищаем
+                    console.warn("Неверный формат инвентаря, очищаем...");
+                    inventory = [];
+                }
+            } catch (e) {
+                console.warn("Ошибка парсинга инвентаря, очищаем...", e);
+                inventory = [];
+            }
+        } else {
+            // Проверяем старые версии для безопасной миграции
+            let oldInventoryV2 = localStorage.getItem("case_sim_inventory_v2");
+            let oldInventoryV1 = localStorage.getItem("inventory_final_balanced");
+            
+            if (oldInventoryV2) {
+                try {
+                    const oldParsed = JSON.parse(oldInventoryV2);
+                    if (Array.isArray(oldParsed) && oldParsed.every(record => record && typeof record === 'object' && 'id' in record)) {
+                        // Миграция с v2 на v3 (обновляем формат даты)
+                        const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+                        inventory = oldParsed.map(record => ({
+                            id: record.id,
+                            date: `Дата получения: ${formatter.format(new Date(record.date || new Date()))}`
+                        }));
+                        console.log("Миграция с v2 на v3 выполнена успешно");
+                    } else {
+                        inventory = [];
+                    }
+                } catch (e) {
+                    inventory = [];
+                }
+            } else if (oldInventoryV1) {
+                try {
+                    const oldParsed = JSON.parse(oldInventoryV1);
+                    if (Array.isArray(oldParsed) && oldParsed.every(id => typeof id === 'number')) {
+                        // Миграция со старой версии (простой массив чисел)
+                        const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+                        inventory = oldParsed.map(id => ({
+                            id: id,
+                            date: `Дата получения: ${formatter.format(new Date())}`
+                        }));
+                        console.log("Миграция со старой версии выполнена успешно");
+                    } else {
+                        inventory = [];
+                    }
+                } catch (e) {
+                    inventory = [];
+                }
+            } else {
+                inventory = [];
+            }
+        }
+        
+        // Загрузка статистики (новый ключ v3)
+        let savedStats = localStorage.getItem("case_sim_stats_v3");
+        if (savedStats) {
+            try {
+                const parsedStats = JSON.parse(savedStats);
+                if (parsedStats && typeof parsedStats === 'object' && 
+                    'total' in parsedStats && 'common' in parsedStats && 'rare' in parsedStats &&
+                    'superRare' in parsedStats && 'epic' in parsedStats && 'mythic' in parsedStats && 'legendary' in parsedStats) {
+                    stats = parsedStats;
+                } else {
+                    // Неверный формат - сбрасываем статистику
+                    stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+                }
+            } catch (e) {
+                stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+            }
+        } else {
+            // Проверяем старую статистику
+            let oldStatsV2 = localStorage.getItem("case_sim_stats_v2");
+            let oldStatsV1 = localStorage.getItem("stats_final_balanced");
+            
+            if (oldStatsV2) {
+                try {
+                    const oldParsedStats = JSON.parse(oldStatsV2);
+                    if (oldParsedStats && typeof oldParsedStats === 'object') {
+                        stats = oldParsedStats;
+                        console.log("Миграция статистики с v2 на v3 выполнена успешно");
+                    } else {
+                        stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+                    }
+                } catch (e) {
+                    stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+                }
+            } else if (oldStatsV1) {
+                try {
+                    const oldParsedStats = JSON.parse(oldStatsV1);
+                    if (oldParsedStats && typeof oldParsedStats === 'object') {
+                        stats = oldParsedStats;
+                        console.log("Миграция старой статистики выполнена успешно");
+                    } else {
+                        stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+                    }
+                } catch (e) {
+                    stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+                }
+            } else {
+                stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+            }
+        }
+        
         updateUI();
         updateStatsDisplay();
     }
-    function saveData() { localStorage.setItem("inventory_final_balanced", JSON.stringify(inventory)); }
-    function saveStats() { localStorage.setItem("stats_final_balanced", JSON.stringify(stats)); }
-    function hasItem(id) { return inventory.includes(id); }
+    
+    function saveData() { 
+        localStorage.setItem("case_sim_inventory_v3", JSON.stringify(inventory)); 
+    }
+    
+    function saveStats() { 
+        localStorage.setItem("case_sim_stats_v3", JSON.stringify(stats)); 
+    }
+    
+    function hasItem(id) { 
+        return inventory.some(i => i.id === id); 
+    }
+    
     function addItem(item) {
         if (!hasItem(item.id)) {
-            inventory.push(item.id);
+            const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+            const dateStr = `Дата получения: ${formatter.format(new Date())}`;
+            inventory.push({ id: item.id, date: dateStr });
             saveData();
             return true;
         }
         return false;
     }
+    
     function updateStatsDisplay() {
         const panel = document.getElementById('statsPanel');
         if (panel && stats.total > 0) {
@@ -667,13 +785,45 @@
                 <div class="stat-item">🔴 Мифических: ${stats.mythic} (${mythicPercent}%)</div>
                 <div class="stat-item">🟡 Легендарных: ${stats.legendary} (${legendaryPercent}%)</div>
             `;
+        } else if (panel && stats.total === 0) {
+            panel.innerHTML = `
+                <div class="stat-item">📊 Открыто: 0</div>
+                <div class="stat-item">⚪ Обычных: 0 (0%)</div>
+                <div class="stat-item">🔵 Редких: 0 (0%)</div>
+                <div class="stat-item">🟣 Сверхредких: 0 (0%)</div>
+                <div class="stat-item">🩷 Эпических: 0 (0%)</div>
+                <div class="stat-item">🔴 Мифических: 0 (0%)</div>
+                <div class="stat-item">🟡 Легендарных: 0 (0%)</div>
+            `;
         }
     }
-    function getCollected() { return ITEMS.filter(i => hasItem(i.id)); }
-    function getMissing() { return ITEMS.filter(i => !hasItem(i.id)); }
-    function isComplete() { return getMissing().length === 0; }
-    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
-    function removeGlow() { if (currentGlow) { currentGlow.remove(); currentGlow = null; } }
+    
+    function getCollected() { 
+        return ITEMS.filter(item => hasItem(item.id)).map(item => {
+            const invRecord = inventory.find(record => record.id === item.id);
+            return { ...item, collectedDate: invRecord ? invRecord.date : "" };
+        });
+    }
+    
+    function getMissing() { 
+        return ITEMS.filter(i => !hasItem(i.id)); 
+    }
+    
+    function isComplete() { 
+        return getMissing().length === 0; 
+    }
+    
+    function escapeHtml(str) { 
+        return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); 
+    }
+    
+    function removeGlow() { 
+        if (currentGlow) { 
+            currentGlow.remove(); 
+            currentGlow = null; 
+        } 
+    }
+    
     function hexToRgba(hex, alpha) {
         let r = parseInt(hex.slice(1,3), 16);
         let g = parseInt(hex.slice(3,5), 16);
@@ -884,9 +1034,9 @@
         resDiv.style.background = hexToRgba(color, 0.2);
         
         if (isNew) {
-            resDiv.innerHTML = `✨ НОВЫЙ ПРЕДМЕТ! ✨<br>🎉 ${won.icon} ${won.name} [${getRarityName(won.rarityKey)}] 🎉<br>📊 Шанс: ${getItemChance(won)}%`;
+            resDiv.innerHTML = `✨ НОВЫЙ ПРЕДМЕТ! ✨<br>🎉 ${won.name} [${getRarityName(won.rarityKey)}] 🎉<br>📊 Шанс: ${getItemChance(won)}%`;
         } else {
-            resDiv.innerHTML = `🔄 ПОВТОР 🔄<br>📦 ${won.icon} ${won.name} [${getRarityName(won.rarityKey)}]<br>📊 Шанс: ${getItemChance(won)}%`;
+            resDiv.innerHTML = `🔄 ПОВТОР 🔄<br>📦 ${won.name} [${getRarityName(won.rarityKey)}]<br>📊 Шанс: ${getItemChance(won)}%`;
             setTimeout(() => { if(resDiv) resDiv.style.background = "#00000099"; }, 2000);
         }
         
@@ -918,7 +1068,11 @@
             let rarity = getItemRarity(i);
             let rarityClass = getRarityClass(i.rarityKey);
             let textClass = getRarityTextClass(i.rarityKey);
-            return `<div class="item-card ${rarityClass}"><img src="${i.img}" class="grid-img" alt="${escapeHtml(i.name)}" onerror="this.style.display='none'"><div class="item-name">${escapeHtml(i.name)}</div><div class="badge ${textClass}">${rarity.name}</div></div>`;
+            return `<div class="item-card ${rarityClass}">
+                        <img src="${i.img}" class="grid-img" alt="${escapeHtml(i.name)}" onerror="this.style.display='none'">
+                        <div class="item-name">${escapeHtml(i.name)}</div>
+                        <div class="badge ${textClass}">${rarity.name}</div>
+                    </div>`;
         }).join('');
         
         let collDiv = document.getElementById("collectionContainer");
@@ -928,7 +1082,12 @@
             let rarity = getItemRarity(i);
             let rarityClass = getRarityClass(i.rarityKey);
             let textClass = getRarityTextClass(i.rarityKey);
-            return `<div class="item-card ${rarityClass}" style="filter:grayscale(1);"><img src="${i.img}" class="grid-img" alt="${escapeHtml(i.name)}" onerror="this.style.display='none'"><div class="item-name">${escapeHtml(i.name)}</div><div class="badge ${textClass}">${rarity.name}</div><div style="font-size:10px;">⚫ НЕ ВЫПАДАЛО</div></div>`;
+            return `<div class="item-card ${rarityClass}" style="filter:grayscale(1);">
+                        <img src="${i.img}" class="grid-img" alt="${escapeHtml(i.name)}" onerror="this.style.display='none'">
+                        <div class="item-name">${escapeHtml(i.name)}</div>
+                        <div class="badge ${textClass}">${rarity.name}</div>
+                        <div style="font-size:10px;">⚫ НЕ ВЫПАДАЛО</div>
+                    </div>`;
         }).join('')}</div>`;
         
         document.getElementById("totalItemsCount").innerText = inventory.length;
