@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Симулятор кейсов | ИСПРАВЛЕННЫЕ СТРЕЛКИ</title>
+    <title>Симулятор кейсов | ФИНАЛЬНАЯ ВЕРСИЯ</title>
     <style>
         * {
             box-sizing: border-box;
@@ -23,7 +23,7 @@
         }
 
         .app {
-            max-width: 1600px;
+            max-width: 100%;
             width: 100%;
             background: rgba(10, 14, 23, 0.7);
             backdrop-filter: blur(2px);
@@ -125,6 +125,7 @@
             margin-bottom: 0;
             height: 400px;
             min-height: 400px;
+            width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -145,6 +146,10 @@
             border-top: 48px solid #00ff66;
             filter: drop-shadow(0 0 10px rgba(0, 255, 102, 0.8));
             z-index: 40;
+            transition: animation 0.3s ease;
+        }
+        
+        .arrow-top.animate {
             animation: arrowTopPulse 2s ease-in-out infinite;
         }
         
@@ -161,6 +166,10 @@
             border-bottom: 48px solid #00ff66;
             filter: drop-shadow(0 0 10px rgba(0, 255, 102, 0.8));
             z-index: 40;
+            transition: animation 0.3s ease;
+        }
+        
+        .arrow-bottom.animate {
             animation: arrowBottomPulse 2s ease-in-out infinite;
         }
         
@@ -344,6 +353,7 @@
             letter-spacing: 3px;
             box-shadow: 0 8px 0 #009933;
             width: 100%;
+            transition: all 0.2s ease;
         }
         .open-btn:active {
             transform: translateY(4px);
@@ -352,6 +362,7 @@
         .open-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
         
         .result-area {
@@ -507,8 +518,8 @@
     <div id="caseTab" class="tab-content active">
         <div class="slot-machine">
             <div class="slot-window" id="slotWindow">
-                <div class="arrow-top"></div>
-                <div class="arrow-bottom"></div>
+                <div class="arrow-top animate" id="arrowTop"></div>
+                <div class="arrow-bottom animate" id="arrowBottom"></div>
                 <div class="center-highlight"></div>
                 <div class="center-indicator"></div>
                 <div style="text-align: center; color: #aaa; z-index: 1;">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
@@ -659,6 +670,7 @@
     let isSpinning = false;
     let currentGlow = null;
     let stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+    let isResultScreen = false;
 
     function loadData() {
         // Загрузка инвентаря (новый ключ v3)
@@ -891,6 +903,58 @@
         @keyframes flashAnim { 0% { opacity: 0; width: 0%; height: 0%; } 15% { opacity: 1; width: 100%; height: 100%; } 100% { opacity: 0; width: 180%; height: 180%; } }
     `;
     document.head.appendChild(styleSheet);
+    
+    function stopArrowsAnimation() {
+        const arrowTop = document.getElementById('arrowTop');
+        const arrowBottom = document.getElementById('arrowBottom');
+        if (arrowTop) arrowTop.classList.remove('animate');
+        if (arrowBottom) arrowBottom.classList.remove('animate');
+    }
+    
+    function startArrowsAnimation() {
+        const arrowTop = document.getElementById('arrowTop');
+        const arrowBottom = document.getElementById('arrowBottom');
+        if (arrowTop) arrowTop.classList.add('animate');
+        if (arrowBottom) arrowBottom.classList.add('animate');
+    }
+    
+    function hideArrows() {
+        const arrowTop = document.getElementById('arrowTop');
+        const arrowBottom = document.getElementById('arrowBottom');
+        if (arrowTop) arrowTop.style.display = 'none';
+        if (arrowBottom) arrowBottom.style.display = 'none';
+    }
+    
+    function showArrows() {
+        const arrowTop = document.getElementById('arrowTop');
+        const arrowBottom = document.getElementById('arrowBottom');
+        if (arrowTop) arrowTop.style.display = 'block';
+        if (arrowBottom) arrowBottom.style.display = 'block';
+    }
+    
+    function resetToInitialState() {
+        const win = document.getElementById("slotWindow");
+        const btn = document.getElementById("openCaseBtn");
+        const resDiv = document.getElementById("rollResult");
+        
+        win.innerHTML = `
+            <div class="arrow-top animate" id="arrowTop"></div>
+            <div class="arrow-bottom animate" id="arrowBottom"></div>
+            <div class="center-highlight"></div>
+            <div class="center-indicator"></div>
+            <div style="text-align: center; color: #aaa; z-index: 1;">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
+        `;
+        
+        btn.textContent = "🔓 ОТКРЫТЬ КЕЙС 🔓";
+        btn.disabled = false;
+        resDiv.innerHTML = "✨ Готов к крутке? Жми на кнопку! ✨";
+        resDiv.style.background = "#00000099";
+        isResultScreen = false;
+        isSpinning = false;
+        removeGlow();
+        
+        startArrowsAnimation();
+    }
 
     function showResult(item, isNew) {
         let win = document.getElementById("slotWindow");
@@ -898,11 +962,10 @@
         let rarityClass = getRarityClass(item.rarityKey);
         let textClass = getRarityTextClass(item.rarityKey);
         let color = rarity.color;
-        let chance = getItemChance(item);
+        
+        hideArrows();
         
         win.innerHTML = `
-            <div class="arrow-top"></div>
-            <div class="arrow-bottom"></div>
             <div class="center-highlight"></div>
             <div class="center-indicator"></div>
             <div class="final-container">
@@ -932,7 +995,7 @@
         
         if (isNew) addEternalGlow(item);
         
-        return chance;
+        isResultScreen = true;
     }
 
     // МАТЕМАТИЧЕСКИ ТОЧНАЯ АНИМАЦИЯ
@@ -977,7 +1040,7 @@
                 `;
             }
             html += `</div>`;
-            win.innerHTML = `<div class="arrow-top"></div><div class="arrow-bottom"></div><div class="center-highlight"></div><div class="center-indicator"></div>${html}`;
+            win.innerHTML = `<div class="arrow-top" id="arrowTop"></div><div class="arrow-bottom" id="arrowBottom"></div><div class="center-highlight"></div><div class="center-indicator"></div>${html}`;
         }
         
         renderSlots();
@@ -1035,9 +1098,11 @@
             document.getElementById("rollResult").innerHTML = "🎉 ПОЗДРАВЛЯЮ! ВСЕ СОБРАНО! 🎉";
             return;
         }
+        
         isSpinning = true;
         btn.disabled = true;
         removeGlow();
+        stopArrowsAnimation();
         
         let won = getRandomItem();
         let isNew = !hasItem(won.id);
@@ -1070,10 +1135,11 @@
             resDiv.innerHTML = `✨ НОВЫЙ ПРЕДМЕТ! ✨<br>🎉 ${won.name} [${getRarityName(won.rarityKey)}] 🎉<br>📊 Шанс: ${getItemChance(won)}%`;
         } else {
             resDiv.innerHTML = `🔄 ПОВТОР 🔄<br>📦 ${won.name} [${getRarityName(won.rarityKey)}]<br>📊 Шанс: ${getItemChance(won)}%`;
-            setTimeout(() => { if(resDiv) resDiv.style.background = "#00000099"; }, 2000);
         }
         
         updateUI();
+        
+        btn.textContent = "🔙 НАЗАД 🔙";
         btn.disabled = false;
         isSpinning = false;
     }
@@ -1084,12 +1150,9 @@
             stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
             saveData();
             saveStats();
-            removeGlow();
+            resetToInitialState();
             updateUI();
             updateStatsDisplay();
-            document.getElementById("rollResult").innerHTML = "✨ Прогресс сброшен! ✨";
-            let win = document.getElementById("slotWindow");
-            win.innerHTML = `<div class="arrow-top"></div><div class="arrow-bottom"></div><div class="center-highlight"></div><div class="center-indicator"></div><div style="text-align: center; color: #aaa; z-index: 1;">🎰 Нажми "ОТКРЫТЬ" 🎰</div>`;
         }
     }
 
@@ -1165,7 +1228,14 @@
         initTabs();
         loadData();
         initAudioControls();
-        document.getElementById("openCaseBtn").onclick = openCase;
+        const openBtn = document.getElementById("openCaseBtn");
+        openBtn.onclick = async () => {
+            if (isResultScreen) {
+                resetToInitialState();
+            } else {
+                await openCase();
+            }
+        };
         document.getElementById("resetProgressBtn").onclick = resetGame;
     });
 </script>
