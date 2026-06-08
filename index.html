@@ -446,11 +446,6 @@
             /* Строго черный контур 1px */
             -webkit-text-stroke: 1px #000000;
             
-            /* Делаем текст прозрачным, чтобы проявить сочный градиент */
-            color: transparent;
-            -webkit-background-clip: text;
-            background-clip: text;
-            
             /* Густой насыщенный цвет редкости, пробегающий по белым буквам */
             background: linear-gradient(90deg, 
                 #ffffff 0%, 
@@ -462,6 +457,11 @@
                 #ffffff 100%
             );
             background-size: 200% 100%;
+
+            /* Жесткое ограничение градиента ТОЛЬКО внутри букв (убирает внешний фон) */
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            color: transparent !important;
             
             /* Усиленное неоновое свечение под цвет редкости */
             animation: shimmer 3s linear infinite, neonGlow 3s ease-in-out infinite;
