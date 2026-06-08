@@ -446,23 +446,23 @@
             /* Строго черный контур 1px */
             -webkit-text-stroke: 1px #000000;
             
-            /* Делаем текст прозрачным для работы градиента-блеска */
+            /* Прозрачный текст для проявления блеска */
             color: transparent !important;
             -webkit-background-clip: text !important;
             background-clip: text !important;
             
-            /* Узкий, концентрированный сочный блеск цвета редкости на белом фоне */
+            /* Дорогой, идеально сбалансированный узкий блеск на белых буквах */
             background: linear-gradient(90deg, 
                 #ffffff 0%, 
-                #ffffff 42%, 
-                var(--rarity-color) 48%, 
-                var(--rarity-color) 52%, 
-                #ffffff 58%, 
+                #ffffff 40%, 
+                var(--rarity-color) 47%, 
+                var(--rarity-color) 53%, 
+                #ffffff 60%, 
                 #ffffff 100%
             );
             background-size: 200% 100%;
             
-            /* Усиленное неоновое свечение под цвет редкости */
+            /* Анимации: плавный блеск 0.5 сек + пауза 3.5 сек / неоновое свечение */
             animation: shimmer 4s linear infinite, neonGlow 4s ease-in-out infinite;
         }
         
@@ -1119,8 +1119,8 @@
         let rarity = getItemRarity(item);
         let rarityClass = getRarityClass(item.rarityKey);
         let textClass = getRarityTextClass(item.rarityKey);
-        // Для обычных предметов используем черный цвет для переливания, для остальных - цвет редкости
-        let color = item.rarityKey === 'common' ? '#000000' : rarity.color;
+        // Для обычных предметов используем темно-серый цвет, для остальных - цвет редкости
+        let color = item.rarityKey === 'common' ? '#333333' : rarity.color;
         
         hideArrows();
         hideCenterHighlight();
