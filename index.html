@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Симулятор кейсов | ПРОСТОРНАЯ ВЕРСИЯ</title>
+    <title>Симулятор кейсов | ЗЕЛЁНЫЕ СТРЕЛКИ</title>
     <style>
         * {
             box-sizing: border-box;
@@ -69,7 +69,7 @@
         
         #volumeSlider {
             cursor: pointer;
-            accent-color: #ffb347;
+            accent-color: #10b981;
             width: 100px;
         }
 
@@ -93,9 +93,9 @@
             font-family: inherit;
         }
         .tab-btn.active {
-            background: #ffb347;
+            background: #10b981;
             color: #1e1e2a;
-            box-shadow: 0 4px 12px rgba(255,180,70,0.3);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
         .tab-content {
             display: none;
@@ -118,25 +118,48 @@
             position: relative;
         }
         
-        .pointer-arrow {
+        /* Верхняя зелёная стрелка */
+        .arrow-top {
             position: absolute;
-            top: -12px;
+            top: -20px;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: 18px solid transparent;
-            border-right: 18px solid transparent;
-            border-top: 28px solid #ffd700;
-            filter: drop-shadow(0 0 8px rgba(255,215,0,0.6));
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-bottom: 40px solid #10b981;
+            filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.6));
             z-index: 35;
-            animation: arrowPulse 1s ease-in-out infinite;
+            animation: arrowTopPulse 2s ease-in-out infinite;
         }
         
-        @keyframes arrowPulse {
-            0% { opacity: 0.7; transform: translateX(-50%) translateY(0px); }
-            50% { opacity: 1; transform: translateX(-50%) translateY(6px); }
-            100% { opacity: 0.7; transform: translateX(-50%) translateY(0px); }
+        /* Нижняя зелёная стрелка */
+        .arrow-bottom {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-top: 40px solid #10b981;
+            filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.6));
+            z-index: 35;
+            animation: arrowBottomPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes arrowTopPulse {
+            0% { opacity: 0.8; transform: translateX(-50%) translateY(0px); }
+            50% { opacity: 1; transform: translateX(-50%) translateY(8px); }
+            100% { opacity: 0.8; transform: translateX(-50%) translateY(0px); }
+        }
+        
+        @keyframes arrowBottomPulse {
+            0% { opacity: 0.8; transform: translateX(-50%) translateY(0px); }
+            50% { opacity: 1; transform: translateX(-50%) translateY(-8px); }
+            100% { opacity: 0.8; transform: translateX(-50%) translateY(0px); }
         }
         
         .center-highlight {
@@ -146,12 +169,12 @@
             transform: translate(-50%, -50%);
             width: 245px;
             height: 245px;
-            border: 3px solid #ffd700;
+            border: 3px solid #10b981;
             border-radius: 28px;
-            box-shadow: 0 0 30px rgba(255,215,0,0.5);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
             pointer-events: none;
             z-index: 18;
-            background: rgba(255,215,0,0.05);
+            background: rgba(16, 185, 129, 0.05);
         }
         
         .slot-window {
@@ -202,12 +225,6 @@
             min-width: 210px;
             border: 2px solid rgba(255,215,0,0.3);
             box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-        }
-        
-        .slot-cell.center {
-            border: 3px solid #ffd700;
-            box-shadow: 0 0 20px rgba(255,215,0,0.5);
-            background: rgba(255,215,0,0.1);
         }
         
         .slot-item {
@@ -313,7 +330,7 @@
         }
         
         .open-btn {
-            background: radial-gradient(circle at 30% 10%, #f5af19, #f12711);
+            background: radial-gradient(circle at 30% 10%, #10b981, #059669);
             border: none;
             font-size: 2rem;
             font-weight: bold;
@@ -324,12 +341,12 @@
             margin: 20px 0;
             font-family: monospace;
             letter-spacing: 3px;
-            box-shadow: 0 8px 0 #8b2c0d;
+            box-shadow: 0 8px 0 #065f46;
             width: 100%;
         }
         .open-btn:active {
             transform: translateY(4px);
-            box-shadow: 0 4px 0 #8b2c0d;
+            box-shadow: 0 4px 0 #065f46;
         }
         .open-btn:disabled {
             opacity: 0.6;
@@ -434,14 +451,14 @@
         .celebration {
             text-align: center;
             padding: 60px 20px;
-            background: linear-gradient(135deg, #ffd89b, #c7e9fb);
+            background: linear-gradient(135deg, #10b981, #059669);
             border-radius: 48px;
             color: #1e1e2a;
             animation: party 1s infinite alternate;
         }
         @keyframes party {
-            from { transform: scale(1); background: #ffd89b; }
-            to { transform: scale(1.02); background: #ffb347; }
+            from { transform: scale(1); background: #10b981; }
+            to { transform: scale(1.02); background: #059669; }
         }
         .celebration h1 {
             font-size: 3rem;
@@ -477,7 +494,7 @@
     <!-- Панель управления звуком -->
     <div class="audio-controls">
         <button id="muteBtn" class="small-reset" style="background: none; padding: 0; font-size: 1.2rem; cursor: pointer;">🔊</button>
-        <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.5" style="cursor: pointer; accent-color: #ffb347; width: 100px;">
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.5" style="cursor: pointer; accent-color: #10b981; width: 100px;">
     </div>
     
     <div class="tabs">
@@ -488,7 +505,8 @@
 
     <div id="caseTab" class="tab-content active">
         <div class="slot-machine">
-            <div class="pointer-arrow"></div>
+            <div class="arrow-top"></div>
+            <div class="arrow-bottom"></div>
             <div class="slot-window" id="slotWindow">
                 <div class="center-highlight"></div>
                 <div class="center-indicator"></div>
@@ -944,9 +962,8 @@
                 let rarity = getItemRarity(item);
                 let rarityClass = getRarityClass(item.rarityKey);
                 let textClass = getRarityTextClass(item.rarityKey);
-                let isCenter = (i === CENTER_INDEX);
                 html += `
-                    <div class="slot-cell ${isCenter ? 'center' : ''}">
+                    <div class="slot-cell">
                         <div class="slot-item ${rarityClass}">
                             <img src="${item.img}" class="slot-img" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
                             <div class="name">${escapeHtml(item.name.substring(0, 18))}</div>
