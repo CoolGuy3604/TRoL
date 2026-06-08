@@ -446,34 +446,36 @@
             /* Строго черный контур 1px */
             -webkit-text-stroke: 1px #000000;
             
-            /* Густой насыщенный цвет редкости, пробегающий по белым буквам */
+            /* Делаем текст прозрачным для работы градиента-блеска */
+            color: transparent !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            
+            /* Узкий, концентрированный сочный блеск цвета редкости на белом фоне */
             background: linear-gradient(90deg, 
                 #ffffff 0%, 
-                #ffffff 25%, 
-                var(--rarity-color) 40%, 
-                var(--rarity-color) 50%, 
-                var(--rarity-color) 60%, 
-                #ffffff 75%, 
+                #ffffff 42%, 
+                var(--rarity-color) 48%, 
+                var(--rarity-color) 52%, 
+                #ffffff 58%, 
                 #ffffff 100%
             );
             background-size: 200% 100%;
-
-            /* Жесткое ограничение градиента ТОЛЬКО внутри букв (убирает внешний фон) */
-            -webkit-background-clip: text !important;
-            background-clip: text !important;
-            color: transparent !important;
             
             /* Усиленное неоновое свечение под цвет редкости */
-            animation: shimmer 3s linear infinite, neonGlow 3s ease-in-out infinite;
+            animation: shimmer 4s linear infinite, neonGlow 4s ease-in-out infinite;
         }
         
-        /* Анимация быстрого сочного блика */
+        /* Бесшовная анимация: быстрый блик за 0.5 сек + пауза 3.5 сек */
         @keyframes shimmer {
             0% {
-                background-position: 200% 0;
+                background-position: 150% 0;
             }
-            100% {
-                background-position: -100% 0;
+            12.5% { /* 12.5% от 4 секунд = ровно 0.5 секунды на пробежку блеска */
+                background-position: -50% 0;
+            }
+            100% { /* Остальное время блик стоит за пределами текста (пауза) */
+                background-position: -50% 0;
             }
         }
         
