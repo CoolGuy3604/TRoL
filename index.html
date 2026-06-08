@@ -451,34 +451,38 @@
             -webkit-background-clip: text !important;
             background-clip: text !important;
             
-            /* Идеально сбалансированный узкий блеск на белых буквах */
+            /* Сбалансированный узкий блеск на белых буквах */
             background: linear-gradient(90deg, 
                 #ffffff 0%, 
-                #ffffff 40%, 
-                var(--rarity-color) 47%, 
-                var(--rarity-color) 53%, 
-                #ffffff 60%, 
+                #ffffff 42%, 
+                var(--rarity-color) 48%, 
+                var(--rarity-color) 52%, 
+                #ffffff 58%, 
                 #ffffff 100%
             );
             background-size: 200% 100%;
             
-            /* Раздельная логика анимаций: 
-               shimmer длится 3с и ЖДЕТ 1 секунду перед первым стартом.
-               neonGlow длится 4с и запускается мгновенно без задержек. */
-            animation: shimmer 3s linear infinite, neonGlow 4s ease-in-out infinite;
-            animation-delay: 1s, 0s;
+            /* Синхронные бесконечные анимации без костыльных задержек */
+            animation: shimmer 6s linear infinite, neonGlow 4s ease-in-out infinite;
         }
         
-        /* Молниеносный бесшовный блик ~0.25 сек + пауза */
+        /* Цикл 6 секунд: 3 секунды тишины (просто белый текст) + сверхбыстрый блеск за 0.25 сек + пауза до конца цикла */
         @keyframes shimmer {
             0% {
-                background-position: 150% 0;
+                /* Блик полностью спрятан за правой границей слова */
+                background-position: 200% 0; 
             }
-            8.3% { /* Сверхбыстрый пролет блика по слову */
-                background-position: -50% 0;
+            50% { 
+                /* Ровно 3 секунды (50% от 6с) блик ВСЁ ЕЩЁ жестко удерживается в скрытом состоянии */
+                background-position: 200% 0; 
             }
-            100% { /* Удержание блика за экраном до конца цикла (пауза) */
-                background-position: -50% 0;
+            54.16% { 
+                /* Блик молниеносно пролетает сквозь слово налево (~0.25 секунды) */
+                background-position: 0% 0; 
+            }
+            100% { 
+                /* Блик остается скрытым слева до самого конца 6-секундного цикла */
+                background-position: 0% 0; 
             }
         }
         
