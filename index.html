@@ -431,39 +431,37 @@
         /* Стили для взрывающейся надписи редкости при выпадении нового предмета */
         .new-rarity-title {
             position: absolute;
-            top: 20px;
-            right: 30px;
-            z-index: 50;
+            top: 65px;
+            right: 110px;
+            z-index: 9999;
             font-size: 3rem;
             font-weight: 900;
             font-family: 'Segoe UI', 'Arial Black', sans-serif;
             letter-spacing: 4px;
             text-transform: uppercase;
             white-space: nowrap;
-            transform: rotate(15deg);
+            transform: rotate(-12deg);
             
-            /* Эффект блеска через градиент */
-            background: linear-gradient(135deg, currentColor 0%, #fff 25%, currentColor 50%, #fff 75%, currentColor 100%);
+            /* Эффект блеска через градиент с использованием CSS-переменной */
+            background: linear-gradient(90deg, var(--rarity-color) 0%, var(--rarity-color) 35%, #ffffff 50%, var(--rarity-color) 65%, var(--rarity-color) 100%);
             background-size: 200% 100%;
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            text-shadow: 0 0 20px rgba(0,0,0,0.3);
+            filter: drop-shadow(0 0 8px var(--rarity-color));
             
-            /* Бесконечная анимация дрожания и блика */
-            animation: textShake 0.15s infinite ease-in-out, shimmer 2s infinite linear;
+            /* Бесконечная анимация плавной пульсации */
+            animation: textPulse 2s ease-in-out infinite, shimmer 3s linear infinite;
         }
         
-        /* Анимация дрожания */
-        @keyframes textShake {
-            0% { transform: rotate(13deg) translate(0px, 0px); }
-            25% { transform: rotate(17deg) translate(1px, 1px); }
-            50% { transform: rotate(13deg) translate(-1px, 0px); }
-            75% { transform: rotate(17deg) translate(0px, -1px); }
-            100% { transform: rotate(13deg) translate(1px, 1px); }
+        /* Анимация благородного дыхания (пульсации) */
+        @keyframes textPulse {
+            0% { transform: rotate(-12deg) scale(1); }
+            50% { transform: rotate(-12deg) scale(1.06); }
+            100% { transform: rotate(-12deg) scale(1); }
         }
         
-        /* Анимация бегущего блика */
+        /* Анимация бегущего блика слева направо */
         @keyframes shimmer {
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
@@ -1106,7 +1104,7 @@
         if (isNew) {
             const rarityName = getRarityName(item.rarityKey).toUpperCase();
             content = `
-                <div class="new-rarity-title" style="color: ${color};">${rarityName}!</div>
+                <div class="new-rarity-title" style="--rarity-color: ${color};">${rarityName}!</div>
                 ${content}
             `;
         }
