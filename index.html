@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Симулятор кейсов | ФИНАЛЬНАЯ ВЕРСИЯ</title>
+    <title>Симулятор кейсов | ФИНАЛЬНАЯ ПОЛИРОВКА</title>
     <style>
         * {
             box-sizing: border-box;
@@ -133,10 +133,10 @@
             overflow: hidden;
         }
         
-        /* Верхняя зелёная стрелка (указывает вниз) - УМЕНЬШЕННАЯ */
+        /* Верхняя зелёная стрелка (указывает вниз) - с плавным переходом */
         .arrow-top {
             position: absolute;
-            top: 15px;
+            top: 4px;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
@@ -146,16 +146,23 @@
             border-top: 48px solid #00ff66;
             filter: drop-shadow(0 0 15px rgba(0, 255, 102, 0.9));
             z-index: 40;
+            transition: all 0.3s ease;
         }
         
         .arrow-top.animate {
             animation: arrowTopPulse 2s ease-in-out infinite;
         }
         
-        /* Нижняя зелёная стрелка (указывает вверх) - УМЕНЬШЕННАЯ */
+        /* Состояние во время крутки - смещена ближе к центру */
+        .arrow-top.spinning {
+            top: 22px;
+            animation: none;
+        }
+        
+        /* Нижняя зелёная стрелка (указывает вверх) - с плавным переходом */
         .arrow-bottom {
             position: absolute;
-            bottom: 15px;
+            bottom: 4px;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
@@ -165,10 +172,17 @@
             border-bottom: 48px solid #00ff66;
             filter: drop-shadow(0 0 15px rgba(0, 255, 102, 0.9));
             z-index: 40;
+            transition: all 0.3s ease;
         }
         
         .arrow-bottom.animate {
             animation: arrowBottomPulse 2s ease-in-out infinite;
+        }
+        
+        /* Состояние во время крутки - смещена ближе к центру */
+        .arrow-bottom.spinning {
+            bottom: 22px;
+            animation: none;
         }
         
         @keyframes arrowTopPulse {
@@ -905,6 +919,20 @@
         if (arrowBottom) arrowBottom.classList.add('animate');
     }
     
+    function setArrowsSpinning() {
+        const arrowTop = document.getElementById('arrowTop');
+        const arrowBottom = document.getElementById('arrowBottom');
+        if (arrowTop) arrowTop.classList.add('spinning');
+        if (arrowBottom) arrowBottom.classList.add('spinning');
+    }
+    
+    function removeArrowsSpinning() {
+        const arrowTop = document.getElementById('arrowTop');
+        const arrowBottom = document.getElementById('arrowBottom');
+        if (arrowTop) arrowTop.classList.remove('spinning');
+        if (arrowBottom) arrowBottom.classList.remove('spinning');
+    }
+    
     function hideArrows() {
         const arrowTop = document.getElementById('arrowTop');
         const arrowBottom = document.getElementById('arrowBottom');
@@ -950,6 +978,7 @@
         removeGlow();
         
         startArrowsAnimation();
+        removeArrowsSpinning();
         showCenterHighlight();
     }
 
@@ -1036,7 +1065,7 @@
                 `;
             }
             html += `</div>`;
-            win.innerHTML = `<div class="arrow-top" id="arrowTop"></div><div class="arrow-bottom" id="arrowBottom"></div><div class="center-indicator"></div>${html}`;
+            win.innerHTML = `<div class="arrow-top spinning" id="arrowTop"></div><div class="arrow-bottom spinning" id="arrowBottom"></div><div class="center-indicator"></div>${html}`;
         }
         
         renderSlots();
@@ -1099,6 +1128,7 @@
         btn.disabled = true;
         removeGlow();
         stopArrowsAnimation();
+        setArrowsSpinning();
         hideCenterHighlight();
         
         let won = getRandomItem();
