@@ -428,43 +428,66 @@
             background: rgba(0,0,0,0.6);
         }
         
-        /* Стили для элитной надписи редкости - внутри карточки */
+        /* Премиальный стиль надписи редкости */
         .new-rarity-title {
             position: absolute;
-            top: -45px;
-            left: 50%;
-            transform: translateX(-50%) rotate(-8deg);
-            z-index: 1000;
-            font-size: 2.2rem;
+            top: -35px;
+            right: -100px;
+            transform: rotate(12deg);
+            z-index: 9999;
+            white-space: nowrap;
+            font-size: 2rem;
             font-weight: 900;
             font-family: 'Segoe UI', 'Arial Black', sans-serif;
             letter-spacing: 4px;
             text-transform: uppercase;
-            white-space: nowrap;
             
-            /* Эффект блеска через градиент с использованием CSS-переменной */
-            background: linear-gradient(90deg, var(--rarity-color) 0%, var(--rarity-color) 47%, #ffffff 50%, var(--rarity-color) 53%, var(--rarity-color) 100%);
+            /* Бликующий текст */
+            background: linear-gradient(90deg, var(--rarity-color) 0%, var(--rarity-color) 40%, #ffffff 50%, var(--rarity-color) 60%, var(--rarity-color) 100%);
             background-size: 200% 100%;
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            filter: drop-shadow(0 0 12px var(--rarity-color));
             
-            /* Благородное парение и редкий блеск */
-            animation: textFloat 3s ease-in-out infinite, shimmer 4s linear infinite;
+            /* Анимации: блик 6 сек / неон 6 сек синхронно */
+            animation: shimmer 6s linear infinite, neonGlow 6s ease-in-out infinite;
         }
         
-        /* Анимация плавного парения вверх-вниз */
-        @keyframes textFloat {
-            0% { transform: translateX(-50%) rotate(-8deg) translateY(0px); }
-            50% { transform: translateX(-50%) rotate(-8deg) translateY(-6px); }
-            100% { transform: translateX(-50%) rotate(-8deg) translateY(0px); }
-        }
-        
-        /* Анимация редкого мощного зеркального блика */
+        /* Анимация медленного сочного блика */
         @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+            0% {
+                background-position: 200% 0;
+            }
+            50% {
+                background-position: -100% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+        
+        /* Анимация неонового свечения, синхронизированная с бликом */
+        @keyframes neonGlow {
+            0% {
+                filter: drop-shadow(0 0 5px var(--rarity-color));
+                opacity: 0.8;
+            }
+            25% {
+                filter: drop-shadow(0 0 22px var(--rarity-color));
+                opacity: 1;
+            }
+            50% {
+                filter: drop-shadow(0 0 22px var(--rarity-color));
+                opacity: 1;
+            }
+            75% {
+                filter: drop-shadow(0 0 5px var(--rarity-color));
+                opacity: 0.8;
+            }
+            100% {
+                filter: drop-shadow(0 0 5px var(--rarity-color));
+                opacity: 0.8;
+            }
         }
         
         .open-btn {
