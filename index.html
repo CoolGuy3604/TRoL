@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Симулятор кейсов | CS2 СТИЛЬ</title>
+    <title>Симулятор кейсов | ФИНАЛЬНЫЙ ДИЗАЙН</title>
     <style>
         * {
             box-sizing: border-box;
@@ -259,55 +259,57 @@
             box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
         
-        /* Базовые стили для карточек крутки, инвентаря, коллекции - рамка 8px */
+        /* Базовые стили для карточек крутки, инвентаря, коллекции - рамка 7px, прижатие к верху */
         .slot-item, .item-card {
             border-radius: 16px;
-            padding: 10px;
+            padding: 0 10px 10px 10px;
             text-align: center;
             height: 210px;
             width: 210px;
             min-width: 210px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
-            border: 8px solid transparent;
+            border: 7px solid transparent;
             transition: all 0.2s ease;
+            position: relative;
+            background-clip: padding-box;
         }
         
-        /* Редкости для карточек крутки, инвентаря и коллекции - рамка 8px */
+        /* Редкости для карточек крутки, инвентаря и коллекции - рамка 7px */
         .slot-item.rarity-common, .item-card.rarity-common {
-            border: 8px solid #dee3f2;
+            border: 7px solid #dee3f2;
             background: linear-gradient(135deg, rgba(222,227,242,0.05), rgba(222,227,242,0.02));
         }
         
         .slot-item.rarity-rare, .item-card.rarity-rare {
-            border: 8px solid #184cff;
+            border: 7px solid #184cff;
             background: linear-gradient(135deg, rgba(24,76,255,0.08), rgba(24,76,255,0.02));
         }
         
         .slot-item.rarity-superRare, .item-card.rarity-superRare {
-            border: 8px solid #8e18ff;
+            border: 7px solid #8e18ff;
             background: linear-gradient(135deg, rgba(142,24,255,0.08), rgba(142,24,255,0.02));
         }
         
         .slot-item.rarity-epic, .item-card.rarity-epic {
-            border: 8px solid #ff18ab;
+            border: 7px solid #ff18ab;
             background: linear-gradient(135deg, rgba(255,24,171,0.08), rgba(255,24,171,0.02));
         }
         
         .slot-item.rarity-mythic, .item-card.rarity-mythic {
-            border: 8px solid #ff1414;
+            border: 7px solid #ff1414;
             background: linear-gradient(135deg, rgba(255,20,20,0.08), rgba(255,20,20,0.02));
         }
         
         .slot-item.rarity-legendary, .item-card.rarity-legendary {
-            border: 8px solid #ffc800;
+            border: 7px solid #ffc800;
             background: linear-gradient(135deg, rgba(255,200,0,0.08), rgba(255,200,0,0.02));
             box-shadow: inset 0 0 15px rgba(255,200,0,0.1);
         }
         
-        /* Базовые стили для карточки выигрыша - рамка 5px */
+        /* Базовые стили для карточки выигрыша - рамка 6px, центр */
         .final-item {
             border-radius: 32px;
             padding: 32px 40px;
@@ -316,38 +318,38 @@
             animation: finalPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             position: relative;
             z-index: 20;
-            border: 5px solid transparent;
+            border: 6px solid transparent;
             transition: all 0.2s ease;
         }
         
-        /* Редкости для карточки выигрыша - рамка 5px */
+        /* Редкости для карточки выигрыша - рамка 6px */
         .final-item.rarity-common {
-            border: 5px solid #dee3f2;
+            border: 6px solid #dee3f2;
             background: linear-gradient(135deg, rgba(222,227,242,0.05), rgba(222,227,242,0.02));
         }
         
         .final-item.rarity-rare {
-            border: 5px solid #184cff;
+            border: 6px solid #184cff;
             background: linear-gradient(135deg, rgba(24,76,255,0.08), rgba(24,76,255,0.02));
         }
         
         .final-item.rarity-superRare {
-            border: 5px solid #8e18ff;
+            border: 6px solid #8e18ff;
             background: linear-gradient(135deg, rgba(142,24,255,0.08), rgba(142,24,255,0.02));
         }
         
         .final-item.rarity-epic {
-            border: 5px solid #ff18ab;
+            border: 6px solid #ff18ab;
             background: linear-gradient(135deg, rgba(255,24,171,0.08), rgba(255,24,171,0.02));
         }
         
         .final-item.rarity-mythic {
-            border: 5px solid #ff1414;
+            border: 6px solid #ff1414;
             background: linear-gradient(135deg, rgba(255,20,20,0.08), rgba(255,20,20,0.02));
         }
         
         .final-item.rarity-legendary {
-            border: 5px solid #ffc800;
+            border: 6px solid #ffc800;
             background: linear-gradient(135deg, rgba(255,200,0,0.08), rgba(255,200,0,0.02));
             box-shadow: inset 0 0 15px rgba(255,200,0,0.1);
         }
@@ -358,6 +360,7 @@
             max-height: 140px;
             object-fit: contain;
             margin-bottom: 8px;
+            margin-top: 8px;
         }
         
         .slot-item .name {
@@ -458,21 +461,23 @@
             text-align: center;
         }
 
+        /* Идеальная горизонтальная симметрия для инвентаря и коллекции */
         .items-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-            gap: 20px;
+            gap: 24px;
             margin-top: 20px;
             max-height: 500px;
             overflow-y: auto;
-            padding: 8px;
+            padding: 0;
+            justify-items: center;
+            align-items: start;
         }
         
         .item-card {
-            background: #141a2c;
-            border-radius: 24px;
             cursor: pointer;
             transition: 0.1s;
+            justify-self: center;
         }
         
         .item-card:hover {
@@ -486,6 +491,7 @@
             max-height: 140px;
             object-fit: contain;
             margin-bottom: 8px;
+            margin-top: 8px;
         }
         
         .item-name {
