@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Симулятор кейсов | ФИНАЛЬНАЯ ВЕРСИЯ</title>
+    <title>Симулятор кейсов | ЧИСТАЯ ВЕРСИЯ</title>
     <style>
         * {
             box-sizing: border-box;
@@ -131,6 +131,12 @@
             justify-content: center;
             position: relative;
             overflow: hidden;
+            transition: box-shadow 0.3s ease, border 0.3s ease;
+        }
+        
+        .slot-window.glow {
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.3), inset 0 0 10px rgba(0, 255, 102, 0.1);
+            border: 1px solid rgba(0, 255, 102, 0.3);
         }
         
         /* Верхняя зелёная стрелка (указывает вниз) */
@@ -146,7 +152,6 @@
             border-top: 48px solid #00ff66;
             filter: drop-shadow(0 0 10px rgba(0, 255, 102, 0.8));
             z-index: 40;
-            transition: animation 0.3s ease;
         }
         
         .arrow-top.animate {
@@ -166,7 +171,6 @@
             border-bottom: 48px solid #00ff66;
             filter: drop-shadow(0 0 10px rgba(0, 255, 102, 0.8));
             z-index: 40;
-            transition: animation 0.3s ease;
         }
         
         .arrow-bottom.animate {
@@ -183,21 +187,6 @@
             0% { opacity: 0.8; transform: translateX(-50%) translateY(0px); }
             50% { opacity: 1; transform: translateX(-50%) translateY(-5px); }
             100% { opacity: 0.8; transform: translateX(-50%) translateY(0px); }
-        }
-        
-        .center-highlight {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 245px;
-            height: 245px;
-            border: 3px solid #00ff66;
-            border-radius: 28px;
-            box-shadow: 0 0 30px rgba(0, 255, 102, 0.5);
-            pointer-events: none;
-            z-index: 18;
-            background: rgba(0, 255, 102, 0.05);
         }
         
         .center-indicator {
@@ -233,7 +222,7 @@
             padding: 10px;
             width: 210px;
             min-width: 210px;
-            border: 2px solid rgba(255,215,0,0.3);
+            border: none;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
         
@@ -517,10 +506,9 @@
 
     <div id="caseTab" class="tab-content active">
         <div class="slot-machine">
-            <div class="slot-window" id="slotWindow">
+            <div class="slot-window glow" id="slotWindow">
                 <div class="arrow-top animate" id="arrowTop"></div>
                 <div class="arrow-bottom animate" id="arrowBottom"></div>
-                <div class="center-highlight"></div>
                 <div class="center-indicator"></div>
                 <div style="text-align: center; color: #aaa; z-index: 1;">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
             </div>
@@ -616,34 +604,27 @@
     // ВИЗУАЛЬНЫЕ ШАНСЫ ДЛЯ ЛЕНТЫ ПРОКРУТКИ (обновлённые)
     function getRandomItemByRarity() {
         const rand = Math.random() * 100;
-        // Визуальные шансы для крутки
         if (rand < 79.6) {
-            // Обычный - 79.6%
             const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'common');
             if (itemsOfThisRarity.length === 0) return ITEMS[0];
             return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
         } else if (rand < 94.6) {
-            // Редкий - 15.0% (79.6+15=94.6)
             const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'rare');
             if (itemsOfThisRarity.length === 0) return ITEMS[0];
             return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
         } else if (rand < 97.6) {
-            // Сверхредкий - 3.0% (94.6+3=97.6)
             const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'superRare');
             if (itemsOfThisRarity.length === 0) return ITEMS[0];
             return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
         } else if (rand < 99.4) {
-            // Эпический - 1.8% (97.6+1.8=99.4)
             const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'epic');
             if (itemsOfThisRarity.length === 0) return ITEMS[0];
             return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
         } else if (rand < 99.7) {
-            // Мифический - 0.3% (99.4+0.3=99.7)
             const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'mythic');
             if (itemsOfThisRarity.length === 0) return ITEMS[0];
             return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
         } else {
-            // Легендарный - 0.3% (99.7-100)
             const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'legendary');
             if (itemsOfThisRarity.length === 0) return ITEMS[0];
             return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
@@ -673,7 +654,6 @@
     let isResultScreen = false;
 
     function loadData() {
-        // Загрузка инвентаря (новый ключ v3)
         let savedInventory = localStorage.getItem("case_sim_inventory_v3");
         if (savedInventory) {
             try {
@@ -681,16 +661,12 @@
                 if (Array.isArray(parsed) && parsed.every(record => record && typeof record === 'object' && 'id' in record && 'date' in record)) {
                     inventory = parsed;
                 } else {
-                    // Неверный формат - очищаем
-                    console.warn("Неверный формат инвентаря, очищаем...");
                     inventory = [];
                 }
             } catch (e) {
-                console.warn("Ошибка парсинга инвентаря, очищаем...", e);
                 inventory = [];
             }
         } else {
-            // Проверяем старые версии для безопасной миграции
             let oldInventoryV2 = localStorage.getItem("case_sim_inventory_v2");
             let oldInventoryV1 = localStorage.getItem("inventory_final_balanced");
             
@@ -698,13 +674,11 @@
                 try {
                     const oldParsed = JSON.parse(oldInventoryV2);
                     if (Array.isArray(oldParsed) && oldParsed.every(record => record && typeof record === 'object' && 'id' in record)) {
-                        // Миграция с v2 на v3 (обновляем формат даты)
                         const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
                         inventory = oldParsed.map(record => ({
                             id: record.id,
                             date: `Дата получения: ${formatter.format(new Date(record.date || new Date()))}`
                         }));
-                        console.log("Миграция с v2 на v3 выполнена успешно");
                     } else {
                         inventory = [];
                     }
@@ -715,13 +689,11 @@
                 try {
                     const oldParsed = JSON.parse(oldInventoryV1);
                     if (Array.isArray(oldParsed) && oldParsed.every(id => typeof id === 'number')) {
-                        // Миграция со старой версии (простой массив чисел)
                         const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
                         inventory = oldParsed.map(id => ({
                             id: id,
                             date: `Дата получения: ${formatter.format(new Date())}`
                         }));
-                        console.log("Миграция со старой версии выполнена успешно");
                     } else {
                         inventory = [];
                     }
@@ -733,7 +705,6 @@
             }
         }
         
-        // Загрузка статистики (новый ключ v3)
         let savedStats = localStorage.getItem("case_sim_stats_v3");
         if (savedStats) {
             try {
@@ -743,14 +714,12 @@
                     'superRare' in parsedStats && 'epic' in parsedStats && 'mythic' in parsedStats && 'legendary' in parsedStats) {
                     stats = parsedStats;
                 } else {
-                    // Неверный формат - сбрасываем статистику
                     stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
                 }
             } catch (e) {
                 stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
             }
         } else {
-            // Проверяем старую статистику
             let oldStatsV2 = localStorage.getItem("case_sim_stats_v2");
             let oldStatsV1 = localStorage.getItem("stats_final_balanced");
             
@@ -759,7 +728,6 @@
                     const oldParsedStats = JSON.parse(oldStatsV2);
                     if (oldParsedStats && typeof oldParsedStats === 'object') {
                         stats = oldParsedStats;
-                        console.log("Миграция статистики с v2 на v3 выполнена успешно");
                     } else {
                         stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
                     }
@@ -771,7 +739,6 @@
                     const oldParsedStats = JSON.parse(oldStatsV1);
                     if (oldParsedStats && typeof oldParsedStats === 'object') {
                         stats = oldParsedStats;
-                        console.log("Миграция старой статистики выполнена успешно");
                     } else {
                         stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
                     }
@@ -932,6 +899,16 @@
         if (arrowBottom) arrowBottom.style.display = 'block';
     }
     
+    function enableGlow() {
+        const slotWindow = document.getElementById('slotWindow');
+        if (slotWindow) slotWindow.classList.add('glow');
+    }
+    
+    function disableGlow() {
+        const slotWindow = document.getElementById('slotWindow');
+        if (slotWindow) slotWindow.classList.remove('glow');
+    }
+    
     function resetToInitialState() {
         const win = document.getElementById("slotWindow");
         const btn = document.getElementById("openCaseBtn");
@@ -940,7 +917,6 @@
         win.innerHTML = `
             <div class="arrow-top animate" id="arrowTop"></div>
             <div class="arrow-bottom animate" id="arrowBottom"></div>
-            <div class="center-highlight"></div>
             <div class="center-indicator"></div>
             <div style="text-align: center; color: #aaa; z-index: 1;">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
         `;
@@ -954,6 +930,7 @@
         removeGlow();
         
         startArrowsAnimation();
+        enableGlow();
     }
 
     function showResult(item, isNew) {
@@ -964,9 +941,9 @@
         let color = rarity.color;
         
         hideArrows();
+        disableGlow();
         
         win.innerHTML = `
-            <div class="center-highlight"></div>
             <div class="center-indicator"></div>
             <div class="final-container">
                 <div class="final-item ${rarityClass}">
@@ -998,7 +975,6 @@
         isResultScreen = true;
     }
 
-    // МАТЕМАТИЧЕСКИ ТОЧНАЯ АНИМАЦИЯ
     async function startSpin(finalItem) {
         let win = document.getElementById("slotWindow");
         const SLOTS_COUNT = 7;
@@ -1040,7 +1016,7 @@
                 `;
             }
             html += `</div>`;
-            win.innerHTML = `<div class="arrow-top" id="arrowTop"></div><div class="arrow-bottom" id="arrowBottom"></div><div class="center-highlight"></div><div class="center-indicator"></div>${html}`;
+            win.innerHTML = `<div class="arrow-top" id="arrowTop"></div><div class="arrow-bottom" id="arrowBottom"></div><div class="center-indicator"></div>${html}`;
         }
         
         renderSlots();
@@ -1103,6 +1079,7 @@
         btn.disabled = true;
         removeGlow();
         stopArrowsAnimation();
+        disableGlow();
         
         let won = getRandomItem();
         let isNew = !hasItem(won.id);
