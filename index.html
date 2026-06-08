@@ -309,7 +309,7 @@
             box-shadow: inset 0 0 15px rgba(255,200,0,0.1);
         }
         
-        /* Базовые стили для карточки выигрыша - рамка 5px (НЕ ТРОГАЕМ) */
+        /* Базовые стили для карточки выигрыша - рамка 5px, более низкий слой */
         .final-item {
             border-radius: 32px;
             padding: 32px 40px;
@@ -317,7 +317,7 @@
             box-shadow: 0 0 30px rgba(0,0,0,0.5);
             animation: finalPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             position: relative;
-            z-index: 20;
+            z-index: 10;
             border: 5px solid transparent;
             transition: all 0.2s ease;
         }
@@ -428,13 +428,14 @@
             background: rgba(0,0,0,0.6);
         }
         
-        /* Премиальный стиль надписи редкости */
+        /* Премиальный стиль надписи редкости - самый высокий слой */
         .new-rarity-title {
             position: absolute;
-            top: -35px;
+            top: 15px;
             right: -100px;
             transform: rotate(12deg);
-            z-index: 9999;
+            z-index: 99999 !important;
+            pointer-events: none;
             white-space: nowrap;
             font-size: 2rem;
             font-weight: 900;
