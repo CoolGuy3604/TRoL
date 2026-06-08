@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Симулятор кейсов | ФИНАЛЬНЫЙ ДИЗАЙН</title>
+    <title>Симулятор кейсов | ЭЛИТНЫЙ ДИЗАЙН</title>
     <style>
         * {
             box-sizing: border-box;
@@ -428,40 +428,40 @@
             background: rgba(0,0,0,0.6);
         }
         
-        /* Стили для взрывающейся надписи редкости при выпадении нового предмета */
+        /* Стили для элитной надписи редкости - внутри карточки */
         .new-rarity-title {
             position: absolute;
-            top: 65px;
-            right: 110px;
-            z-index: 9999;
-            font-size: 3rem;
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-8deg);
+            z-index: 1000;
+            font-size: 2.2rem;
             font-weight: 900;
             font-family: 'Segoe UI', 'Arial Black', sans-serif;
             letter-spacing: 4px;
             text-transform: uppercase;
             white-space: nowrap;
-            transform: rotate(-12deg);
             
             /* Эффект блеска через градиент с использованием CSS-переменной */
-            background: linear-gradient(90deg, var(--rarity-color) 0%, var(--rarity-color) 35%, #ffffff 50%, var(--rarity-color) 65%, var(--rarity-color) 100%);
+            background: linear-gradient(90deg, var(--rarity-color) 0%, var(--rarity-color) 47%, #ffffff 50%, var(--rarity-color) 53%, var(--rarity-color) 100%);
             background-size: 200% 100%;
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            filter: drop-shadow(0 0 8px var(--rarity-color));
+            filter: drop-shadow(0 0 12px var(--rarity-color));
             
-            /* Бесконечная анимация плавной пульсации */
-            animation: textPulse 2s ease-in-out infinite, shimmer 3s linear infinite;
+            /* Благородное парение и редкий блеск */
+            animation: textFloat 3s ease-in-out infinite, shimmer 4s linear infinite;
         }
         
-        /* Анимация благородного дыхания (пульсации) */
-        @keyframes textPulse {
-            0% { transform: rotate(-12deg) scale(1); }
-            50% { transform: rotate(-12deg) scale(1.06); }
-            100% { transform: rotate(-12deg) scale(1); }
+        /* Анимация плавного парения вверх-вниз */
+        @keyframes textFloat {
+            0% { transform: translateX(-50%) rotate(-8deg) translateY(0px); }
+            50% { transform: translateX(-50%) rotate(-8deg) translateY(-6px); }
+            100% { transform: translateX(-50%) rotate(-8deg) translateY(0px); }
         }
         
-        /* Анимация бегущего блика слева направо */
+        /* Анимация редкого мощного зеркального блика */
         @keyframes shimmer {
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
@@ -1088,26 +1088,20 @@
         hideArrows();
         hideCenterHighlight();
         
-        // Создаем контент окна
+        let rarityName = getRarityName(item.rarityKey).toUpperCase();
+        
+        // Создаем контент окна с надписью внутри карточки для новых предметов
         let content = `
             <div class="center-indicator"></div>
             <div class="final-container">
                 <div class="final-item ${rarityClass}">
+                    ${isNew ? `<div class="new-rarity-title" style="--rarity-color: ${color};">${rarityName}!</div>` : ''}
                     <img src="${item.img}" class="final-img" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
                     <div class="name">${escapeHtml(item.name)}</div>
                     <div class="rarity-badge ${textClass}">${rarity.name}</div>
                 </div>
             </div>
         `;
-        
-        // Если предмет новый - добавляем взрывающуюся надпись с названием редкости
-        if (isNew) {
-            const rarityName = getRarityName(item.rarityKey).toUpperCase();
-            content = `
-                <div class="new-rarity-title" style="--rarity-color: ${color};">${rarityName}!</div>
-                ${content}
-            `;
-        }
         
         win.innerHTML = content;
         
