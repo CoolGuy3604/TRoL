@@ -442,82 +442,46 @@
             letter-spacing: 4px;
             text-transform: uppercase;
             
-            /* Строгий черный контур */
+            /* Стабильная белая основа и черный контур — текст больше не пропадает */
+            color: #ffffff !important;
             -webkit-text-stroke: 1px #000000;
             
-            /* Белая основа букв со сквозным эффектом для насыщенного блика */
-            color: transparent !important;
-            -webkit-background-clip: text !important;
-            background-clip: text !important;
-            
-            /* Насыщенный градиент: чистый белый текст и супер-яркий блик цвета редкости в центре */
-            background: linear-gradient(90deg, 
-                #ffffff 0%, 
-                #ffffff 40%, 
-                var(--rarity-color) 48%, 
-                var(--rarity-color) 52%, 
-                #ffffff 60%, 
-                #ffffff 100%
-            );
-            background-size: 500% 100%;
-            
-            /* Дополнительное неоновое усиление цвета, чтобы блик был ядовито-ярким */
-            filter: drop-shadow(0 0 12px var(--rarity-color));
-            
-            /* Запуск: сначала вылет (titleSpawn), затем бесконечный блик раз в 5 секунд (quickShimmer) и общая мягкая пульсация свечения (neonGlow) */
-            animation: titleSpawn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
-                       quickShimmer 5s linear infinite 0.4s,
-                       neonGlow 4s ease-in-out infinite 0.4s;
+            /* Запускаем одну чистую анимацию на 5 секунд по кругу */
+            transform-origin: center;
+            animation: perfectTitleAnim 5s ease-in-out infinite;
         }
         
-        /* Экстремальный вылет из огромного размера (масштаб увеличен до 12) */
-        @keyframes titleSpawn {
+        /* Единый стабильный цикл на 5 секунд */
+        @keyframes perfectTitleAnim {
+            /* 0% - 8% (первые 0.4 сек): Эпичный вылет из гигантского размера */
             0% {
                 transform: rotate(12deg) scale(12);
                 opacity: 0;
+                filter: drop-shadow(0 0 0 transparent);
             }
-            100% {
+            8% {
                 transform: rotate(12deg) scale(1);
                 opacity: 1;
+                filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
             }
-        }
-        
-        /* Цикл строго 5 секунд: 4.6 секунды тишины + молниеносный сочный пролет блика за 0.4 секунды */
-        @keyframes quickShimmer {
-            0% {
-                background-position: 250% 0;
-            }
+            
+            /* 8% - 92% (следующие 4.2 сек): Текст просто красиво и стабильно горит, никакого мерцания */
             92% {
-                /* Удержание паузы (92% от 5 секунд — это ровно 4.6 сек) */
-                background-position: 250% 0;
+                transform: rotate(12deg) scale(1);
+                opacity: 1;
+                filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
             }
+            
+            /* 92% - 96% (0.2 сек): Вспышка сочного неонового блика цвета редкости */
+            96% {
+                transform: rotate(12deg) scale(1.03); /* Легкое премиальное покачивание во время блика */
+                filter: drop-shadow(0 0 20px var(--rarity-color)) drop-shadow(0 0 30px var(--rarity-color));
+            }
+            
+            /* 96% - 100% (последние 0.2 сек): Возврат в исходное состояние перед повтором */
             100% {
-                /* Быстрое смещение за оставшиеся 0.4 секунды */
-                background-position: -250% 0;
-            }
-        }
-        
-        /* Анимация сверх-яркого неонового свечения */
-        @keyframes neonGlow {
-            0% {
-                filter: drop-shadow(0 0 2px var(--rarity-color));
-                opacity: 0.9;
-            }
-            25% {
-                filter: drop-shadow(0 0 18px var(--rarity-color));
-                opacity: 1;
-            }
-            50% {
-                filter: drop-shadow(0 0 25px var(--rarity-color));
-                opacity: 1;
-            }
-            75% {
-                filter: drop-shadow(0 0 10px var(--rarity-color));
-                opacity: 1;
-            }
-            100% {
-                filter: drop-shadow(0 0 2px var(--rarity-color));
-                opacity: 0.9;
+                transform: rotate(12deg) scale(1);
+                filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
             }
         }
         
