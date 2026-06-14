@@ -433,7 +433,6 @@
             position: absolute;
             top: 13px;
             right: -95px;
-            transform: rotate(12deg);
             z-index: 99999 !important;
             pointer-events: none;
             white-space: nowrap;
@@ -443,26 +442,58 @@
             letter-spacing: 4px;
             text-transform: uppercase;
             
-            /* Черный контур букв */
+            /* Строгий черный контур */
             -webkit-text-stroke: 1px #000000;
             
-            /* Чистый стабильный белый цвет вместо проблемных бликов */
-            color: #ffffff !important;
+            /* Белая основа букв со сквозным эффектом для насыщенного блика */
+            color: transparent !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
             
-            /* Запуск анимации: резкий выезд (0.4с) и затем бесконечная неоновая пульсация (4с) */
-            animation: titleSpawn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, 
+            /* Насыщенный градиент: чистый белый текст и супер-яркий блик цвета редкости в центре */
+            background: linear-gradient(90deg, 
+                #ffffff 0%, 
+                #ffffff 40%, 
+                var(--rarity-color) 48%, 
+                var(--rarity-color) 52%, 
+                #ffffff 60%, 
+                #ffffff 100%
+            );
+            background-size: 500% 100%;
+            
+            /* Дополнительное неоновое усиление цвета, чтобы блик был ядовито-ярким */
+            filter: drop-shadow(0 0 12px var(--rarity-color));
+            
+            /* Запуск: сначала вылет (titleSpawn), затем бесконечный блик раз в 5 секунд (quickShimmer) и общая мягкая пульсация свечения (neonGlow) */
+            animation: titleSpawn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
+                       quickShimmer 5s linear infinite 0.4s,
                        neonGlow 4s ease-in-out infinite 0.4s;
         }
         
-        /* Новая анимация: резкое уменьшение из огромного размера до текущего */
+        /* Экстремальный вылет из огромного размера (масштаб увеличен до 12) */
         @keyframes titleSpawn {
             0% {
-                transform: rotate(12deg) scale(5);
+                transform: rotate(12deg) scale(12);
                 opacity: 0;
             }
             100% {
                 transform: rotate(12deg) scale(1);
                 opacity: 1;
+            }
+        }
+        
+        /* Цикл строго 5 секунд: 4.6 секунды тишины + молниеносный сочный пролет блика за 0.4 секунды */
+        @keyframes quickShimmer {
+            0% {
+                background-position: 250% 0;
+            }
+            92% {
+                /* Удержание паузы (92% от 5 секунд — это ровно 4.6 сек) */
+                background-position: 250% 0;
+            }
+            100% {
+                /* Быстрое смещение за оставшиеся 0.4 секунды */
+                background-position: -250% 0;
             }
         }
         
