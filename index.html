@@ -442,17 +442,19 @@
             letter-spacing: 4px;
             text-transform: uppercase;
             
-            /* Стабильный белый текст и четкий черный контур */
+            /* Стабильный белый текст и черный контур */
             color: #ffffff !important;
             -webkit-text-stroke: 1px #000000;
             
-            /* ФИКС: Вылет (titleSpawn) играет 1 раз на 0.4 секунды и застывает (forwards). */
-            /* Бесконечный блик (shimmerGlow) включается через 0.4 секунды после вылета и крутится по кругу (infinite). */
+            /* Фиксация точки масштабирования строго по центру слова */
+            transform-origin: center;
+            
+            /* Вылет 1 раз (0.4с) с фиксацией в конце, далее бесконечный блик раз в 5с */
             animation: titleSpawn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
                        shimmerGlow 5s ease-in-out infinite 0.4s;
         }
         
-        /* 1. АНИМАЦИЯ ВЫЛЕТА (Играет строго 1 раз и застывает) */
+        /* ИСПРАВЛЕННАЯ АНИМАЦИЯ: строго из огромного размера (scale 12) в нормальный (scale 1) */
         @keyframes titleSpawn {
             0% {
                 transform: rotate(12deg) scale(12);
