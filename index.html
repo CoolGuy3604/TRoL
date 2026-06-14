@@ -448,41 +448,46 @@
             
             transform-origin: center;
             
-            /* НАМНОГО МЕДЛЕННЕЕ: Вылет теперь длится 1.5 секунды. Блик включается через 1.5 секунды. */
-            animation: titleSpawn 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards,
-                       shimmerGlow 5s ease-in-out infinite 1.5s;
+            /* Появление из вращения (2 секунды). Блик включается через 2 секунды. */
+            animation: titleSpawn 2s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+                       shimmerGlow 5s ease-in-out infinite 2s;
         }
         
-        /* 1. ИСПРАВЛЕННЫЙ МЕДЛЕННЫЙ ВЫЛЕТ: Строго из гигантского (scale 12) в нормальный (scale 1) */
+        /* 1. ПОЯВЛЕНИЕ ИЗ ВРАЩЕНИЯ (Длится 2 секунды, без изменения размера) */
         @keyframes titleSpawn {
             0% {
-                transform: rotate(12deg) scale(12);
+                transform: rotate(1080deg);
                 opacity: 0;
                 filter: drop-shadow(0 0 0 transparent);
             }
             100% {
-                transform: rotate(12deg) scale(1);
+                transform: rotate(12deg);
                 opacity: 1;
                 filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
             }
         }
         
-        /* 2. БЕСКОНЕЧНЫЙ БЛИК С РАСТВОРЕНИЕМ В СТОРОНЫ */
+        /* 2. БЕСКОНЕЧНЫЙ БЛИК С РАСТВОРЕНИЕМ И ВЫБРОСОМ СВЕТА НАРУЖУ */
         @keyframes shimmerGlow {
-            /* 0% - 92%: Текст статичен, ждем 4.6 секунды */
-            0%, 92% {
-                transform: rotate(12deg) scale(1);
+            /* 0% - 90%: Текст статичен, ждем паузу */
+            0%, 90% {
+                transform: rotate(12deg);
                 filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
             }
-            /* 94% - 96%: Взрыв яркого неона и легкое премиальное расширение */
-            96% {
-                transform: rotate(12deg) scale(1.04);
-                filter: drop-shadow(0 0 20px var(--rarity-color)) drop-shadow(0 0 35px var(--rarity-color));
+            /* 95%: Взрыв сочного неона, свет концентрируется на буквах */
+            95% {
+                transform: rotate(12deg) scale(1.02);
+                filter: drop-shadow(0 0 15px var(--rarity-color)) drop-shadow(0 0 25px var(--rarity-color));
             }
-            /* 96% - 100%: ЭФФЕКТ РАСТВОРЕНИЯ — неон расширяется вширь до 60px и полностью исчезает (rgba с альфа-ноль) */
+            /* 99%: ЭФФЕКТ РАСТВОРЕНИЯ — свет резко выталкивается наружу на 120px и растворяется в воздухе */
+            99% {
+                transform: rotate(12deg) scale(1.04);
+                filter: drop-shadow(0 0 120px rgba(0,0,0,0)) drop-shadow(0 0 5px rgba(0,0,0,0.5));
+            }
+            /* 100%: Мгновенный сброс в исходную точку без обратной анимации сжатия */
             100% {
                 transform: rotate(12deg) scale(1);
-                filter: drop-shadow(0 0 60px rgba(0,0,0,0)) drop-shadow(0 0 5px rgba(0,0,0,0.5));
+                filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
             }
         }
         
