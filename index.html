@@ -442,43 +442,43 @@
             letter-spacing: 4px;
             text-transform: uppercase;
             
-            /* Стабильная белая основа и черный контур — текст больше не пропадает */
+            /* Стабильный белый текст и четкий черный контур */
             color: #ffffff !important;
             -webkit-text-stroke: 1px #000000;
             
-            /* Запускаем одну чистую анимацию на 5 секунд по кругу */
-            transform-origin: center;
-            animation: perfectTitleAnim 5s ease-in-out infinite;
+            /* ФИКС: Вылет (titleSpawn) играет 1 раз на 0.4 секунды и застывает (forwards). */
+            /* Бесконечный блик (shimmerGlow) включается через 0.4 секунды после вылета и крутится по кругу (infinite). */
+            animation: titleSpawn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
+                       shimmerGlow 5s ease-in-out infinite 0.4s;
         }
         
-        /* Единый стабильный цикл на 5 секунд */
-        @keyframes perfectTitleAnim {
-            /* 0% - 8% (первые 0.4 сек): Эпичный вылет из гигантского размера */
+        /* 1. АНИМАЦИЯ ВЫЛЕТА (Играет строго 1 раз и застывает) */
+        @keyframes titleSpawn {
             0% {
                 transform: rotate(12deg) scale(12);
                 opacity: 0;
                 filter: drop-shadow(0 0 0 transparent);
             }
-            8% {
+            100% {
                 transform: rotate(12deg) scale(1);
                 opacity: 1;
                 filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
             }
-            
-            /* 8% - 92% (следующие 4.2 сек): Текст просто красиво и стабильно горит, никакого мерцания */
-            92% {
+        }
+        
+        /* 2. БЕСКОНЕЧНЫЙ БЛИК (Текст стоит на месте, меняется только неоновое свечение раз в 5 секунд) */
+        @keyframes shimmerGlow {
+            /* От 0% до 92% (первые 4.6 секунды цикла): Текст просто стабильно горит без мерцания */
+            0%, 92% {
                 transform: rotate(12deg) scale(1);
-                opacity: 1;
                 filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
             }
-            
-            /* 92% - 96% (0.2 сек): Вспышка сочного неонового блика цвета редкости */
+            /* От 92% до 96% (0.2 секунды): Плавный взрыв сочного неонового цвета редкости */
             96% {
-                transform: rotate(12deg) scale(1.03); /* Легкое премиальное покачивание во время блика */
-                filter: drop-shadow(0 0 20px var(--rarity-color)) drop-shadow(0 0 30px var(--rarity-color));
+                transform: rotate(12deg) scale(1.03); /* Еле заметное премиальное покачивание */
+                filter: drop-shadow(0 0 20px var(--rarity-color)) drop-shadow(0 0 35px var(--rarity-color));
             }
-            
-            /* 96% - 100% (последние 0.2 сек): Возврат в исходное состояние перед повтором */
+            /* От 96% до 100% (последние 0.2 секунды): Возврат к обычному свечению перед следующей 4.6-секундной паузой */
             100% {
                 transform: rotate(12deg) scale(1);
                 filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
