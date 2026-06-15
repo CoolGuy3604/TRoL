@@ -1328,10 +1328,8 @@
     }
 
     function updateUI() {
-        // Строгий порядок редкостей от самой не редкой до самой редкой
         const rarityOrder = ['common', 'rare', 'superRare', 'epic', 'mythic', 'legendary'];
         
-        // Локальный словарь для названий столбцов во множественном числе (СТРОГО ДЛЯ ИНВЕНТАРЯ И КОЛЛЕКЦИИ)
         const pluralRarityNames = {
             common: "Обычные",
             rare: "Редкие",
@@ -1349,14 +1347,21 @@
             invDiv.innerHTML = '<div style="text-align:center;padding:40px;width:100%;">🧸 Инвентарь пуст...</div>';
         } else {
             let invHtml = "";
+            let isFirstInv = true; // Флаг для пропуска линии у самого первого заголовка
+            
             rarityOrder.forEach(key => {
                 let itemsInRarity = collected.filter(i => i.rarityKey === key);
                 if (itemsInRarity.length > 0) {
-                    // Используем множественное число из словаря
-                    let rarityNamePlural = pluralRarityNames[key];
+                    let rarityName = pluralRarityNames[key];
+                    
+                    // Если группа не первая по счету в инвентаре, добавляем белую разделяющую полосу
+                    let hrLine = !isFirstInv ? `<hr style="border: none; height: 1px; background: rgba(255,255,255,0.15); margin: 40px 10px 20px 10px; width: 100%;">` : '';
+                    isFirstInv = false; // Все последующие группы получат линию
+                    
                     invHtml += `
-                        <div style="width:100%; margin-top:30px; margin-bottom:10px;">
-                            <h3 style="font-size:1.5rem; margin:0; padding-left:10px; color:${getRarityByKey(key).color}; text-shadow: 0 0 10px ${hexToRgba(getRarityByKey(key).color, 0.3)};">${rarityNamePlural}</h3>
+                        ${hrLine}
+                        <div style="width:100%; margin-top:10px; margin-bottom:10px;">
+                            <h3 style="font-size:1.5rem; margin:0; padding-left:10px; color:${getRarityByKey(key).color}; text-shadow: 0 0 10px ${hexToRgba(getRarityByKey(key).color, 0.3)};">${rarityName}</h3>
                         </div>
                         <div class="items-grid" style="width:100%;">
                     `;
@@ -1376,7 +1381,7 @@
             invDiv.innerHTML = invHtml;
         }
         
-        // 2. ОБНОВЛЕНИЕ ВКЛАДКИ КОЛЛЕКЦИИ (ОТОБРАЖАЮТСЯ ТОЛЬКО ОТСУТСТВУЮЩИЕ ПРЕДМЕТЫ)
+        // 2. ОБНОВЛЕНИЕ ВКЛАДКИ КОЛЛЕКЦИИ
         let collDiv = document.getElementById("collectionContainer");
         let missing = getMissing();
         
@@ -1384,15 +1389,22 @@
             collDiv.innerHTML = `<div class="celebration"><h1>🏆 ВСЕ СОБРАНО! 🏆</h1><button class="small-reset" id="resetC">Начать заново</button></div>`;
         } else {
             let collHtml = "";
+            let isFirstColl = true; // Флаг для пропуска линии у самого первого заголовка в коллекции
+            
             rarityOrder.forEach(key => {
                 let missingInRarity = missing.filter(i => i.rarityKey === key);
                 
                 if (missingInRarity.length > 0) {
-                    // Используем множественное число из словаря
-                    let rarityNamePlural = pluralRarityNames[key];
+                    let rarityName = pluralRarityNames[key];
+                    
+                    // Если группа не первая по счету в оставшейся коллекции, добавляем белую разделяющую полосу
+                    let hrLine = !isFirstColl ? `<hr style="border: none; height: 1px; background: rgba(255,255,255,0.15); margin: 40px 10px 20px 10px; width: 100%;">` : '';
+                    isFirstColl = false; // Все последующие оставшиеся группы получат линию
+                    
                     collHtml += `
-                        <div style="width:100%; margin-top:30px; margin-bottom:10px;">
-                            <h3 style="font-size:1.5rem; margin:0; padding-left:10px; color:${getRarityByKey(key).color}; text-shadow: 0 0 10px ${hexToRgba(getRarityByKey(key).color, 0.3)};">${rarityNamePlural}</h3>
+                        ${hrLine}
+                        <div style="width:100%; margin-top:10px; margin-bottom:10px;">
+                            <h3 style="font-size:1.5rem; margin:0; padding-left:10px; color:${getRarityByKey(key).color}; text-shadow: 0 0 10px ${hexToRgba(getRarityByKey(key).color, 0.3)};">${rarityName}</h3>
                         </div>
                         <div class="items-grid" style="width:100%;">
                     `;
