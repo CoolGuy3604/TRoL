@@ -645,7 +645,7 @@
             border-radius: 20px;
         }
 
-        /* Контейнер без изменений, удерживает правое окно далеко сбоку */
+        /* Главный контейнер без изменений */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -658,12 +658,12 @@
             padding: 20px;
         }
         
-        /* ТВОЯ ОРИГИНАЛЬНАЯ КАРТОЧКА — ПОЛНОСТЬЮ ВОССТАНОВЛЕНА К ПЕРВОЗДАННОМУ ВИДУ */
+        /* ТВОЯ ОРИГИНАЛЬНАЯ КАРТОЧКА — ШИРИНА УВЕЛИЧЕНА ДО 620px ДЛЯ СОХРАНЕНИЯ ПРОПОРЦИЙ */
         .modal-card {
             background: #0d1326;
             border-radius: 36px;
-            padding: 40px; /* Вернули прежние выверенные отступы */
-            max-width: 480px;
+            padding: 40px; /* Исходные выверенные отступы сохранены */
+            max-width: 620px; /* Увеличено под новый размер картинки */
             width: 100%;
             text-align: center;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6);
@@ -679,14 +679,14 @@
             align-items: center;
         }
 
-        /* КАРТИНКА ПРЕДМЕТА — ВОССТАНОВЛЕНА К ИЗНАЧАЛЬНЫМ ПРАВИЛЬНЫМ МАСШТАБАМ */
+        /* КАРТИНКА ПРЕДМЕТА — СТРОГО НА 40% БОЛЬШЕ ОТ ИСХОДНОЙ (106.54%) */
         .modal-main-content img {
-            width: 76.1%; /* Тот самый идеальный выверенный размер */
+            width: 106.54%; /* Увеличено ровно на 40% */
             max-width: 100%;
             height: auto;
             object-fit: contain;
             margin-bottom: 20px;
-            transform: none; /* Убраны все scale, ломавшие пропорции */
+            transform: none;
         }
 
         .modal-desc {
@@ -697,7 +697,7 @@
             word-break: break-word;
         }
 
-        /* ПАНЕЛЬ СТАТИСТИКИ ОСТАЕТСЯ ДАЛЕКО СПРАВА */
+        /* ПАНЕЛЬ СТАТИСТИКИ ОСТАЕТСЯ ДАЛЕКО СПРАВА С УЧЕТОМ НОВОЙ ШИРИНЫ КАРТОЧКИ */
         .modal-side-panel {
             background: #0d1326;
             border-radius: 28px;
@@ -713,12 +713,12 @@
             animation: finalPop 0.3s ease-out;
             
             position: absolute;
-            left: calc(50% + 240px + 80px); /* Удерживает панель далеко в углу */
+            left: calc(50% + 310px + 80px); /* Идеальное смещение с сохранением зазора 80px */
         }
         
-        @media (max-width: 1100px) {
+        @media (max-width: 1200px) {
             .modal-overlay { display: none; flex-direction: column; gap: 16px; justify-content: flex-start; overflow-y: auto; }
-            .modal-side-panel { position: static; max-width: 480px; margin-top: 10px; }
+            .modal-side-panel { position: static; max-width: 620px; margin-top: 10px; }
         }
         
         .modal-side-row {
