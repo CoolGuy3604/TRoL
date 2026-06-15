@@ -672,18 +672,19 @@
             position: relative;
         }
         
+        /* ТОЧНАЯ КАЛИБРОВКА СИММЕТРИИ ОТСТУПОВ (Имя и Редкость отдалены друг от друга) */
         #modalName {
             font-size: 1.8rem;
             font-weight: bold;
-            margin-top: 15px !important;
-            margin-bottom: 0 !important;
+            margin-top: 15px !important;    /* Строгий зазор от картинки до имени */
+            margin-bottom: 6px !important;  /* Чуть увеличили расстояние до редкости */
             color: #fff;
         }
         #modalBadge {
             font-size: 0.85rem;
             padding: 4px 12px;
-            margin-top: 8px !important;
-            margin-bottom: 15px !important;
+            margin-top: 6px !important;     /* Чуть увеличили расстояние от имени */
+            margin-bottom: 15px !important; /* Строгий зазор от редкости до описания */
         }
         .modal-desc {
             font-size: 1rem;
@@ -726,13 +727,14 @@
             color: #00ff66;
         }
 
-        /* ПОЛНОЕ ОТКЛЮЧЕНИЕ УВЕЛИЧЕНИЯ, ПОДСВЕТКИ И КЛИКАБЕЛЬНОГО КУРСОРA В КОЛЛЕКЦИИ */
+        /* ПОЛНОЕ И ОКОНЧАТЕЛЬНОЕ УДАЛЕНИЕ ЛЮБОЙ ПОДСВЕТКИ ФОНА В КОЛЛЕКЦИИ */
         #collectionContainer .item-card {
-            cursor: default !important; /* Курсор мыши становится обычным, а не пальцем */
+            cursor: default !important;
         }
         #collectionContainer .item-card:hover {
             transform: none !important;
-            background: linear-gradient(135deg, rgba(222,227,242,0.05), rgba(222,227,242,0.02)) !important; /* Жестко возвращаем базовый фон без подсветки */
+            /* ФИКС: Принудительно наследуем исходный градиент редкости, полностью блокируя подсветку */
+            background: inherit !important; 
             box-shadow: none !important;
         }
     </style>
