@@ -658,7 +658,7 @@
     
     <div class="tabs">
         <button class="tab-btn active" data-tab="case">📦 Кейс</button>
-        <button class="tab-btn" data-tab="inventory">🎒 Инвентарь</button>
+        <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot" style="display: none; position: absolute; top: 2px; right: 6px; width: 12px; height: 12px; background-color: #ff1414; border-radius: 50%; box-shadow: 0 0 8px #ff1414;"></span></button>
         <button class="tab-btn" data-tab="collection">🏆 Коллекция</button>
     </div>
 
@@ -1284,6 +1284,12 @@
         showResult(won, isNew);
         addItem(won);
         
+        // Если предмет новый — зажигаем красную точку уведомления на кнопке инвентаря
+        if (isNew) {
+            const dot = document.getElementById("invDot");
+            if (dot) dot.style.display = "inline-block";
+        }
+        
         stats.total++;
         if (won.rarityKey === 'common') stats.common++;
         else if (won.rarityKey === 'rare') stats.rare++;
@@ -1369,6 +1375,13 @@
                 document.getElementById("inventoryTab").classList.remove("active");
                 document.getElementById("collectionTab").classList.remove("active");
                 document.getElementById(id + "Tab").classList.add("active");
+                
+                // ФИКС: Если открыли вкладку инвентаря, убираем красную точку уведомления
+                if (id === "inventory") {
+                    const dot = document.getElementById("invDot");
+                    if (dot) dot.style.display = "none";
+                }
+                
                 updateUI();
             };
         });
@@ -1424,6 +1437,12 @@
         
         showResult(won, isNew);
         addItem(won);
+        
+        // Если предмет новый — зажигаем красную точку уведомления на кнопке инвентаря (для теста)
+        if (isNew) {
+            const dot = document.getElementById("invDot");
+            if (dot) dot.style.display = "inline-block";
+        }
         
         // Обновление статистики для честности теста
         stats.total++;
