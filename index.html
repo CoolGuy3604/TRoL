@@ -672,19 +672,19 @@
             position: relative;
         }
         
-        /* ТОЧНАЯ КАЛИБРОВКА СИММЕТРИИ ОТСТУПОВ (Имя и Редкость отдалены друг от друга) */
+        /* ТОЧНАЯ КАЛИБРОВКА СИММЕТРИИ ОТСТУПОВ (+10px между именем и редкостью) */
         #modalName {
             font-size: 1.8rem;
             font-weight: bold;
-            margin-top: 15px !important;    /* Строгий зазор от картинки до имени */
-            margin-bottom: 6px !important;  /* Чуть увеличили расстояние до редкости */
+            margin-top: 15px !important;     /* Жесткий верхний зазор от картинки */
+            margin-bottom: 16px !important;  /* Увеличено ровно на 10px для отдаления */
             color: #fff;
         }
         #modalBadge {
             font-size: 0.85rem;
             padding: 4px 12px;
-            margin-top: 6px !important;     /* Чуть увеличили расстояние от имени */
-            margin-bottom: 15px !important; /* Строгий зазор от редкости до описания */
+            margin-top: 0 !important;
+            margin-bottom: 15px !important;  /* Жесткий нижний зазор до описания */
         }
         .modal-desc {
             font-size: 1rem;
@@ -727,15 +727,43 @@
             color: #00ff66;
         }
 
-        /* ПОЛНОЕ И ОКОНЧАТЕЛЬНОЕ УДАЛЕНИЕ ЛЮБОЙ ПОДСВЕТКИ ФОНА В КОЛЛЕКЦИИ */
+        /* АНИМАЦИЯ ПРОСЕДАНИЯ КНОПКИ ЗАКРЫТЬ (Один в один как у кнопки Кейса) */
+        .modal-card .open-btn:hover {
+            transform: translateY(2px);
+            box-shadow: 0 6px 0 #009933;
+        }
+        .modal-card .open-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #009933;
+        }
+
+        /* ЖЕСТКОЕ И ОКОНЧАТЕЛЬНОЕ УДАЛЕНИЕ ЛЮБОЙ ПОДСВЕТКИ ФОНА В КОЛЛЕКЦИИ ПО ТИПАМ РЕДКОСТЕЙ */
         #collectionContainer .item-card {
             cursor: default !important;
         }
         #collectionContainer .item-card:hover {
             transform: none !important;
-            /* ФИКС: Принудительно наследуем исходный градиент редкости, полностью блокируя подсветку */
-            background: inherit !important; 
             box-shadow: none !important;
+        }
+        /* Перебиваем ховеры для каждой редкости в коллекции персонально */
+        #collectionContainer .item-card.rarity-common:hover {
+            background: linear-gradient(135deg, rgba(222,227,242,0.05), rgba(222,227,242,0.02)) !important;
+        }
+        #collectionContainer .item-card.rarity-rare:hover {
+            background: linear-gradient(135deg, rgba(24,76,255,0.08), rgba(24,76,255,0.02)) !important;
+        }
+        #collectionContainer .item-card.rarity-superRare:hover {
+            background: linear-gradient(135deg, rgba(142,24,255,0.08), rgba(142,24,255,0.02)) !important;
+        }
+        #collectionContainer .item-card.rarity-epic:hover {
+            background: linear-gradient(135deg, rgba(255,24,171,0.08), rgba(255,24,171,0.02)) !important;
+        }
+        #collectionContainer .item-card.rarity-mythic:hover {
+            background: linear-gradient(135deg, rgba(255,20,20,0.08), rgba(255,20,20,0.02)) !important;
+        }
+        #collectionContainer .item-card.rarity-legendary:hover {
+            background: linear-gradient(135deg, rgba(255,200,0,0.08), rgba(255,200,0,0.02)) !important;
+            box-shadow: inset 0 0 15px rgba(255,200,0,0.1) !important;
         }
     </style>
 </head>
