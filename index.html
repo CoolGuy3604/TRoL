@@ -644,6 +644,40 @@
             padding: 8px 12px;
             border-radius: 20px;
         }
+
+        /* Стиль для размытого экрана модального окна */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 7, 15, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 100000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        /* Карточка внутри модального окна */
+        .modal-card {
+            background: #0d1326;
+            border-radius: 36px;
+            padding: 40px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            animation: finalPop 0.3s ease-out;
+            border: 4px solid transparent;
+        }
+        
+        .modal-desc {
+            font-size: 1rem;
+            color: #b5bed9;
+            margin: 20px 0;
+            line-height: 1.5;
+            word-break: break-word;
+        }
     </style>
 </head>
 <body>
@@ -708,6 +742,17 @@
     <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
 </div>
 
+<!-- ОКНО ПРОСМОТРА ОПИСАНИЯ ПРЕДМЕТА -->
+<div id="descModal" class="modal-overlay" onclick="closeItemDescription()">
+    <div class="modal-card" id="modalCard" onclick="event.stopPropagation()">
+        <img id="modalImg" src="" style="width: 70%; max-height: 180px; object-fit: contain; margin-bottom: 15px;" alt="">
+        <h2 id="modalName" style="font-size: 1.8rem; font-weight: bold; margin-bottom: 8px; color: #fff;"></h2>
+        <div id="modalBadge" class="badge" style="font-size: 0.85rem; padding: 4px 12px; margin-bottom: 15px;"></div>
+        <div id="modalDesc" class="modal-desc"></div>
+        <button class="open-btn" onclick="closeItemDescription()" style="font-size: 1.2rem; padding: 10px 30px; margin: 10px 0 0 0;">❌ ЗАКРЫТЬ</button>
+    </div>
+</div>
+
 <script>
     // ==================== ЗВУКОВОЙ ДВИЖОК ====================
     const clickAudio = new Audio('click.mp3');
@@ -729,21 +774,21 @@
     };
 
     const ITEMS = [
-        { id: 0, name: "★ Нож-бабочка", img: "images/item3.png", rarityKey: "legendary" },
-        { id: 1, name: "AWP | Dragon Lore", img: "images/item3.png", rarityKey: "mythic" },
-        { id: 2, name: "AK-47 | Fire Serpent", img: "images/item3.png", rarityKey: "mythic" },
-        { id: 3, name: "M4A4 | Howl", img: "images/item3.png", rarityKey: "mythic" },
-        { id: 4, name: "Desert Eagle | Blaze", img: "images/item3.png", rarityKey: "epic" },
-        { id: 5, name: "SSG 08 | Blood in the Water", img: "images/item3.png", rarityKey: "epic" },
-        { id: 6, name: "USP-S | Kill Confirmed", img: "images/item3.png", rarityKey: "superRare" },
-        { id: 7, name: "Glock-18 | Fade", img: "images/item3.png", rarityKey: "superRare" },
-        { id: 8, name: "P250 | Splash", img: "images/item3.png", rarityKey: "rare" },
-        { id: 9, name: "MP7 | Nemesis", img: "images/item3.png", rarityKey: "rare" },
-        { id: 10, name: "Galil AR | Chatterbox", img: "images/item3.png", rarityKey: "rare" },
-        { id: 11, name: "Tec-9 | Ice Cap", img: "images/item3.png", rarityKey: "common" },
-        { id: 12, name: "MAG-7 | Hazard", img: "images/item3.png", rarityKey: "common" },
-        { id: 13, name: "Negev | Lionfish", img: "images/item3.png", rarityKey: "common" },
-        { id: 14, name: "★ Перчатки (Crimson Web)", img: "images/item3.png", rarityKey: "legendary" }
+        { id: 0, name: "★ Нож-бабочка", img: "images/item3.png", rarityKey: "legendary", description: "Редчайший нож с уникальной анимацией осмотра. Мечта любого коллекционера." },
+        { id: 1, name: "AWP | Dragon Lore", img: "images/item3.png", rarityKey: "mythic", description: "Легендарная снайперская винтовка, украшенная рисунком огнедышащего дракона." },
+        { id: 2, name: "AK-47 | Fire Serpent", img: "images/item3.png", rarityKey: "mythic", description: "Автомат с изображением огненного змея из мифологии майя." },
+        { id: 3, name: "M4A4 | Howl", img: "images/item3.png", rarityKey: "mythic", description: "Засекреченная штурмовая винтовка с изображением свирепого волка." },
+        { id: 4, name: "Desert Eagle | Blaze", img: "images/item3.png", rarityKey: "epic", description: "Мощный пистолет с языками пламени, нанесенными на хромированную поверхность." },
+        { id: 5, name: "SSG 08 | Blood in the Water", img: "images/item3.png", rarityKey: "epic", description: "Акула, преследующая свою жертву в багровых водах. Опасное оружие." },
+        { id: 6, name: "USP-S | Kill Confirmed", img: "images/item3.png", rarityKey: "superRare", description: "Бесшумный пистолет со стильным рисунком пробитого черепа." },
+        { id: 7, name: "Glock-18 | Fade", img: "images/item3.png", rarityKey: "superRare", description: "Стандартный пистолет террористов с хромированным градиентным напылением." },
+        { id: 8, name: "P250 | Splash", img: "images/item3.png", rarityKey: "rare", description: "Простой и надежный пистолет с яркими брызгами краски на корпусе." },
+        { id: 9, name: "MP7 | Nemesis", img: "images/item3.png", rarityKey: "rare", description: "Пистолет-пулемет с геометрическим футуристическим паттерном монстра." },
+        { id: 10, name: "Galil AR | Chatterbox", img: "images/item3.png", rarityKey: "rare", description: "Грубо раскрашенный автомат с имитацией клацающей пасти на затворе." },
+        { id: 11, name: "Tec-9 | Ice Cap", img: "images/item3.png", rarityKey: "common", description: "Пистолет для ведения огня на ходу, покрытый узором арктического льда." },
+        { id: 12, name: "MAG-7 | Hazard", img: "images/item3.png", rarityKey: "common", description: "Дробовик в яркой промышленной окраске, предупреждающей об опасности." },
+        { id: 13, name: "Negev | Lionfish", img: "images/item3.png", rarityKey: "common", description: "Тяжелый пулемет с камуфляжем в стиле ядовитой рыбы-льва." },
+        { id: 14, name: "★ Перчатки (Crimson Web)", img: "images/item3.png", rarityKey: "legendary", description: "Стильные кожаные перчатки, покрытые узором из кровавой паутины." }
     ];
 
     const itemsCountByRarity = {};
@@ -1359,11 +1404,12 @@
                         </div>
                         <div class="items-grid" style="width:100%;">
                     `;
+                    // Добавлен клик только на карточки инвентаря
                     invHtml += itemsInRarity.map(i => {
                         let rarity = getItemRarity(i);
                         let rarityClass = getRarityClass(i.rarityKey);
                         let textClass = getRarityTextClass(i.rarityKey);
-                        return `<div class="item-card ${rarityClass}">
+                        return `<div class="item-card ${rarityClass}" onclick="openItemDescription(${i.id})">
                                     <img src="${i.img}" class="grid-img" alt="${escapeHtml(i.name)}" onerror="this.style.display='none'">
                                     <div class="item-name">${escapeHtml(i.name)}</div>
                                     <div class="badge ${textClass}">${rarity.name}</div>
@@ -1459,6 +1505,40 @@
             isMuted = !isMuted;
             muteBtn.textContent = isMuted ? '🔇' : '🔊';
         });
+    }
+
+    // ==================== СИСТЕМА ПРОСМОТРА ОПИСАНИЙ ПРЕДМЕТОВ ====================
+    function openItemDescription(id) {
+        const item = ITEMS.find(i => i.id === id);
+        if (!item) return;
+        
+        const modal = document.getElementById("descModal");
+        const card = document.getElementById("modalCard");
+        const img = document.getElementById("modalImg");
+        const name = document.getElementById("modalName");
+        const badge = document.getElementById("modalBadge");
+        const desc = document.getElementById("modalDesc");
+        
+        let rarity = getItemRarity(item);
+        let rarityClass = getRarityClass(item.rarityKey);
+        let textClass = getRarityTextClass(item.rarityKey);
+        
+        // Подставляем данные в окно
+        img.src = item.img;
+        name.innerText = item.name;
+        badge.innerText = rarity.name;
+        desc.innerText = item.description || "У этого предмета пока нет описания.";
+        
+        // Сбрасываем старые классы редкости у карточки модалки и ставим новые
+        card.className = "modal-card " + rarityClass;
+        badge.className = "badge " + textClass;
+        
+        // Показываем окно по центру экрана
+        modal.style.display = "flex";
+    }
+
+    function closeItemDescription() {
+        document.getElementById("descModal").style.display = "none";
     }
 
     // ==================== ВРЕМЕННАЯ ФУНКЦИЯ ТЕСТИРОВАНИЯ (УДАЛИТЬ ПО СЛОВУ НАЗАРИК) ====================
