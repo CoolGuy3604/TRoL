@@ -645,7 +645,7 @@
             border-radius: 20px;
         }
 
-        /* Стиль для размытого экрана модального окна */
+        /* Общий контейнер теперь держит два независимых окна рядом */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -656,56 +656,52 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            gap: 24px; /* Расстояние между твоей карточкой и новым окном инфо */
         }
         
-        /* Изменяем карточку под двухколоночный вид, не ломая внутренние масштабы */
+        /* ТВОЯ ОРИГИНАЛЬНАЯ КАРТОЧКА — ВОССТАНОВЛЕНА ОДИН В ОДИН, МАСШТАБЫ НЕ ТРОНУТЫ */
         .modal-card {
             background: #0d1326;
             border-radius: 36px;
             padding: 40px;
-            max-width: 950px; /* Расширяем общую ширину под две панели */
+            max-width: 480px; /* Прежний идеальный размер */
             width: 100%;
-            display: flex;
-            flex-direction: row; /* Карточка слева, инфо-панель справа */
-            align-items: center;
-            justify-content: center;
-            gap: 40px;
+            text-align: center;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6);
             animation: finalPop 0.3s ease-out;
             border: 4px solid transparent;
         }
         
-        /* Стили для левой (оригинальной) части внутри модалки, чтобы сохранить её пропорции */
-        .modal-main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
+        .modal-desc {
+            font-size: 1rem;
+            color: #b5bed9;
+            margin: 20px 0;
+            line-height: 1.5;
+            word-break: break-word;
         }
 
-        /* Новая правая полость для строк метаданных */
-        .modal-info-panel {
-            flex: 1;
-            background: rgba(7, 11, 20, 0.5);
-            border-radius: 24px;
-            border: 1px solid rgba(255,255,255,0.05);
+        /* НОВОЕ ПОЛНОСТЬЮ ОТДЕЛЬНОЕ МАЛЕНЬКОЕ ОКНО СПРАВА */
+        .modal-side-panel {
+            background: #0d1326;
+            border-radius: 28px;
+            border: 4px solid rgba(255,255,255,0.1);
             padding: 24px;
+            max-width: 320px;
+            width: 100%;
             display: flex;
             flex-direction: column;
             gap: 16px;
             text-align: left;
-            align-self: stretch;
-            justify-content: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            animation: finalPop 0.3s ease-out;
         }
         
-        .modal-info-row {
-            font-size: 1.1rem;
+        .modal-side-row {
+            font-size: 1rem;
             color: #eee;
-            font-family: inherit;
         }
         
-        .modal-info-row strong {
+        .modal-side-row strong {
             color: #00ff66;
         }
     </style>
@@ -772,26 +768,25 @@
     <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
 </div>
 
-<!-- ОКНО ПРОСМОТРА ОПИСАНИЯ ПРЕДМЕТА С ДОПОЛНИТЕЛЬНОЙ ИНФО-ПАНЕЛЬЮ -->
+<!-- ТВОЯ ПРОШЛАЯ КАРТОЧКА И ОТДЕЛЬНОЕ ОКНО ИНФО СПРАВА ОТ НЕЕ -->
 <div id="descModal" class="modal-overlay" onclick="closeItemDescription()">
+    
+    <!-- ТВОЯ ОРИГИНАЛЬНАЯ КАРТОЧКА ПРЕДМЕТА — ПОЛНОСТЬЮ КАК В ПРЕДЫДУЩЕМ ВАРИАНТЕ КОДА -->
     <div class="modal-card" id="modalCard" onclick="event.stopPropagation()">
-        
-        <!-- Левая (оригинальная) часть карточки — МАСШТАБЫ И СТРУКТУРА НЕ ИЗМЕНЕНЫ -->
-        <div class="modal-main-content">
-            <img id="modalImg" src="" style="width: 76.1%; height: auto; object-fit: contain; margin-bottom: 20px;" alt="">
-            <h2 id="modalName" style="font-size: 1.8rem; font-weight: bold; margin-bottom: 8px; color: #fff;"></h2>
-            <div id="modalBadge" class="badge" style="font-size: 0.85rem; padding: 4px 12px; margin-bottom: 15px;"></div>
-            <div id="modalDesc" class="modal-desc"></div>
-            <button class="open-btn" onclick="closeItemDescription()" style="font-size: 1.2rem; padding: 10px 30px; margin: 10px 0 0 0; width: auto;">❌ ЗАКРЫТЬ</button>
-        </div>
-        
-        <!-- Новая правая полость для вывода даты и круток -->
-        <div class="modal-info-panel">
-            <div class="modal-info-row" id="infoDateRow">📅 Дата получения: <strong>--</strong></div>
-            <div class="modal-info-row" id="infoRollsRow">🎰 Круток потребовалось: <strong>--</strong></div>
-        </div>
-
+        <img id="modalImg" src="" style="width: 76.1%; height: auto; object-fit: contain; margin-bottom: 20px;" alt="">
+        <h2 id="modalName" style="font-size: 1.8rem; font-weight: bold; margin-bottom: 8px; color: #fff;"></h2>
+        <div id="modalBadge" class="badge" style="font-size: 0.85rem; padding: 4px 12px; margin-bottom: 15px;"></div>
+        <div id="modalDesc" class="modal-desc"></div>
+        <button class="open-btn" onclick="closeItemDescription()" style="font-size: 1.2rem; padding: 10px 30px; margin: 10px 0 0 0;">❌ ЗАКРЫТЬ</button>
     </div>
+    
+    <!-- ОТДЕЛЬНОЕ ОКОШКО СПРАВА ДЛЯ НОВОЙ ИНФОРМАЦИИ -->
+    <div class="modal-side-panel" id="modalSidePanel" onclick="event.stopPropagation()">
+        <div style="font-size: 1.1rem; font-weight: bold; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 4px;">📊 Статистика предмета</div>
+        <div class="modal-side-row" id="infoDateRow">📅 Дата получения: <strong>--</strong></div>
+        <div class="modal-side-row" id="infoRollsRow">🎰 Круток потребовалось: <strong>--</strong></div>
+    </div>
+
 </div>
 
 <script>
@@ -1561,7 +1556,6 @@
         const item = ITEMS.find(i => i.id === id);
         if (!item) return;
         
-        // Находим запись этого предмета в инвентаре, чтобы достать метаданные
         const invRecord = inventory.find(record => record.id === id);
         
         const modal = document.getElementById("descModal");
@@ -1571,7 +1565,8 @@
         const badge = document.getElementById("modalBadge");
         const desc = document.getElementById("modalDesc");
         
-        // Новые элементы правой панели
+        // Элементы нового отдельного бокового окна
+        const sidePanel = document.getElementById("modalSidePanel");
         const infoDate = document.getElementById("infoDateRow");
         const infoRolls = document.getElementById("infoRollsRow");
         
@@ -1579,21 +1574,23 @@
         let rarityClass = getRarityClass(item.rarityKey);
         let textClass = getRarityTextClass(item.rarityKey);
         
+        // Наполнение твоей оригинальной карточки
         img.src = item.img;
         name.innerText = item.name;
         badge.innerText = rarity.name;
         desc.innerText = item.description || "У этого предмета пока нет описания.";
+        card.className = "modal-card " + rarityClass;
+        badge.className = "badge " + textClass;
         
-        // Выводим данные в правую полость. Если данных старых сохранений нет, выводим "Неизвестно"
+        // Наполнение отдельного окошка справа
         if (invRecord) {
-            // Убираем префикс "Дата получения: ", если он был в старых v2 сейвах, и выводим чистое значение
             let cleanDate = invRecord.date ? invRecord.date.replace("Дата получения: ", "") : "--";
             infoDate.innerHTML = `📅 Дата получения: <strong>${cleanDate}</strong>`;
             infoRolls.innerHTML = `🎰 Круток потребовалось: <strong>${invRecord.rollsToDrop || "Неизвестно"}</strong>`;
         }
         
-        card.className = "modal-card " + rarityClass;
-        badge.className = "badge " + textClass;
+        // Окрашиваем рамку бокового окна в цвет редкости для красоты
+        sidePanel.style.borderColor = rarity.color;
         
         modal.style.display = "flex";
     }
