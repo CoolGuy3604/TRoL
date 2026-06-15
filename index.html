@@ -551,6 +551,12 @@
             background: #1e2540;
         }
 
+        /* ФИКС: Отключаем увеличение карточек при наведении курсора ТОЛЬКО во вкладке Коллекция */
+        #collectionContainer .item-card:hover {
+            transform: none !important;
+            background: transparent !important; /* Убираем также изменение фона, чтобы карточка вела себя как статичная */
+        }
+
         .grid-img {
             width: 85%;
             height: auto;
@@ -689,6 +695,22 @@
             transform: none;
         }
 
+        /* Идеальное выравнивание отступов вокруг названия и редкости */
+        #modalName {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-top: 15px !important; /* Фиксированный отступ от картинки */
+            margin-bottom: 0 !important;
+            color: #fff;
+        }
+        
+        #modalBadge {
+            font-size: 0.85rem;
+            padding: 4px 12px;
+            margin-top: 8px !important;
+            margin-bottom: 15px !important; /* Фиксированный отступ до начала описания */
+        }
+
         .modal-desc {
             font-size: 1rem;
             color: #b5bed9;
@@ -793,27 +815,27 @@
     <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
 </div>
 
-<!-- ТВОЯ ПРОШЛАЯ КАРТОЧКА И ОТДЕЛЬНОЕ ОКНО ИНФО СПРАВА ОТ НЕЕ -->
+<!-- ВОССТАНОВЛЕННАЯ КАРТОЧКА С ЧИСТЫМИ ТЕКСТАМИ БЕЗ СМАЙЛОВ -->
 <div id="descModal" class="modal-overlay" onclick="closeItemDescription()">
     
-    <!-- ТВОЯ ОРИГИНАЛЬНАЯ КАРТОЧКА ПРЕДМЕТА — ПОЛНОСТЬЮ КАК В ПРЕДЫДУЩЕМ ВАРИАНТЕ КОДА -->
     <div class="modal-card" id="modalCard" onclick="event.stopPropagation()">
         <div class="modal-main-content">
-            <img id="modalImg" src="" alt="">
-            <h2 id="modalName" style="font-size: 1.8rem; font-weight: bold; margin-bottom: 8px; color: #fff;"></h2>
-            <div id="modalBadge" class="badge" style="font-size: 0.85rem; padding: 4px 12px; margin-bottom: 15px;"></div>
+            <img id="modalImg" src="" style="width: 100.15%; height: auto; object-fit: contain; margin-bottom: 20px;" alt="">
+            <h2 id="modalName"></h2>
+            <div id="modalBadge" class="badge"></div>
             <div id="modalDesc" class="modal-desc"></div>
-            <button class="open-btn" onclick="closeItemDescription()" style="font-size: 1.2rem; padding: 10px 30px; margin: 10px 0 0 0;">❌ ЗАКРЫТЬ</button>
+            <!-- Смайл ❌ полностью убран из текста кнопки -->
+            <button class="open-btn" onclick="closeItemDescription()" style="font-size: 1.2rem; padding: 10px 30px; margin: 10px 0 0 0;">ЗАКРЫТЬ</button>
         </div>
-    </div>
-    
-    <!-- ОТДЕЛЬНОЕ ОКОШКО СПРАВА ДЛЯ НОВОЙ ИНФОРМАЦИИ -->
-    <div class="modal-side-panel" id="modalSidePanel" onclick="event.stopPropagation()">
-        <div style="font-size: 1.1rem; font-weight: bold; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 4px;">📊 Статистика предмета</div>
-        <div class="modal-side-row" id="infoDateRow">📅 Дата получения: <strong>--</strong></div>
-        <div class="modal-side-row" id="infoRollsRow">🎰 Круток потребовалось: <strong>--</strong></div>
-    </div>
+        
+        <div class="modal-side-panel" id="modalSidePanel" onclick="event.stopPropagation()">
+            <!-- Смайл 📊 полностью убран из заголовка -->
+            <div style="font-size: 1.1rem; font-weight: bold; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 4px;">Статистика предмета</div>
+            <div class="modal-side-row" id="infoDateRow">📅 Дата получения: <strong>--</strong></div>
+            <div class="modal-side-row" id="infoRollsRow">🎰 Круток потребовалось: <strong>--</strong></div>
+        </div>
 
+    </div>
 </div>
 
 <script>
