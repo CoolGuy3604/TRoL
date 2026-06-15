@@ -678,6 +678,15 @@
             <span>⭐ Осталось выбить: <strong id="remainingCount">0</strong></span>
             <button class="small-reset" id="resetProgressBtn">♻️ Сбросить прогресс</button>
         </div>
+        <!-- ВРЕМЕННАЯ ТЕСТОВАЯ ПАНЕЛЬ ДЛЯ ПРОВЕРКИ АНИМАЦИЙ (УДАЛИТЬ ПО СЛОВУ НАЗАРИК) -->
+        <div class="test-admin-panel" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 20px; justify-content: center;">
+            <button onclick="testOpenCaseWithRarity('common')" style="background: #dee3f2; color: #000; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-weight: bold;">⚪ Common</button>
+            <button onclick="testOpenCaseWithRarity('rare')" style="background: #184cff; color: #fff; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-weight: bold;">🔵 Rare</button>
+            <button onclick="testOpenCaseWithRarity('superRare')" style="background: #8e18ff; color: #fff; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-weight: bold;">🟣 SuperRare</button>
+            <button onclick="testOpenCaseWithRarity('epic')" style="background: #ff18ab; color: #fff; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-weight: bold;">🩷 Epic</button>
+            <button onclick="testOpenCaseWithRarity('mythic')" style="background: #ff1414; color: #fff; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-weight: bold;">🔴 Mythic</button>
+            <button onclick="testOpenCaseWithRarity('legendary')" style="background: #ffc800; color: #000; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-weight: bold;">🟡 Legendary</button>
+        </div>
         <div class="stats-panel" id="statsPanel">
             <div class="stat-item">📊 Открыто: 0</div>
             <div class="stat-item">⚪ Обычных: 0 (0%)</div>
@@ -1379,6 +1388,64 @@
             isMuted = !isMuted;
             muteBtn.textContent = isMuted ? '🔇' : '🔊';
         });
+    }
+
+    // ==================== ВРЕМЕННАЯ ФУНКЦИЯ ТЕСТИРОВАНИЯ (УДАЛИТЬ ПО СЛОВУ НАЗАРИК) ====================
+    async function testOpenCaseWithRarity(rarityKey) {
+        let btn = document.getElementById("openCaseBtn");
+        if (isSpinning || btn.disabled) return;
+        
+        // Ищем предметы только заданной редкости
+        const filteredItems = ITEMS.filter(i => i.rarityKey === rarityKey);
+        if (filteredItems.length === 0) {
+            alert("В массиве ITEMS нет предметов с редкостью: " + rarityKey);
+            return;
+        }
+        
+        // Берем случайный предмет из этой редкости
+        let won = filteredItems[Math.floor(Math.random() * filteredItems.length)];
+        
+        isSpinning = true;
+        btn.disabled = true;
+        removeGlow();
+        stopArrowsAnimation();
+        setArrowsSpinning();
+        hideCenterHighlight();
+        
+        let isNew = !hasItem(won.id);
+        
+        // Запуск прокрутки со строго заданным предметом
+        await startSpin(won);
+        
+        if (!isMuted) {
+            winAudio.currentTime = 0;
+            winAudio.play().catch(() => {});
+        }
+        
+        showResult(won, isNew);
+        addItem(won);
+        
+        // Обновление статистики для честности теста
+        stats.total++;
+        stats[won.rarityKey]++;
+        saveStats();
+        updateStatsDisplay();
+        
+        let resDiv = document.getElementById("rollResult");
+        let color = getItemRarity(won).color;
+        resDiv.style.background = hexToRgba(color, 0.2);
+        
+        if (isNew) {
+            resDiv.innerHTML = `✨ ТЕСТ: НОВЫЙ ПРЕДМЕТ! ✨<br>🎉 ${won.name} [${getRarityName(won.rarityKey)}] 🎉<br>📊 Шанс: ${getItemChance(won)}%`;
+        } else {
+            resDiv.innerHTML = `🔄 ТЕСТ: ПОВТОР 🔄<br>📦 ${won.name} [${getRarityName(won.rarityKey)}]<br>📊 Шанс: ${getItemChance(won)}%`;
+        }
+        
+        updateUI();
+        
+        btn.textContent = "🔙 НАЗАД 🔙";
+        btn.disabled = false;
+        isSpinning = false;
     }
 
     document.addEventListener("DOMContentLoaded", () => {
