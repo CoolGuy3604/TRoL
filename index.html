@@ -538,8 +538,6 @@
             justify-content: center;
             gap: 24px;
             margin-top: 20px;
-            max-height: 500px;
-            overflow-y: auto;
             padding: 8px;
         }
         
@@ -1330,34 +1328,86 @@
     }
 
     function updateUI() {
+        // Строгий порядок редкостей от самой не редкой до самой редкой
+        const rarityOrder = ['common', 'rare', 'superRare', 'epic', 'mythic', 'legendary'];
+        
+        // 1. ОБНОВЛЕНИЕ ВКЛАДКИ ИНВЕНТАРЯ
         let invDiv = document.getElementById("inventoryGrid");
         let collected = getCollected();
-        if (collected.length === 0) invDiv.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;">🧸 Инвентарь пуст...</div>';
-        else invDiv.innerHTML = collected.map(i => {
-            let rarity = getItemRarity(i);
-            let rarityClass = getRarityClass(i.rarityKey);
-            let textClass = getRarityTextClass(i.rarityKey);
-            return `<div class="item-card ${rarityClass}">
-                        <img src="${i.img}" class="grid-img" alt="${escapeHtml(i.name)}" onerror="this.style.display='none'">
-                        <div class="item-name">${escapeHtml(i.name)}</div>
-                        <div class="badge ${textClass}">${rarity.name}</div>
-                    </div>`;
-        }).join('');
         
+        if (collected.length === 0) {
+            invDiv.innerHTML = '<div style="text-align:center;padding:40px;width:100%;">🧸 Инвентарь пуст...</div>';
+        } else {
+            let invHtml = "";
+            rarityOrder.forEach(key => {
+                // Фильтруем предметы из инвентаря по текущей редкости
+                let itemsInRarity = collected.filter(i => i.rarityKey === key);
+                if (itemsInRarity.length > 0) {
+                    let rarityName = getRarityName(key);
+                    // Добавляем красивый заголовок столбца и открываем симметричную сетку
+                    invHtml += `
+                        <div style="width:100%; margin-top:30px; margin-bottom:10px;">
+                            <h3 style="font-size:1.5rem; margin:0; padding-left:10px; color:${getRarityByKey(key).color}; text-shadow: 0 0 10px ${hexToRgba(getRarityByKey(key).color, 0.3)};">${rarityName}</h3>
+                        </div>
+                        <div class="items-grid" style="width:100%;">
+                    `;
+                    // Наполняем сетку карточками предметов
+                    invHtml += itemsInRarity.map(i => {
+                        let rarity = getItemRarity(i);
+                        let rarityClass = getRarityClass(i.rarityKey);
+                        let textClass = getRarityTextClass(i.rarityKey);
+                        return `<div class="item-card ${rarityClass}">
+                                    <img src="${i.img}" class="grid-img" alt="${escapeHtml(i.name)}" onerror="this.style.display='none'">
+                                    <div class="item-name">${escapeHtml(i.name)}</div>
+                                    <div class="badge ${textClass}">${rarity.name}</div>
+                                </div>`;
+                    }).join('');
+                    invHtml += `</div>`; // Закрываем сетку для этой редкости
+                }
+            });
+            invDiv.innerHTML = invHtml;
+        }
+        
+        // 2. ОБНОВЛЕНИЕ ВКЛАДКИ КОЛЛЕКЦИИ
         let collDiv = document.getElementById("collectionContainer");
         let missing = getMissing();
-        if (missing.length === 0) collDiv.innerHTML = `<div class="celebration"><h1>🏆 ВСЕ СОБРАНО! 🏆</h1><button class="small-reset" id="resetC">Начать заново</button></div>`;
-        else collDiv.innerHTML = `<div class="items-grid">${missing.map(i => {
-            let rarity = getItemRarity(i);
-            let rarityClass = getRarityClass(i.rarityKey);
-            let textClass = getRarityTextClass(i.rarityKey);
-            return `<div class="item-card ${rarityClass}" style="filter: grayscale(1); opacity: 0.4;">
-                        <img src="${i.img}" class="grid-img" alt="${escapeHtml(i.name)}" onerror="this.style.display='none'">
-                        <div class="item-name">${escapeHtml(i.name)}</div>
-                        <div class="badge ${textClass}">${rarity.name}</div>
-                    </div>`;
-        }).join('')}</div>`;
         
+        if (missing.length === 0) {
+            collDiv.innerHTML = `<div class="celebration"><h1>🏆 ВСЕ СОБРАНО! 🏆</h1><button class="small-reset" id="resetC">Начать заново</button></div>`;
+        } else {
+            let collHtml = "";
+            rarityOrder.forEach(key => {
+                // Ищем в общем массиве ITEMS все предметы этой редкости, чтобы показать их в Коллекции
+                let itemsInRarity = ITEMS.filter(i => i.rarityKey === key);
+                if (itemsInRarity.length > 0) {
+                    let rarityName = getRarityName(key);
+                    // Добавляем заголовок столбца редкости для Коллекции
+                    collHtml += `
+                        <div style="width:100%; margin-top:30px; margin-bottom:10px;">
+                            <h3 style="font-size:1.5rem; margin:0; padding-left:10px; color:${getRarityByKey(key).color}; text-shadow: 0 0 10px ${hexToRgba(getRarityByKey(key).color, 0.3)};">${rarityName}</h3>
+                        </div>
+                        <div class="items-grid" style="width:100%;">
+                    `;
+                    collHtml += itemsInRarity.map(i => {
+                        let rarity = getItemRarity(i);
+                        let rarityClass = getRarityClass(i.rarityKey);
+                        let textClass = getRarityTextClass(i.rarityKey);
+                        let isMissing = missing.some(m => m.id === i.id);
+                        // Если предмета нет в инвентаре, он отображается серым (isMissing)
+                        let cardStyle = isMissing ? 'filter: grayscale(1); opacity: 0.4;' : '';
+                        return `<div class="item-card ${rarityClass}" style="${cardStyle}">
+                                    <img src="${i.img}" class="grid-img" alt="${escapeHtml(i.name)}" onerror="this.style.display='none'">
+                                    <div class="item-name">${escapeHtml(i.name)}</div>
+                                    <div class="badge ${textClass}">${rarity.name}</div>
+                                </div>`;
+                    }).join('');
+                    collHtml += `</div>`;
+                }
+            });
+            collDiv.innerHTML = collHtml;
+        }
+        
+        // Обновление общих счетчиков на главной панели
         document.getElementById("totalItemsCount").innerText = inventory.length;
         document.getElementById("remainingCount").innerText = missing.length;
         let resetBtn = document.getElementById("resetC");
