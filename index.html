@@ -696,14 +696,13 @@
         </div>
     </div>
 
-    <!-- ФИКС: Убран класс items-grid, чтобы расстояния стали строго симметричны Коллекции -->
+    <!-- Заголовки H2 удалены -->
     <div id="inventoryTab" class="tab-content">
-        <h2>🎒 Инвентарь</h2>
         <div id="inventoryGrid"></div>
     </div>
 
+    <!-- Заголовки H2 удалены -->
     <div id="collectionTab" class="tab-content">
-        <h2>🏆 Коллекция</h2>
         <div id="collectionContainer"></div>
     </div>
     <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
@@ -1258,10 +1257,6 @@
     async function openCase() {
         let btn = document.getElementById("openCaseBtn");
         if (isSpinning || btn.disabled) return;
-        if (isComplete()) {
-            document.getElementById("rollResult").innerHTML = "🎉 ПОЗДРАВЛЯЮ! ВСЕ СОБРАНО! 🎉";
-            return;
-        }
         
         isSpinning = true;
         btn.disabled = true;
@@ -1348,16 +1343,14 @@
             invDiv.innerHTML = '<div style="text-align:center;padding:40px;width:100%;">🧸 Инвентарь пуст...</div>';
         } else {
             let invHtml = "";
-            let isFirstInv = true; // Флаг для пропуска линии у самого первого заголовка
+            let isFirstInv = true;
             
             rarityOrder.forEach(key => {
                 let itemsInRarity = collected.filter(i => i.rarityKey === key);
                 if (itemsInRarity.length > 0) {
                     let rarityName = pluralRarityNames[key];
-                    
-                    // Если группа не первая по счету в инвентаре, добавляем белую разделяющую полосу
                     let hrLine = !isFirstInv ? `<hr style="border: none; height: 1px; background: rgba(255,255,255,0.15); margin: 40px 10px 20px 10px; width: 100%;">` : '';
-                    isFirstInv = false; // Все последующие группы получат линию
+                    isFirstInv = false;
                     
                     invHtml += `
                         ${hrLine}
@@ -1387,25 +1380,25 @@
         let missing = getMissing();
         
         if (missing.length === 0) {
-            collDiv.innerHTML = `<div class="celebration"><h1>🏆 ВСЕ СОБРАНО! 🏆</h1><button class="small-reset" id="resetC">Начать заново</button></div>`;
+            // Кнопка удалена, оставлен только требуемый текст триумфа
+            collDiv.innerHTML = `<div class="celebration"><h1>🏆 ВСЕ СОБРАНО! 🏆</h1><p style="font-size:1.5rem; font-weight:bold; margin-top:10px;">Все предметы собраны! Ур-рааааа!</p></div>`;
         } else {
             let collHtml = "";
-            let isFirstColl = true; // Флаг для пропуска линии у самого первого заголовка в коллекции
+            let isFirstColl = true;
             
             rarityOrder.forEach(key => {
                 let missingInRarity = missing.filter(i => i.rarityKey === key);
                 
                 if (missingInRarity.length > 0) {
                     let rarityName = pluralRarityNames[key];
-                    
-                    // Если группа не первая по счету в оставшейся коллекции, добавляем белую разделяющую полосу
                     let hrLine = !isFirstColl ? `<hr style="border: none; height: 1px; background: rgba(255,255,255,0.15); margin: 40px 10px 20px 10px; width: 100%;">` : '';
-                    isFirstColl = false; // Все последующие оставшиеся группы получат линию
+                    isFirstColl = false;
                     
+                    // ФИКС: Заголовки в коллекции теперь строго черно-белые (#aaa) без цветных теней
                     collHtml += `
                         ${hrLine}
                         <div style="width:100%; margin-top:10px; margin-bottom:10px;">
-                            <h3 style="font-size:1.5rem; margin:0; padding-left:10px; color:${getRarityByKey(key).color}; text-shadow: 0 0 10px ${hexToRgba(getRarityByKey(key).color, 0.3)};">${rarityName}</h3>
+                            <h3 style="font-size:1.5rem; margin:0; padding-left:10px; color:#aaa;">${rarityName}</h3>
                         </div>
                         <div class="items-grid" style="width:100%;">
                     `;
@@ -1427,8 +1420,6 @@
         
         document.getElementById("totalItemsCount").innerText = inventory.length;
         document.getElementById("remainingCount").innerText = missing.length;
-        let resetBtn = document.getElementById("resetC");
-        if (resetBtn) resetBtn.onclick = resetGame;
     }
 
     function initTabs() {
@@ -1475,7 +1466,6 @@
         let btn = document.getElementById("openCaseBtn");
         if (isSpinning || btn.disabled) return;
         
-        // Ищем предметы только заданной редкости
         const filteredItems = ITEMS.filter(i => i.rarityKey === rarityKey);
         if (filteredItems.length === 0) {
             alert("В массиве ITEMS нет предметов с редкостью: " + rarityKey);
