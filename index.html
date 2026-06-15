@@ -658,12 +658,12 @@
             padding: 20px;
         }
         
-        /* Карточка внутри модального окна */
+        /* Увеличенная карточка для вмещения гигантского изображения */
         .modal-card {
             background: #0d1326;
             border-radius: 36px;
             padding: 40px;
-            max-width: 480px;
+            max-width: 750px; /* Увеличено, чтобы карточка не была узкой */
             width: 100%;
             text-align: center;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6);
@@ -745,7 +745,8 @@
 <!-- ОКНО ПРОСМОТРА ОПИСАНИЯ ПРЕДМЕТА -->
 <div id="descModal" class="modal-overlay" onclick="closeItemDescription()">
     <div class="modal-card" id="modalCard" onclick="event.stopPropagation()">
-        <img id="modalImg" src="" style="width: 70%; max-height: 180px; object-fit: contain; margin-bottom: 15px;" alt="">
+        <!-- Картинка предмета увеличена за счет ухода от жестких лимитов высоты -->
+        <img id="modalImg" src="" style="width: 90%; height: auto; object-fit: contain; margin-bottom: 20px;" alt="">
         <h2 id="modalName" style="font-size: 1.8rem; font-weight: bold; margin-bottom: 8px; color: #fff;"></h2>
         <div id="modalBadge" class="badge" style="font-size: 0.85rem; padding: 4px 12px; margin-bottom: 15px;"></div>
         <div id="modalDesc" class="modal-desc"></div>
