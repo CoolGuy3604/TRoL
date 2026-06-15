@@ -551,12 +551,6 @@
             background: #1e2540;
         }
 
-        /* ФИКС: Отключаем увеличение карточек при наведении курсора ТОЛЬКО во вкладке Коллекция */
-        #collectionContainer .item-card:hover {
-            transform: none !important;
-            background: transparent !important; /* Убираем также изменение фона, чтобы карточка вела себя как статичная */
-        }
-
         .grid-img {
             width: 85%;
             height: auto;
@@ -664,12 +658,12 @@
             padding: 20px;
         }
         
-        /* ТВОЯ ОРИГИНАЛЬНАЯ КАРТОЧКА — СКОРРЕКТИРОВАНА ПОД НОВЫЕ ИДЕАЛЬНЫЕ ПРОПОРЦИИ */
+        /* ТВОЯ ОРИГИНАЛЬНАЯ КАРТОЧКА — СТРОГО ПО ЦЕНТРУ ЭКРАНА С ПРАВИЛЬНЫМИ ОТСТУПАМИ */
         .modal-card {
             background: #0d1326;
             border-radius: 36px;
-            padding: 40px; /* Исходные выверенные отступы сохранены */
-            max-width: 580px; /* Уменьшено вслед за картинкой для баланса воздуха */
+            padding: 40px;
+            max-width: 580px;
             width: 100%;
             text-align: center;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6);
@@ -678,39 +672,19 @@
             position: relative;
         }
         
-        .modal-main-content {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        /* КАРТИНКА ПРЕДМЕТА — СТРОГО НА 6% МЕНЬШЕ ОТ ПРЕДЫДУЩЕЙ (100.15%) */
-        .modal-main-content img {
-            width: 100.15%; /* Уменьшено ровно на 6% */
-            max-width: 100%;
-            height: auto;
-            object-fit: contain;
-            margin-bottom: 20px;
-            transform: none;
-        }
-
-        /* Идеальное выравнивание отступов вокруг названия и редкости */
         #modalName {
             font-size: 1.8rem;
             font-weight: bold;
-            margin-top: 15px !important; /* Фиксированный отступ от картинки */
+            margin-top: 15px !important;
             margin-bottom: 0 !important;
             color: #fff;
         }
-        
         #modalBadge {
             font-size: 0.85rem;
             padding: 4px 12px;
             margin-top: 8px !important;
-            margin-bottom: 15px !important; /* Фиксированный отступ до начала описания */
+            margin-bottom: 15px !important;
         }
-
         .modal-desc {
             font-size: 1rem;
             color: #b5bed9;
@@ -719,7 +693,7 @@
             word-break: break-word;
         }
 
-        /* ПАНЕЛЬ СТАТИСТИКИ УДЕРЖИВАЕТ ЗАЗОР 80px ОТ ОБНОВЛЕННОЙ ЦЕНТРАЛЬНОЙ КАРТОЧКИ */
+        /* ПАНЕЛЬ СТАТИСТИКИ — ВЕРНУЛАСЬ НА СВОЮ ИСХОДНУЮ ВЫСОТУ СПРАВА */
         .modal-side-panel {
             background: #0d1326;
             border-radius: 28px;
@@ -735,7 +709,7 @@
             animation: finalPop 0.3s ease-out;
             
             position: absolute;
-            left: calc(50% + 290px + 80px); /* Смещение пересчитано под половину ширины карточки (290px) */
+            left: calc(50% + 290px + 80px); /* Держит панель справа на зазоре 80px */
         }
         
         @media (max-width: 1180px) {
@@ -750,6 +724,16 @@
         }
         .modal-side-row strong {
             color: #00ff66;
+        }
+
+        /* ПОЛНОЕ ОТКЛЮЧЕНИЕ УВЕЛИЧЕНИЯ, ПОДСВЕТКИ И КЛИКАБЕЛЬНОГО КУРСОРA В КОЛЛЕКЦИИ */
+        #collectionContainer .item-card {
+            cursor: default !important; /* Курсор мыши становится обычным, а не пальцем */
+        }
+        #collectionContainer .item-card:hover {
+            transform: none !important;
+            background: linear-gradient(135deg, rgba(222,227,242,0.05), rgba(222,227,242,0.02)) !important; /* Жестко возвращаем базовый фон без подсветки */
+            box-shadow: none !important;
         }
     </style>
 </head>
@@ -815,27 +799,24 @@
     <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
 </div>
 
-<!-- ВОССТАНОВЛЕННАЯ КАРТОЧКА С ЧИСТЫМИ ТЕКСТАМИ БЕЗ СМАЙЛОВ -->
+<!-- ОЧИЩЕННАЯ ИСПРАВЛЕННАЯ СТРУКТУРА ОКНА СТАТИСТИКИ -->
 <div id="descModal" class="modal-overlay" onclick="closeItemDescription()">
     
     <div class="modal-card" id="modalCard" onclick="event.stopPropagation()">
-        <div class="modal-main-content">
-            <img id="modalImg" src="" style="width: 100.15%; height: auto; object-fit: contain; margin-bottom: 20px;" alt="">
-            <h2 id="modalName"></h2>
-            <div id="modalBadge" class="badge"></div>
-            <div id="modalDesc" class="modal-desc"></div>
-            <!-- Смайл ❌ полностью убран из текста кнопки -->
-            <button class="open-btn" onclick="closeItemDescription()" style="font-size: 1.2rem; padding: 10px 30px; margin: 10px 0 0 0;">ЗАКРЫТЬ</button>
-        </div>
-        
-        <div class="modal-side-panel" id="modalSidePanel" onclick="event.stopPropagation()">
-            <!-- Смайл 📊 полностью убран из заголовка -->
-            <div style="font-size: 1.1rem; font-weight: bold; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 4px;">Статистика предмета</div>
-            <div class="modal-side-row" id="infoDateRow">📅 Дата получения: <strong>--</strong></div>
-            <div class="modal-side-row" id="infoRollsRow">🎰 Круток потребовалось: <strong>--</strong></div>
-        </div>
-
+        <!-- Элементы возвращены напрямую в modal-card, чтобы вернуть высоту правому окну -->
+        <img id="modalImg" src="" style="width: 100.15%; height: auto; object-fit: contain; margin-bottom: 20px;" alt="">
+        <h2 id="modalName"></h2>
+        <div id="modalBadge" class="badge"></div>
+        <div id="modalDesc" class="modal-desc"></div>
+        <button class="open-btn" onclick="closeItemDescription()" style="font-size: 1.2rem; padding: 10px 30px; margin: 10px 0 0 0;">ЗАКРЫТЬ</button>
     </div>
+    
+    <div class="modal-side-panel" id="modalSidePanel" onclick="event.stopPropagation()">
+        <div style="font-size: 1.1rem; font-weight: bold; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 4px;">Статистика предмета</div>
+        <div class="modal-side-row" id="infoDateRow">📅 Дата получения: <strong>--</strong></div>
+        <div class="modal-side-row" id="infoRollsRow">🎰 Круток потребовалось: <strong>--</strong></div>
+    </div>
+
 </div>
 
 <script>
