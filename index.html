@@ -1678,10 +1678,9 @@
             let minutes = Math.floor((totalSeconds % 3600) / 60);
             
             // Вычисление любимого предмета
-            let favoriteItemName = "–";
+            let favoriteItemName = "–"; // Строгий дефолт-прочерк при старте
             let maxClicks = 0;
             if (extendedStats.totalRollsEver > 0) {
-                favoriteItemName = "Нет любимого предмета";
                 for (let id in extendedStats.itemClicks) {
                     if (extendedStats.itemClicks[id] > maxClicks) {
                         maxClicks = extendedStats.itemClicks[id];
@@ -1689,8 +1688,11 @@
                         if (foundItem) favoriteItemName = foundItem.name;
                     }
                 }
+                // Если клики были, выводим имя и число. Если кликов еще 0 — останется прочерк "–"
                 if (maxClicks > 0) {
                     favoriteItemName = `${favoriteItemName} (Открыт ${maxClicks} раз)`;
+                } else {
+                    favoriteItemName = "–";
                 }
             }
 
@@ -1703,7 +1705,7 @@
             let percentColor = percentFloor === 100 ? "#00ff66" : "#ffffff";
             let percentSpan = `<span style="color: ${percentColor}; font-weight: bold;">${percentFloor}%</span>`;
             
-            // ФИКС: Окрашивание дроби предметов (например, 15/15) в зеленый при 100% сборе всей коллекции
+            // Окрашивание дроби собранных предметов в зеленый при 100% коллекции
             let countColor = uniqueCollected === totalPossible ? "#00ff66" : "#ffffff";
             let itemsCountSpan = `<span style="color: ${countColor}; font-weight: bold;">${uniqueCollected}/${totalPossible}</span>`;
             
@@ -1713,7 +1715,7 @@
             // Настройка отображения тяжелого предмета
             let heavyItemStyled = "–";
             if (extendedStats.totalRollsEver > 0) {
-                heavyItemStyled = "Нет";
+                heavyItemStyled = "–";
                 if (extendedStats.heavyItemRolls > 0) {
                     let heavyColor = getRarityByKey(extendedStats.heavyItemRarity).color;
                     heavyItemStyled = `<span style="color: ${heavyColor}; font-weight: bold;">${extendedStats.heavyItemName}</span> (Потребовалось круток: <span style="color: #ff1414; font-weight: bold;">${extendedStats.heavyItemRolls}</span>)`;
@@ -1726,45 +1728,36 @@
                 firstItemStyled = `<span style="color: #fff; font-weight: bold;">${extendedStats.firstItemName}</span>`;
             }
 
-            // СБОРКА ШАБЛОНА В СТРОГО УТВЕРЖДЕННОМ ПОРЯДКЕ СО СМАЙЛИКАМИ
+            // СБОРКА ИТОГОВОГО ШАБЛОНА: КАРТОЧКА НАВЕРХУ, ДАЛЕЕ СТРОГИЙ ПОРЯДОК СТРОК
             statsContainer.innerHTML = `
-                <!-- 1. Всего вращений совершено -->
-                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">🔄 Всего вращений совершено: <span style="color: #fff; font-weight: bold;">${extendedStats.totalRollsEver}</span></div>
-                
-                <!-- 2. Барабан вращался -->
-                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">⏱️ Барабан вращался: ${hours} часов ${minutes} минут</div>
-                
-                <!-- 3. Больше всего вращений совершено -->
-                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">📈 Больше всего вращений совершено: <span style="color: #fff; font-weight: bold;">${extendedStats.mostRollsInDayDate} (${extendedStats.mostRollsInDayCount})</span></div>
-                
-                <!-- ОБЪЕДИНЕННАЯ ГРУППА "ОСНОВНОЙ ПРОГРЕСС" (Внутри неё пункты 4, 5, 6) -->
-                <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 16px 20px; margin-bottom: 5px; display: flex; flex-direction: column; gap: 12px; box-shadow: inset 0 0 15px rgba(0,0,0,0.2);">
-                    <!-- ФИКС: Текст заменен на ОСНОВНОЙ ПРОГРЕСС -->
+                <!-- [ОСНОВНОЙ ПРОГРЕСС] — ТЕПЕРЬ САМЫЙ ПЕРВЫЙ И ВЫШЕ ВСЕГО -->
+                <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 16px 20px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 12px; box-shadow: inset 0 0 15px rgba(0,0,0,0.2);">
                     <div style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: -4px; font-weight: bold;">ОСНОВНОЙ ПРОГРЕСС</div>
                     
-                    <!-- 4. Всего предметов собрано (ФИКС: Дробь красится в зеленый при фулл сборе) -->
                     <div style="border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 8px;">Всего предметов собрано: ${itemsCountSpan}</div>
                     
-                    <!-- 5. Проценты сбора -->
                     <div style="border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 8px;">(Собрано ${percentSpan} от всей коллекции)</div>
                     
-                    <!-- 6. Из них сокровищ -->
+                    <!-- ФИКС: Смайлик удален, лишний двойной пробел убран -->
                     <div style="font-size: 1.15rem; color: #fff;">
-                        <span style="font-weight: normal;">💎 Из них сокровищ:</span> <span style="color: #ffc800; font-size: 1.3rem; font-weight: bold;">${treasureCount}</span> <span style="font-size: 0.95rem; font-weight: normal; color: #aaa; margin-left: 10px;">(Сокровищами считаются предметы <span style="color: ${RARITIES.mythic.color}; font-weight: bold;">мифической</span> и <span style="color: ${RARITIES.legendary.color}; font-weight: bold;">легендарной</span> редкости)</span>
+                        <span style="font-weight: normal;">Из них сокровищ:</span> <span style="color: #ffc800; font-size: 1.3rem; font-weight: bold;">${treasureCount}</span> <span style="font-size: 0.95rem; font-weight: normal; color: #aaa; margin-left: 4px;">(Сокровищами считаются предметы <span style="color: ${RARITIES.mythic.color}; font-weight: bold;">мифической</span> и <span style="color: ${RARITIES.legendary.color}; font-weight: bold;">легендарной</span> редкости)</span>
                     </div>
                 </div>
                 
-                <!-- ВНЕШНИЕ СТРОКИ СТАТИСТИКИ АККАУНТА (Пункты 7, 8, 9, 10) -->
-                <!-- 7. Первый выпавший предмет -->
-                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px; margin-top: 10px;">1️⃣ Первый выпавший предмет: ${firstItemStyled}</div>
+                <!-- ОСТАЛЬНЫЕ СТРОКИ СТАТИСТИКИ В УТВЕРЖДЕННОМ ПОРЯДКЕ -->
+                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px; margin-top: 10px;">🔄 Всего вращений совершено: <span style="color: #fff; font-weight: bold;">${extendedStats.totalRollsEver}</span></div>
                 
-                <!-- 8. Тяжелее всего дался -->
+                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">⏱️ Барабан вращался: ${hours} часов ${minutes} минут</div>
+                
+                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">📈 Больше всего вращений совершено: <span style="color: #fff; font-weight: bold;">${extendedStats.mostRollsInDayDate} (${extendedStats.mostRollsInDayCount})</span></div>
+                
+                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">1️⃣ Первый выпавший предмет: ${firstItemStyled}</div>
+                
                 <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">🧱 Тяжелее всего дался: ${heavyItemStyled}</div>
                 
-                <!-- 9. Любимый предмет -->
+                <!-- ФИКС: Если кликов в инвентаре не было, выведет строгий прочерк "–" -->
                 <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">❤️ Любимый предмет: <span style="color: #00ff66; font-weight: bold;">${favoriteItemName}</span></div>
                 
-                <!-- 10. Рекордная серия повторов -->
                 <div style="padding-top: 5px;">⏩ Рекордная серия повторов: <span style="color: #fff; font-weight: bold;">${extendedStats.maxDryStreak}</span></div>
             `;
         }
