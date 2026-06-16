@@ -1852,6 +1852,7 @@
         if (invRecord) {
             let cleanDate = invRecord.date ? invRecord.date.replace("Дата получения: ", "") : "--";
             infoDate.innerHTML = `📅 Дата получения: <strong>${cleanDate}</strong>`;
+            // ФИКС: Выводим именно персональные крутки предмета из invRecord.rollsToDrop
             infoRolls.innerHTML = `🎰 Круток потребовалось: <strong>${invRecord.rollsToDrop || "Неизвестно"}</strong>`;
         }
         
