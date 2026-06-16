@@ -982,7 +982,8 @@
         mostRollsInDayDate: "--",
         mostRollsInDayCount: 0,
         dailyCalendar: {},
-        itemClicks: {}
+        itemClicks: {},
+        itemRollCounters: {} // ФИКС: Сюда пишется личный счетчик круток для каждого еще не выбитого скина
     };
 
     function loadExtendedStats() {
@@ -1117,15 +1118,16 @@
     function addItem(item) {
         if (!hasItem(item.id)) {
             const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-            const dateStr = formatter.format(new Date());
+            const dateStr = `${formatter.format(new Date())}`;
             
-            // Фиксируем порядковый номер крутки, на которой выпал предмет (текущие крутки + 1)
-            const rollNum = stats.total + 1;
+            // ФИКС: Берем личный накопившийся счетчик круток предмета. 
+            // Если предмета в базе нет (его только что добавил админ в код), то попытка равна 1.
+            const personalRolls = extendedStats.itemRollCounters[item.id] || 1;
             
             inventory.push({ 
                 id: item.id, 
                 date: dateStr,
-                rollsToDrop: rollNum 
+                rollsToDrop: personalRolls // Теперь сюда пишется честное число
             });
             saveData();
             return true;
@@ -1466,6 +1468,13 @@
             extendedStats.mostRollsInDayCount = extendedStats.dailyCalendar[todayStr];
             extendedStats.mostRollsInDayDate = todayStr;
         }
+        
+        // ФИКС: Крутка засчитывается только тем предметам, которые игрок еще НЕ выбил
+        ITEMS.forEach(i => {
+            if (!hasItem(i.id)) {
+                extendedStats.itemRollCounters[i.id] = (extendedStats.itemRollCounters[i.id] || 0) + 1;
+            }
+        });
         saveExtendedStats();
         // ==================== КОНЕЦ РАСШИРЕННОЙ СТАТИСТИКИ ====================
         
@@ -1496,8 +1505,8 @@
                 extendedStats.firstItemName = won.name;
             }
             
-            // Проверяем, тяжелее ли этот предмет дался, чем предыдущий рекордсмен
-            const currentRollsToDrop = stats.total; // Номер крутки
+            // ФИКС: Проверяем рекорд тяжелого предмета по его личному счетчику
+            const currentRollsToDrop = extendedStats.itemRollCounters[won.id] || 1;
             if (currentRollsToDrop > extendedStats.heavyItemRolls) {
                 extendedStats.heavyItemRolls = currentRollsToDrop;
                 extendedStats.heavyItemName = won.name;
@@ -1565,7 +1574,8 @@
                 mostRollsInDayDate: "--",
                 mostRollsInDayCount: 0,
                 dailyCalendar: {},
-                itemClicks: {}
+                itemClicks: {},
+                itemRollCounters: {} // Очищается при сбросе
             };
             saveData();
             saveStats();
@@ -1738,7 +1748,6 @@
                     
                     <div style="border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 8px;">(Собрано ${percentSpan} от всей коллекции)</div>
                     
-                    <!-- ФИКС: Смайлик удален, лишний двойной пробел убран -->
                     <div style="font-size: 1.15rem; color: #fff;">
                         <span style="font-weight: normal;">Из них сокровищ:</span> <span style="color: #ffc800; font-size: 1.3rem; font-weight: bold;">${treasureCount}</span> <span style="font-size: 0.95rem; font-weight: normal; color: #aaa; margin-left: 4px;">(Сокровищами считаются предметы <span style="color: ${RARITIES.mythic.color}; font-weight: bold;">мифической</span> и <span style="color: ${RARITIES.legendary.color}; font-weight: bold;">легендарной</span> редкости)</span>
                     </div>
@@ -1755,7 +1764,6 @@
                 
                 <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">🧱 Тяжелее всего дался: ${heavyItemStyled}</div>
                 
-                <!-- ФИКС: Если кликов в инвентаре не было, выведет строгий прочерк "–" -->
                 <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">❤️ Любимый предмет: <span style="color: #00ff66; font-weight: bold;">${favoriteItemName}</span></div>
                 
                 <div style="padding-top: 5px;">⏩ Рекордная серия повторов: <span style="color: #fff; font-weight: bold;">${extendedStats.maxDryStreak}</span></div>
@@ -1874,6 +1882,13 @@
             extendedStats.mostRollsInDayCount = extendedStats.dailyCalendar[todayStr];
             extendedStats.mostRollsInDayDate = todayStr;
         }
+        
+        // ФИКС: Крутка засчитывается только тем предметам, которые игрок еще НЕ выбил
+        ITEMS.forEach(i => {
+            if (!hasItem(i.id)) {
+                extendedStats.itemRollCounters[i.id] = (extendedStats.itemRollCounters[i.id] || 0) + 1;
+            }
+        });
         saveExtendedStats();
         // ==================== КОНЕЦ РАСШИРЕННОЙ СТАТИСТИКИ ====================
         
@@ -1912,7 +1927,8 @@
                 extendedStats.firstItemName = won.name;
             }
             
-            const currentRollsToDrop = stats.total;
+            // ФИКС: Проверяем рекорд тяжелого предмета по его личному счетчику
+            const currentRollsToDrop = extendedStats.itemRollCounters[won.id] || 1;
             if (currentRollsToDrop > extendedStats.heavyItemRolls) {
                 extendedStats.heavyItemRolls = currentRollsToDrop;
                 extendedStats.heavyItemName = won.name;
