@@ -22,6 +22,48 @@
             color: #eee;
         }
 
+        /* Стили окна входа/регистрации */
+        .auth-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(145deg, #0a0f1e 0%, #0c1222 100%);
+            z-index: 200000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .auth-card {
+            background: #0d1326;
+            border-radius: 36px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .auth-input {
+            width: 100%;
+            background: rgba(7, 11, 20, 0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 20px;
+            border-radius: 20px;
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 16px;
+            outline: none;
+        }
+        .auth-input:focus {
+            border-color: #00ff66;
+        }
+        .auth-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
         .app {
             max-width: 100%;
             width: 100%;
@@ -134,7 +176,6 @@
             overflow: hidden;
         }
         
-        /* Верхняя зелёная стрелка (указывает вниз) - ФИНАЛЬНАЯ КАЛИБРОВКА 11px */
         .arrow-top {
             position: absolute;
             top: 11px;
@@ -154,13 +195,11 @@
             animation: arrowTopPulse 2s ease-in-out infinite;
         }
         
-        /* Состояние во время крутки - смещена ближе к центру */
         .arrow-top.spinning {
             top: 22px;
             animation: none;
         }
         
-        /* Нижняя зелёная стрелка (указывает вверх) - ФИНАЛЬНАЯ КАЛИБРОВКА 11px */
         .arrow-bottom {
             position: absolute;
             bottom: 11px;
@@ -180,7 +219,6 @@
             animation: arrowBottomPulse 2s ease-in-out infinite;
         }
         
-        /* Состояние во время крутки - смещена ближе к центру */
         .arrow-bottom.spinning {
             bottom: 22px;
             animation: none;
@@ -198,7 +236,6 @@
             100% { opacity: 0.8; transform: translateX(-50%) translateY(0px); }
         }
         
-        /* Зелёная рамка-прицел в центре с неоном */
         .center-highlight {
             position: absolute;
             top: 50%;
@@ -260,7 +297,6 @@
             box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
         
-        /* Базовые стили для карточек крутки, инвентаря, коллекции - рамка 6px */
         .slot-item, .item-card {
             border-radius: 16px;
             padding: 10px;
@@ -278,7 +314,6 @@
             z-index: 2;
         }
         
-        /* Редкости для карточек крутки, инвентаря и коллекции - рамка 6px */
         .slot-item.rarity-common, .item-card.rarity-common {
             border: 6px solid #dee3f2;
             background: linear-gradient(135deg, rgba(222,227,242,0.05), rgba(222,227,242,0.02));
@@ -310,7 +345,6 @@
             box-shadow: inset 0 0 15px rgba(255,200,0,0.1);
         }
         
-        /* Базовые стили для карточки выигрыша - рамка 5px, более низкий слой */
         .final-item {
             border-radius: 32px;
             padding: 32px 40px;
@@ -323,7 +357,6 @@
             transition: all 0.2s ease;
         }
         
-        /* Редкости для карточки выигрыша - рамка 5px (НЕ ТРОГАЕМ) */
         .final-item.rarity-common {
             border: 5px solid #dee3f2;
             background: linear-gradient(135deg, rgba(222,227,242,0.05), rgba(222,227,242,0.02));
@@ -429,7 +462,6 @@
             background: rgba(0,0,0,0.6);
         }
         
-        /* Премиальный стиль надписи редкости - самый высокий слой */
         .new-rarity-title {
             position: absolute;
             top: 13px;
@@ -442,19 +474,13 @@
             font-family: 'Segoe UI', 'Arial Black', sans-serif;
             letter-spacing: 4px;
             text-transform: uppercase;
-            
-            /* Стабильный белый текст и черный контур */
             color: #ffffff !important;
             -webkit-text-stroke: 1px #000000;
-            
             transform-origin: center;
-            
-            /* Появление из вращения (2 секунды). Блик включается через 2 секунды. */
             animation: titleSpawn 2s cubic-bezier(0.25, 1, 0.5, 1) forwards,
                        shimmerGlow 5s ease-in-out infinite 2s;
         }
         
-        /* 1. ПОЯВЛЕНИЕ ИЗ ВРАЩЕНИЯ (Длится 2 секунды, без изменения размера) */
         @keyframes titleSpawn {
             0% {
                 transform: rotate(1080deg);
@@ -468,28 +494,19 @@
             }
         }
         
-        /* НОВАЯ ЛОГИКА: Блик в начале цикла + супер-плавное растворение в стороны */
         @keyframes shimmerGlow {
-            /* 0% - 20% (первые 1.0 сек): Текст спокойно и статично стоит после появления. Комфортная пауза. */
             0%, 20% {
                 transform: rotate(12deg) scale(1);
                 filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
             }
-            
-            /* 20% - 30% (за 0.5 сек): Нарастает сочный, яркий неоновый взрыв цвета редкости */
             30% {
-                transform: rotate(12deg) scale(1.03); /* Нежное премиальное покачивание */
+                transform: rotate(12deg) scale(1.03);
                 filter: drop-shadow(0 0 15px var(--rarity-color)) drop-shadow(0 0 25px var(--rarity-color));
             }
-            
-            /* 30% - 45% (целые 0.75 сек плавного РАСТВОРЕНИЯ): Свет выталкивается далеко в стороны и медленно тает */
             45% {
                 transform: rotate(12deg) scale(1);
-                /* Радиус размытия вырос до 100px, а цвет плавно ушел в полный ноль (rgba) без рывков */
                 filter: drop-shadow(0 0 100px rgba(0,0,0,0)) drop-shadow(0 0 5px rgba(0,0,0,0.5));
             }
-            
-            /* 45% - 100% (оставшееся время до конца 5 секунд): Текст чисто отдыхает до следующего цикла */
             100% {
                 transform: rotate(12deg) scale(1);
                 filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
@@ -532,7 +549,6 @@
             text-align: center;
         }
 
-        /* Идеальная горизонтальная симметрия для инвентаря и коллекции */
         .items-grid {
             display: flex;
             flex-wrap: wrap;
@@ -646,7 +662,6 @@
             border-radius: 20px;
         }
 
-        /* Главный контейнер без изменений */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -659,7 +674,6 @@
             padding: 20px;
         }
         
-        /* ТВОЯ ОРИГИНАЛЬНАЯ КАРТОЧКА — СТРОГО ПО ЦЕНТРУ ЭКРАНА С ПРАВИЛЬНЫМИ ОТСТУПАМИ */
         .modal-card {
             background: #0d1326;
             border-radius: 36px;
@@ -673,19 +687,18 @@
             position: relative;
         }
         
-        /* ТОЧНАЯ КАЛИБРОВКА СИММЕТРИИ ОТСТУПОВ (+10px между именем и редкостью) */
         #modalName {
             font-size: 1.8rem;
             font-weight: bold;
-            margin-top: 15px !important;     /* Жесткий верхний зазор от картинки */
-            margin-bottom: 16px !important;  /* Увеличено ровно на 10px для отдаления */
+            margin-top: 15px !important;
+            margin-bottom: 16px !important;
             color: #fff;
         }
         #modalBadge {
             font-size: 0.85rem;
             padding: 4px 12px;
             margin-top: 0 !important;
-            margin-bottom: 15px !important;  /* Жесткий нижний зазор до описания */
+            margin-bottom: 15px !important;
         }
         .modal-desc {
             font-size: 1rem;
@@ -695,7 +708,6 @@
             word-break: break-word;
         }
 
-        /* ПАНЕЛЬ СТАТИСТИКИ — ВЕРНУЛАСЬ НА СВОЮ ИСХОДНУЮ ВЫСОТУ СПРАВА */
         .modal-side-panel {
             background: #0d1326;
             border-radius: 28px;
@@ -709,9 +721,8 @@
             text-align: left;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6);
             animation: finalPop 0.3s ease-out;
-            
             position: absolute;
-            left: calc(50% + 290px + 80px); /* Держит панель справа на зазоре 80px */
+            left: calc(50% + 290px + 80px);
         }
         
         @media (max-width: 1180px) {
@@ -728,7 +739,6 @@
             color: #00ff66;
         }
 
-        /* АНИМАЦИЯ ПРОСЕДАНИЯ КНОПКИ ЗАКРЫТЬ (Один в один как у кнопки Кейса) */
         .modal-card .open-btn:hover {
             transform: translateY(2px);
             box-shadow: 0 6px 0 #009933;
@@ -738,7 +748,6 @@
             box-shadow: 0 2px 0 #009933;
         }
 
-        /* ЖЕСТКОЕ И ОКОНЧАТЕЛЬНОЕ УДАЛЕНИЕ ЛЮБОЙ ПОДСВЕТКИ ФОНА В КОЛЛЕКЦИИ ПО ТИПАМ РЕДКОСТЕЙ */
         #collectionContainer .item-card {
             cursor: default !important;
         }
@@ -746,7 +755,6 @@
             transform: none !important;
             box-shadow: none !important;
         }
-        /* Перебиваем ховеры для каждой редкости в коллекции персонально */
         #collectionContainer .item-card.rarity-common:hover {
             background: linear-gradient(135deg, rgba(222,227,242,0.05), rgba(222,227,242,0.02)) !important;
         }
@@ -766,11 +774,43 @@
             background: linear-gradient(135deg, rgba(255,200,0,0.08), rgba(255,200,0,0.02)) !important;
             box-shadow: inset 0 0 15px rgba(255,200,0,0.1) !important;
         }
+        
+        .test-admin-panel {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 20px;
+            justify-content: center;
+        }
+        .test-admin-panel button {
+            border: none;
+            padding: 6px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
+
+<!-- ОКНО АВТОРИЗАЦИИ FIREBASE -->
+<div id="authOverlay" class="auth-overlay">
+    <div class="auth-card">
+        <h2 style="font-size: 1.8rem; font-weight: bold; margin-bottom: 24px; color: #fff;">🔑 Вход в аккаунт</h2>
+        <input type="email" id="authEmail" class="auth-input" placeholder="Ваш Email">
+        <input type="password" id="authPassword" class="auth-input" placeholder="Пароль">
+        <div id="authError" style="color: #ff1414; font-size: 0.9rem; margin-bottom: 12px; display: none;"></div>
+        <div class="auth-btn-group">
+            <button id="signInBtn" class="open-btn" style="font-size: 1.2rem; padding: 12px; margin: 0;">ВОЙТИ</button>
+            <button id="signUpBtn" class="small-reset" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); padding: 10px; border-radius: 20px;">Зарегистрироваться</button>
+        </div>
+    </div>
+</div>
+
 <div class="app">
-    <!-- Панель управления звуком -->
     <div class="audio-controls">
         <button id="muteBtn" class="small-reset" style="background: none; padding: 0; font-size: 1.2rem; cursor: pointer;">🔊</button>
         <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.5" style="cursor: pointer; accent-color: #00ff66; width: 100px;">
@@ -799,14 +839,13 @@
             <span>⭐ Осталось выбить: <strong id="remainingCount">0</strong></span>
             <button class="small-reset" id="resetProgressBtn">♻️ Сбросить прогресс</button>
         </div>
-        <!-- ВРЕМЕННАЯ ТЕСТОВАЯ ПАНЕЛЬ ДЛЯ ПРОВЕРКИ АНИМАЦИЙ (УДАЛИТЬ ПО СЛОВУ НАЗАРИК) -->
-        <div class="test-admin-panel" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 20px; justify-content: center;">
-            <button onclick="testOpenCaseWithRarity('common')" style="background: #dee3f2; color: #000; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-weight: bold;">⚪ Common</button>
-            <button onclick="testOpenCaseWithRarity('rare')" style="background: #184cff; color: #fff; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-weight: bold;">🔵 Rare</button>
-            <button onclick="testOpenCaseWithRarity('superRare')" style="background: #8e18ff; color: #fff; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-weight: bold;">🟣 SuperRare</button>
-            <button onclick="testOpenCaseWithRarity('epic')" style="background: #ff18ab; color: #fff; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-weight: bold;">🩷 Epic</button>
-            <button onclick="testOpenCaseWithRarity('mythic')" style="background: #ff1414; color: #fff; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-weight: bold;">🔴 Mythic</button>
-            <button onclick="testOpenCaseWithRarity('legendary')" style="background: #ffc800; color: #000; border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-weight: bold;">🟡 Legendary</button>
+        <div class="test-admin-panel">
+            <button onclick="testOpenCaseWithRarity('common')" style="background: #dee3f2; color: #000;">⚪ Common</button>
+            <button onclick="testOpenCaseWithRarity('rare')" style="background: #184cff; color: #fff;">🔵 Rare</button>
+            <button onclick="testOpenCaseWithRarity('superRare')" style="background: #8e18ff; color: #fff;">🟣 SuperRare</button>
+            <button onclick="testOpenCaseWithRarity('epic')" style="background: #ff18ab; color: #fff;">🩷 Epic</button>
+            <button onclick="testOpenCaseWithRarity('mythic')" style="background: #ff1414; color: #fff;">🔴 Mythic</button>
+            <button onclick="testOpenCaseWithRarity('legendary')" style="background: #ffc800; color: #000;">🟡 Legendary</button>
         </div>
         <div class="stats-panel" id="statsPanel">
             <div class="stat-item">📊 Открыто: 0</div>
@@ -819,47 +858,57 @@
         </div>
     </div>
 
-    <!-- Заголовки H2 удалены -->
     <div id="inventoryTab" class="tab-content">
         <div id="inventoryGrid"></div>
     </div>
 
-    <!-- Заголовки H2 удалены -->
     <div id="collectionTab" class="tab-content">
         <div id="collectionContainer"></div>
     </div>
 
-    <!-- Контейнер для новой вкладки статистики -->
     <div id="statsTab" class="tab-content">
-        <div class="stats-panel-rows" id="globalStatsContainer" style="display: flex; flex-direction: column; gap: 20px; padding: 20px 10px; font-size: 1.15rem; color: #fff;">
-            <!-- Строки будут генерироваться JavaScript кодом автоматически -->
-        </div>
+        <div class="stats-panel-rows" id="globalStatsContainer" style="display: flex; flex-direction: column; gap: 20px; padding: 20px 10px; font-size: 1.15rem; color: #fff;"></div>
     </div>
     
     <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
 </div>
 
-<!-- ОЧИЩЕННАЯ ИСПРАВЛЕННАЯ СТРУКТУРА ОКНА СТАТИСТИКИ -->
 <div id="descModal" class="modal-overlay" onclick="closeItemDescription()">
-    
     <div class="modal-card" id="modalCard" onclick="event.stopPropagation()">
-        <!-- Элементы возвращены напрямую в modal-card, чтобы вернуть высоту правому окну -->
         <img id="modalImg" src="" style="width: 100.15%; height: auto; object-fit: contain; margin-bottom: 20px;" alt="">
         <h2 id="modalName"></h2>
         <div id="modalBadge" class="badge"></div>
         <div id="modalDesc" class="modal-desc"></div>
         <button class="open-btn" onclick="closeItemDescription()" style="font-size: 1.2rem; padding: 10px 30px; margin: 10px 0 0 0;">ЗАКРЫТЬ</button>
     </div>
-    
     <div class="modal-side-panel" id="modalSidePanel" onclick="event.stopPropagation()">
         <div style="font-size: 1.1rem; font-weight: bold; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 4px;">Статистика предмета</div>
         <div class="modal-side-row" id="infoDateRow">📅 Дата получения: <strong>--</strong></div>
         <div class="modal-side-row" id="infoRollsRow">🎰 Круток потребовалось: <strong>--</strong></div>
     </div>
-
 </div>
 
-<script>
+<script type="module">
+    // ==================== ПОДКЛЮЧЕНИЕ FIREBASE ====================
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAhFEJ1AZRntBc_Qyrhd-D3klK_kQawSt0",
+        authDomain: "case-simulator-e2e36.firebaseapp.com",
+        projectId: "case-simulator-e2e36",
+        storageBucket: "case-simulator-e2e36.firebasestorage.app",
+        messagingSenderId: "820284500611",
+        appId: "1:820284500611:web:1f7eb404a8296fd5a349b6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    let currentUserUid = null;
+
     // ==================== ЗВУКОВОЙ ДВИЖОК ====================
     const clickAudio = new Audio('click.mp3');
     const winAudio = new Audio('win.mp3');
@@ -868,7 +917,7 @@
     
     clickAudio.volume = currentVolume;
     winAudio.volume = currentVolume;
-    
+
     // ==================== СИСТЕМА РЕДКОСТЕЙ ====================
     const RARITIES = {
         common: { name: "Обычный", color: "#dee3f2", totalChance: 95.234 },
@@ -900,7 +949,6 @@
     const itemsCountByRarity = {};
     for (const item of ITEMS) itemsCountByRarity[item.rarityKey] = (itemsCountByRarity[item.rarityKey] || 0) + 1;
 
-    // РЕАЛЬНЫЕ ШАНСЫ ДЛЯ ВЫИГРЫША (НЕ ТРОГАТЬ!)
     const cumulativeItems = [];
     let cumulativeSum = 0;
     for (const item of ITEMS) {
@@ -917,7 +965,6 @@
         return ITEMS[0];
     }
 
-    // ВИЗУАЛЬНЫЕ ШАНСЫ ДЛЯ ЛЕНТЫ ПРОКРУТКИ (обновлённые)
     function getRandomItemByRarity() {
         const rand = Math.random() * 100;
         if (rand < 79.6) {
@@ -969,7 +1016,6 @@
     let stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
     let isResultScreen = false;
 
-    // ==================== РАСШИРЕННАЯ СТАТИСТИКА ====================
     let extendedStats = {
         totalRollsEver: 0,
         spinTimeMs: 0,
@@ -983,134 +1029,59 @@
         mostRollsInDayCount: 0,
         dailyCalendar: {},
         itemClicks: {},
-        itemRollCounters: {} // Сюда пишется личный счетчик круток для каждого еще не выбитого скина
+        itemRollCounters: {}
     };
 
-    function loadExtendedStats() {
-        let saved = localStorage.getItem("case_sim_extended_stats_v1");
-        if (saved) {
-            try { 
-                const parsed = JSON.parse(saved);
-                // Объединяем с дефолтными значениями на случай добавления новых полей
-                extendedStats = { ...extendedStats, ...parsed };
-            } catch (e) {}
+    // ==================== ОБЛАЧНЫЕ ФУНКЦИИ СОХРАНЕНИЯ ====================
+    function saveAllDataToCloud() {
+        if (!currentUserUid) {
+            console.warn("Нет авторизованного пользователя. Данные не сохранены.");
+            return;
         }
-    }
-    
-    function saveExtendedStats() {
-        localStorage.setItem("case_sim_extended_stats_v1", JSON.stringify(extendedStats));
+        set(ref(db, `users/${currentUserUid}`), {
+            inventory: inventory,
+            stats: stats,
+            extendedStats: extendedStats
+        }).catch((error) => console.error("Ошибка сохранения в облако:", error));
     }
 
-    function loadData() {
-        let savedInventory = localStorage.getItem("case_sim_inventory_v3");
-        if (savedInventory) {
-            try {
-                const parsed = JSON.parse(savedInventory);
-                if (Array.isArray(parsed) && parsed.every(record => record && typeof record === 'object' && 'id' in record && 'date' in record)) {
-                    inventory = parsed;
-                } else {
-                    inventory = [];
-                }
-            } catch (e) {
-                inventory = [];
-            }
-        } else {
-            let oldInventoryV2 = localStorage.getItem("case_sim_inventory_v2");
-            let oldInventoryV1 = localStorage.getItem("inventory_final_balanced");
-            
-            if (oldInventoryV2) {
-                try {
-                    const oldParsed = JSON.parse(oldInventoryV2);
-                    if (Array.isArray(oldParsed) && oldParsed.every(record => record && typeof record === 'object' && 'id' in record)) {
-                        const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-                        inventory = oldParsed.map(record => ({
-                            id: record.id,
-                            date: formatter.format(new Date(record.date || new Date()))
-                        }));
-                    } else {
-                        inventory = [];
-                    }
-                } catch (e) {
-                    inventory = [];
-                }
-            } else if (oldInventoryV1) {
-                try {
-                    const oldParsed = JSON.parse(oldInventoryV1);
-                    if (Array.isArray(oldParsed) && oldParsed.every(id => typeof id === 'number')) {
-                        const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-                        inventory = oldParsed.map(id => ({
-                            id: id,
-                            date: formatter.format(new Date())
-                        }));
-                    } else {
-                        inventory = [];
-                    }
-                } catch (e) {
-                    inventory = [];
-                }
+    function saveData() { saveAllDataToCloud(); }
+    function saveStats() { saveAllDataToCloud(); }
+    function saveExtendedStats() { saveAllDataToCloud(); }
+
+    async function loadData() {
+        if (!currentUserUid) return;
+        const dbRef = ref(db);
+        try {
+            const snapshot = await get(child(dbRef, `users/${currentUserUid}`));
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                inventory = data.inventory || [];
+                stats = data.stats || { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+                extendedStats = data.extendedStats || {
+                    totalRollsEver: 0, spinTimeMs: 0, firstItemName: "Нет предметов",
+                    maxDryStreak: 0, currentDryStreak: 0, heavyItemName: "Нет предметов",
+                    heavyItemRarity: "common", heavyItemRolls: 0, mostRollsInDayDate: "--",
+                    mostRollsInDayCount: 0, dailyCalendar: {}, itemClicks: {}, itemRollCounters: {}
+                };
             } else {
                 inventory = [];
-            }
-        }
-        
-        let savedStats = localStorage.getItem("case_sim_stats_v3");
-        if (savedStats) {
-            try {
-                const parsedStats = JSON.parse(savedStats);
-                if (parsedStats && typeof parsedStats === 'object' && 
-                    'total' in parsedStats && 'common' in parsedStats && 'rare' in parsedStats &&
-                    'superRare' in parsedStats && 'epic' in parsedStats && 'mythic' in parsedStats && 'legendary' in parsedStats) {
-                    stats = parsedStats;
-                } else {
-                    stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
-                }
-            } catch (e) {
                 stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+                extendedStats = {
+                    totalRollsEver: 0, spinTimeMs: 0, firstItemName: "Нет предметов",
+                    maxDryStreak: 0, currentDryStreak: 0, heavyItemName: "Нет предметов",
+                    heavyItemRarity: "common", heavyItemRolls: 0, mostRollsInDayDate: "--",
+                    mostRollsInDayCount: 0, dailyCalendar: {}, itemClicks: {}, itemRollCounters: {}
+                };
             }
-        } else {
-            let oldStatsV2 = localStorage.getItem("case_sim_stats_v2");
-            let oldStatsV1 = localStorage.getItem("stats_final_balanced");
-            
-            if (oldStatsV2) {
-                try {
-                    const oldParsedStats = JSON.parse(oldStatsV2);
-                    if (oldParsedStats && typeof oldParsedStats === 'object') {
-                        stats = oldParsedStats;
-                    } else {
-                        stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
-                    }
-                } catch (e) {
-                    stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
-                }
-            } else if (oldStatsV1) {
-                try {
-                    const oldParsedStats = JSON.parse(oldStatsV1);
-                    if (oldParsedStats && typeof oldParsedStats === 'object') {
-                        stats = oldParsedStats;
-                    } else {
-                        stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
-                    }
-                } catch (e) {
-                    stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
-                }
-            } else {
-                stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
-            }
+            updateUI();
+            updateStatsDisplay();
+        } catch (error) {
+            console.error("Ошибка загрузки из Firebase:", error);
         }
-        
-        loadExtendedStats();
-        updateUI();
-        updateStatsDisplay();
     }
-    
-    function saveData() { 
-        localStorage.setItem("case_sim_inventory_v3", JSON.stringify(inventory)); 
-    }
-    
-    function saveStats() { 
-        localStorage.setItem("case_sim_stats_v3", JSON.stringify(stats)); 
-    }
-    
+
+    // ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
     function hasItem(id) { 
         return inventory.some(i => i.id === id); 
     }
@@ -1119,10 +1090,7 @@
         if (!hasItem(item.id)) {
             const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
             const dateStr = `${formatter.format(new Date())}`;
-            
-            // Берем личный накопившийся счетчик круток предмета
             const personalRolls = extendedStats.itemRollCounters[item.id] || 1;
-            
             inventory.push({ 
                 id: item.id, 
                 date: dateStr,
@@ -1132,37 +1100,6 @@
             return true;
         }
         return false;
-    }
-    
-    function updateStatsDisplay() {
-        const panel = document.getElementById('statsPanel');
-        if (panel && stats.total > 0) {
-            const commonPercent = (stats.common / stats.total * 100).toFixed(1);
-            const rarePercent = (stats.rare / stats.total * 100).toFixed(1);
-            const superRarePercent = (stats.superRare / stats.total * 100).toFixed(1);
-            const epicPercent = (stats.epic / stats.total * 100).toFixed(1);
-            const mythicPercent = (stats.mythic / stats.total * 100).toFixed(1);
-            const legendaryPercent = (stats.legendary / stats.total * 100).toFixed(1);
-            panel.innerHTML = `
-                <div class="stat-item">📊 Открыто: ${stats.total}</div>
-                <div class="stat-item">⚪ Обычных: ${stats.common} (${commonPercent}%)</div>
-                <div class="stat-item">🔵 Редких: ${stats.rare} (${rarePercent}%)</div>
-                <div class="stat-item">🟣 Сверхредких: ${stats.superRare} (${superRarePercent}%)</div>
-                <div class="stat-item">🩷 Эпических: ${stats.epic} (${epicPercent}%)</div>
-                <div class="stat-item">🔴 Мифических: ${stats.mythic} (${mythicPercent}%)</div>
-                <div class="stat-item">🟡 Легендарных: ${stats.legendary} (${legendaryPercent}%)</div>
-            `;
-        } else if (panel && stats.total === 0) {
-            panel.innerHTML = `
-                <div class="stat-item">📊 Открыто: 0</div>
-                <div class="stat-item">⚪ Обычных: 0 (0%)</div>
-                <div class="stat-item">🔵 Редких: 0 (0%)</div>
-                <div class="stat-item">🟣 Сверхредких: 0 (0%)</div>
-                <div class="stat-item">🩷 Эпических: 0 (0%)</div>
-                <div class="stat-item">🔴 Мифических: 0 (0%)</div>
-                <div class="stat-item">🟡 Легендарных: 0 (0%)</div>
-            `;
-        }
     }
     
     function getCollected() { 
@@ -1310,7 +1247,6 @@
         let rarity = getItemRarity(item);
         let rarityClass = getRarityClass(item.rarityKey);
         let textClass = getRarityTextClass(item.rarityKey);
-        // Для обычных предметов используем темно-серый цвет, для остальных - цвет редкости
         let color = item.rarityKey === 'common' ? '#333333' : rarity.color;
         
         hideArrows();
@@ -1318,7 +1254,6 @@
         
         let rarityName = getRarityName(item.rarityKey).toUpperCase();
         
-        // Создаем контент окна с надписью внутри карточки для новых предметов
         let content = `
             <div class="center-indicator"></div>
             <div class="final-container">
@@ -1450,32 +1385,24 @@
         let btn = document.getElementById("openCaseBtn");
         if (isSpinning || btn.disabled) return;
         
-        // ==================== РАСШИРЕННАЯ СТАТИСТИКА ====================
-        // Добавляем +1 к глобальным круткам за ВСЕ время
         extendedStats.totalRollsEver++;
-        
-        // Прибавляем чистое время вращения барабана (200 шагов анимации с задержками дают примерно 14.5 секунд на одну крутку)
         extendedStats.spinTimeMs += 14500;
         
-        // Фиксация суточного календаря активности
         const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
         const todayStr = formatter.format(new Date());
         extendedStats.dailyCalendar[todayStr] = (extendedStats.dailyCalendar[todayStr] || 0) + 1;
         
-        // Сравниваем с историческим рекордом за 24 часа
         if (extendedStats.dailyCalendar[todayStr] > extendedStats.mostRollsInDayCount) {
             extendedStats.mostRollsInDayCount = extendedStats.dailyCalendar[todayStr];
             extendedStats.mostRollsInDayDate = todayStr;
         }
         
-        // Крутка засчитывается только тем предметам, которые игрок еще НЕ выбил
         ITEMS.forEach(i => {
             if (!hasItem(i.id)) {
                 extendedStats.itemRollCounters[i.id] = (extendedStats.itemRollCounters[i.id] || 0) + 1;
             }
         });
         saveExtendedStats();
-        // ==================== КОНЕЦ РАСШИРЕННОЙ СТАТИСТИКИ ====================
         
         isSpinning = true;
         btn.disabled = true;
@@ -1497,14 +1424,11 @@
         showResult(won, isNew);
         addItem(won);
         
-        // ==================== РАСШИРЕННАЯ СТАТИСТИКА (продолжение) ====================
         if (isNew) {
-            // Если выбит первый предмет за всю историю аккаунта
             if (inventory.length === 1) {
                 extendedStats.firstItemName = won.name;
             }
             
-            // Проверяем рекорд тяжелого предмета по его личному счетчику
             const currentRollsToDrop = extendedStats.itemRollCounters[won.id] || 1;
             if (currentRollsToDrop > extendedStats.heavyItemRolls) {
                 extendedStats.heavyItemRolls = currentRollsToDrop;
@@ -1512,19 +1436,15 @@
                 extendedStats.heavyItemRarity = won.rarityKey;
             }
             
-            // Прерываем серию сухости (повторов)
             extendedStats.currentDryStreak = 0;
         } else {
-            // Если выпал повтор, увеличиваем текущую серию
             extendedStats.currentDryStreak++;
             if (extendedStats.currentDryStreak > extendedStats.maxDryStreak) {
                 extendedStats.maxDryStreak = extendedStats.currentDryStreak;
             }
         }
         saveExtendedStats();
-        // ==================== КОНЕЦ РАСШИРЕННОЙ СТАТИСТИКИ ====================
         
-        // Если предмет новый — зажигаем красную точку уведомления на кнопке инвентаря
         if (isNew) {
             const dot = document.getElementById("invDot");
             if (dot) dot.style.display = "inline-block";
@@ -1557,31 +1477,34 @@
         isSpinning = false;
     }
 
-    function resetGame() {
-        if (confirm("Сбросить прогресс?")) {
-            inventory = [];
-            stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
-            extendedStats = {
-                totalRollsEver: 0,
-                spinTimeMs: 0,
-                firstItemName: "Нет предметов",
-                maxDryStreak: 0,
-                currentDryStreak: 0,
-                heavyItemName: "Нет предметов",
-                heavyItemRarity: "common",
-                heavyItemRolls: 0,
-                mostRollsInDayDate: "--",
-                mostRollsInDayCount: 0,
-                dailyCalendar: {},
-                itemClicks: {},
-                itemRollCounters: {} // Очищается при сбросе
-            };
-            saveData();
-            saveStats();
-            saveExtendedStats();
-            resetToInitialState();
-            updateUI();
-            updateStatsDisplay();
+    function updateStatsDisplay() {
+        const panel = document.getElementById('statsPanel');
+        if (panel && stats.total > 0) {
+            const commonPercent = (stats.common / stats.total * 100).toFixed(1);
+            const rarePercent = (stats.rare / stats.total * 100).toFixed(1);
+            const superRarePercent = (stats.superRare / stats.total * 100).toFixed(1);
+            const epicPercent = (stats.epic / stats.total * 100).toFixed(1);
+            const mythicPercent = (stats.mythic / stats.total * 100).toFixed(1);
+            const legendaryPercent = (stats.legendary / stats.total * 100).toFixed(1);
+            panel.innerHTML = `
+                <div class="stat-item">📊 Открыто: ${stats.total}</div>
+                <div class="stat-item">⚪ Обычных: ${stats.common} (${commonPercent}%)</div>
+                <div class="stat-item">🔵 Редких: ${stats.rare} (${rarePercent}%)</div>
+                <div class="stat-item">🟣 Сверхредких: ${stats.superRare} (${superRarePercent}%)</div>
+                <div class="stat-item">🩷 Эпических: ${stats.epic} (${epicPercent}%)</div>
+                <div class="stat-item">🔴 Мифических: ${stats.mythic} (${mythicPercent}%)</div>
+                <div class="stat-item">🟡 Легендарных: ${stats.legendary} (${legendaryPercent}%)</div>
+            `;
+        } else if (panel && stats.total === 0) {
+            panel.innerHTML = `
+                <div class="stat-item">📊 Открыто: 0</div>
+                <div class="stat-item">⚪ Обычных: 0 (0%)</div>
+                <div class="stat-item">🔵 Редких: 0 (0%)</div>
+                <div class="stat-item">🟣 Сверхредких: 0 (0%)</div>
+                <div class="stat-item">🩷 Эпических: 0 (0%)</div>
+                <div class="stat-item">🔴 Мифических: 0 (0%)</div>
+                <div class="stat-item">🟡 Легендарных: 0 (0%)</div>
+            `;
         }
     }
 
@@ -1597,7 +1520,6 @@
             legendary: "Легендарные"
         };
         
-        // 1. ОБНОВЛЕНИЕ ВКЛАДКИ ИНВЕНТАРЯ
         let invDiv = document.getElementById("inventoryGrid");
         let collected = getCollected();
         
@@ -1637,7 +1559,6 @@
             invDiv.innerHTML = invHtml;
         }
         
-        // 2. ОБНОВЛЕНИЕ ВКЛАДКИ КОЛЛЕКЦИИ
         let collDiv = document.getElementById("collectionContainer");
         let missing = getMissing();
         
@@ -1678,15 +1599,12 @@
             collDiv.innerHTML = collHtml;
         }
         
-        // 3. ОТРИСОВКА И РАСЧЕТ НОВОЙ ВКЛАДКИ СТАТИСТИКИ
         let statsContainer = document.getElementById("globalStatsContainer");
         if (statsContainer) {
-            // Расчет времени вращения
             let totalSeconds = Math.floor(extendedStats.spinTimeMs / 1000);
             let hours = Math.floor(totalSeconds / 3600);
             let minutes = Math.floor((totalSeconds % 3600) / 60);
             
-            // Вычисление любимого предмета
             let favoriteItemStyled = "–";
             let maxClicks = 0;
             let favoriteItemObj = null;
@@ -1706,13 +1624,11 @@
                 }
             }
 
-            // Математика процентов с округлением вниз
             let uniqueCollected = collected.length;
             let totalPossible = ITEMS.length;
             let percentRaw = totalPossible > 0 ? (uniqueCollected / totalPossible) * 100 : 0;
             let percentFloor = Math.floor(percentRaw);
             
-            // ФИКС: Если коллекция собрана на 100%, заменяем строку на зеленую победную фразу
             let percentLineHtml = "";
             if (percentFloor === 100) {
                 percentLineHtml = `<div style="border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 8px; color: #00ff66; font-weight: bold;">Вся коллекция полностью собрана!</div>`;
@@ -1720,14 +1636,11 @@
                 percentLineHtml = `<div style="border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 8px;">(Собрано <span style="color: #fff; font-weight: bold;">${percentFloor}%</span> от всей коллекции)</div>`;
             }
             
-            // Окрашивание дроби собранных предметов в зеленый при 100% коллекции
             let countColor = uniqueCollected === totalPossible ? "#00ff66" : "#ffffff";
             let itemsCountSpan = `<span style="color: ${countColor}; font-weight: bold;">${uniqueCollected}/${totalPossible}</span>`;
             
-            // Расчет сокровищ
             let treasureCount = collected.filter(i => i.rarityKey === 'mythic' || i.rarityKey === 'legendary').length;
 
-            // Настройка отображения тяжелого предмета
             let heavyItemStyled = "–";
             if (extendedStats.totalRollsEver > 0) {
                 heavyItemStyled = "–";
@@ -1737,7 +1650,6 @@
                 }
             }
 
-            // ФИКС: Первый выпавший предмет теперь динамически красится в цвет своей редкости
             let firstItemStyled = "–";
             if (extendedStats.totalRollsEver > 0 && extendedStats.firstItemName !== "Нет предметов") {
                 let firstItemObj = ITEMS.find(item => item.name === extendedStats.firstItemName);
@@ -1749,22 +1661,16 @@
                 }
             }
 
-            // СБОРКА ОБНОВЛЕННОГО ШАБЛОНА
             statsContainer.innerHTML = `
-                <!-- [ОСНОВНОЙ ПРОГРЕСС] -->
                 <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 16px 20px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 12px; box-shadow: inset 0 0 15px rgba(0,0,0,0.2);">
                     <div style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: -4px; font-weight: bold;">ОСНОВНОЙ ПРОГРЕСС</div>
                     <div style="border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 8px;">Всего предметов собрано: ${itemsCountSpan}</div>
-                    
-                    <!-- ФИКС: Переменная строки процентов с динамической заменой текста при 100% -->
                     ${percentLineHtml}
-                    
                     <div style="font-size: 1.15rem; color: #fff;">
                         <span style="font-weight: normal;">Из них сокровищ:</span> <span style="color: #ffc800; font-size: 1.3rem; font-weight: bold;">${treasureCount}</span> <span style="font-size: 0.95rem; font-weight: normal; color: #aaa; margin-left: 4px;">(Сокровищами считаются предметы <span style="color: ${RARITIES.mythic.color}; font-weight: bold;">мифической</span> и <span style="color: ${RARITIES.legendary.color}; font-weight: bold;">легендарной</span> редкости)</span>
                     </div>
                 </div>
                 
-                <!-- ОСТАЛЬНЫЕ СТРОКИ СТАТИСТИКИ -->
                 <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px; margin-top: 10px;">🔄 Всего вращений совершено: <span style="color: #fff; font-weight: bold;">${extendedStats.totalRollsEver}</span></div>
                 <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">⏱️ Барабан вращался: ${hours} часов ${minutes} минут</div>
                 <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">📈 Больше всего вращений совершено: <span style="color: #fff; font-weight: bold;">${extendedStats.mostRollsInDayDate} (${extendedStats.mostRollsInDayCount})</span></div>
@@ -1818,12 +1724,11 @@
         });
     }
 
-    // ==================== СИСТЕМА ПРОСМОТРА ОПИСАНИЙ ПРЕДМЕТОВ ====================
+    // ==================== МОДАЛЬНОЕ ОКНО ====================
     function openItemDescription(id) {
         const item = ITEMS.find(i => i.id === id);
         if (!item) return;
         
-        // Счетчик открытий для любимого предмета
         extendedStats.itemClicks[id] = (extendedStats.itemClicks[id] || 0) + 1;
         saveExtendedStats();
         
@@ -1836,7 +1741,6 @@
         const badge = document.getElementById("modalBadge");
         const desc = document.getElementById("modalDesc");
         
-        // Элементы нового отдельного бокового окна
         const sidePanel = document.getElementById("modalSidePanel");
         const infoDate = document.getElementById("infoDateRow");
         const infoRolls = document.getElementById("infoRollsRow");
@@ -1845,7 +1749,6 @@
         let rarityClass = getRarityClass(item.rarityKey);
         let textClass = getRarityTextClass(item.rarityKey);
         
-        // Наполнение твоей оригинальной карточки
         img.src = item.img;
         name.innerText = item.name;
         badge.innerText = rarity.name;
@@ -1853,14 +1756,12 @@
         card.className = "modal-card " + rarityClass;
         badge.className = "badge " + textClass;
         
-        // Наполнение отдельного окошка справа
         if (invRecord) {
             let cleanDate = invRecord.date ? invRecord.date.replace("Дата получения: ", "") : "--";
             infoDate.innerHTML = `📅 Дата получения: <strong>${cleanDate}</strong>`;
             infoRolls.innerHTML = `🎰 Круток потребовалось: <strong>${invRecord.rollsToDrop || "Неизвестно"}</strong>`;
         }
         
-        // Окрашиваем рамку бокового окна в цвет редкости для красоты
         sidePanel.style.borderColor = rarity.color;
         
         modal.style.display = "flex";
@@ -1870,12 +1771,11 @@
         document.getElementById("descModal").style.display = "none";
     }
 
-    // ==================== ВРЕМЕННАЯ ФУНКЦИЯ ТЕСТИРОВАНИЯ (УДАЛИТЬ ПО СЛОВУ НАЗАРИК) ====================
+    // ==================== ТЕСТОВЫЕ ФУНКЦИИ ====================
     async function testOpenCaseWithRarity(rarityKey) {
         let btn = document.getElementById("openCaseBtn");
         if (isSpinning || btn.disabled) return;
         
-        // ==================== РАСШИРЕННАЯ СТАТИСТИКА ====================
         extendedStats.totalRollsEver++;
         extendedStats.spinTimeMs += 14500;
         
@@ -1888,14 +1788,12 @@
             extendedStats.mostRollsInDayDate = todayStr;
         }
         
-        // Крутка засчитывается только тем предметам, которые игрок еще НЕ выбил
         ITEMS.forEach(i => {
             if (!hasItem(i.id)) {
                 extendedStats.itemRollCounters[i.id] = (extendedStats.itemRollCounters[i.id] || 0) + 1;
             }
         });
         saveExtendedStats();
-        // ==================== КОНЕЦ РАСШИРЕННОЙ СТАТИСТИКИ ====================
         
         const filteredItems = ITEMS.filter(i => i.rarityKey === rarityKey);
         if (filteredItems.length === 0) {
@@ -1903,7 +1801,6 @@
             return;
         }
         
-        // Берем случайный предмет из этой редкости
         let won = filteredItems[Math.floor(Math.random() * filteredItems.length)];
         
         isSpinning = true;
@@ -1915,7 +1812,6 @@
         
         let isNew = !hasItem(won.id);
         
-        // Запуск прокрутки со строго заданным предметом
         await startSpin(won);
         
         if (!isMuted) {
@@ -1926,7 +1822,6 @@
         showResult(won, isNew);
         addItem(won);
         
-        // ==================== РАСШИРЕННАЯ СТАТИСТИКА (продолжение) ====================
         if (isNew) {
             if (inventory.length === 1) {
                 extendedStats.firstItemName = won.name;
@@ -1947,15 +1842,12 @@
             }
         }
         saveExtendedStats();
-        // ==================== КОНЕЦ РАСШИРЕННОЙ СТАТИСТИКИ ====================
         
-        // Если предмет новый — зажигаем красную точку уведомления на кнопке инвентаря (для теста)
         if (isNew) {
             const dot = document.getElementById("invDot");
             if (dot) dot.style.display = "inline-block";
         }
         
-        // Обновление статистики для честности теста
         stats.total++;
         stats[won.rarityKey]++;
         saveStats();
@@ -1978,11 +1870,91 @@
         isSpinning = false;
     }
 
+    async function resetGame() {
+        if (confirm("Сбросить прогресс?")) {
+            inventory = [];
+            stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+            extendedStats = {
+                totalRollsEver: 0, spinTimeMs: 0, firstItemName: "Нет предметов",
+                maxDryStreak: 0, currentDryStreak: 0, heavyItemName: "Нет предметов",
+                heavyItemRarity: "common", heavyItemRolls: 0, mostRollsInDayDate: "--",
+                mostRollsInDayCount: 0, dailyCalendar: {}, itemClicks: {}, itemRollCounters: {}
+            };
+            
+            if (currentUserUid) {
+                await set(ref(db, `users/${currentUserUid}`), {
+                    inventory: inventory,
+                    stats: stats,
+                    extendedStats: extendedStats
+                });
+            }
+            resetToInitialState();
+            updateUI();
+            updateStatsDisplay();
+        }
+    }
+
+    // ==================== ЭКСПОРТ В ГЛОБАЛЬНЫЙ ОБЪЕКТ WINDOW ====================
+    window.testOpenCaseWithRarity = testOpenCaseWithRarity;
+    window.openItemDescription = openItemDescription;
+    window.closeItemDescription = closeItemDescription;
+    window.resetGame = resetGame;
+
+    // ==================== ИНИЦИАЛИЗАЦИЯ ====================
     document.addEventListener("DOMContentLoaded", () => {
         initTabs();
-        loadData();
-        loadExtendedStats();
         initAudioControls();
+        
+        const authOverlay = document.getElementById("authOverlay");
+        const emailInput = document.getElementById("authEmail");
+        const passwordInput = document.getElementById("authPassword");
+        const errorDiv = document.getElementById("authError");
+        
+        // Отслеживание состояния аккаунта
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUserUid = user.uid;
+                authOverlay.style.display = "none";
+                loadData();
+            } else {
+                currentUserUid = null;
+                authOverlay.style.display = "flex";
+            }
+        });
+
+        // Кнопка ВОЙТИ
+        document.getElementById("signInBtn").onclick = () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            errorDiv.style.display = "none";
+            
+            signInWithEmailAndPassword(auth, email, password)
+                .catch(error => {
+                    errorDiv.innerText = "Ошибка входа: Неверный email или пароль.";
+                    errorDiv.style.display = "block";
+                });
+        };
+
+        // Кнопка ЗАРЕГИСТРИРОВАТЬСЯ
+        document.getElementById("signUpBtn").onclick = () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            errorDiv.style.display = "none";
+            
+            if (password.length < 6) {
+                errorDiv.innerText = "Пароль должен быть не менее 6 символов.";
+                errorDiv.style.display = "block";
+                return;
+            }
+            
+            createUserWithEmailAndPassword(auth, email, password)
+                .catch(error => {
+                    errorDiv.innerText = "Ошибка регистрации. Проверьте формат Email.";
+                    errorDiv.style.display = "block";
+                });
+        };
+
+        // Кнопка открытия кейса
         const openBtn = document.getElementById("openCaseBtn");
         openBtn.onclick = async () => {
             if (isResultScreen) {
@@ -1991,6 +1963,8 @@
                 await openCase();
             }
         };
+
+        // Кнопка сброса прогресса
         document.getElementById("resetProgressBtn").onclick = resetGame;
     });
 </script>
