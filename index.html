@@ -79,6 +79,7 @@
             margin-bottom: 30px;
             border-bottom: 2px solid #2a2e3f;
             padding-bottom: 12px;
+            flex-wrap: wrap;
         }
         .tab-btn {
             background: none;
@@ -779,6 +780,7 @@
         <button class="tab-btn active" data-tab="case">📦 Кейс</button>
         <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot" style="display: none; position: absolute; top: 2px; right: 6px; width: 12px; height: 12px; background-color: #ff1414; border-radius: 50%; box-shadow: 0 0 8px #ff1414;"></span></button>
         <button class="tab-btn" data-tab="collection">🏆 Коллекция</button>
+        <button class="tab-btn" data-tab="stats">📊 Статистика</button>
     </div>
 
     <div id="caseTab" class="tab-content active">
@@ -826,6 +828,14 @@
     <div id="collectionTab" class="tab-content">
         <div id="collectionContainer"></div>
     </div>
+
+    <!-- Контейнер для новой вкладки статистики -->
+    <div id="statsTab" class="tab-content">
+        <div class="stats-panel-rows" id="globalStatsContainer" style="display: flex; flex-direction: column; gap: 20px; padding: 20px 10px; font-size: 1.15rem; color: #fff;">
+            <!-- Строки будут генерироваться JavaScript кодом автоматически -->
+        </div>
+    </div>
+    
     <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
 </div>
 
@@ -959,6 +969,37 @@
     let stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
     let isResultScreen = false;
 
+    // ==================== РАСШИРЕННАЯ СТАТИСТИКА ====================
+    let extendedStats = {
+        totalRollsEver: 0,
+        spinTimeMs: 0,
+        firstItemName: "Нет предметов",
+        maxDryStreak: 0,
+        currentDryStreak: 0,
+        heavyItemName: "Нет предметов",
+        heavyItemRarity: "common",
+        heavyItemRolls: 0,
+        mostRollsInDayDate: "--",
+        mostRollsInDayCount: 0,
+        dailyCalendar: {},
+        itemClicks: {}
+    };
+
+    function loadExtendedStats() {
+        let saved = localStorage.getItem("case_sim_extended_stats_v1");
+        if (saved) {
+            try { 
+                const parsed = JSON.parse(saved);
+                // Объединяем с дефолтными значениями на случай добавления новых полей
+                extendedStats = { ...extendedStats, ...parsed };
+            } catch (e) {}
+        }
+    }
+    
+    function saveExtendedStats() {
+        localStorage.setItem("case_sim_extended_stats_v1", JSON.stringify(extendedStats));
+    }
+
     function loadData() {
         let savedInventory = localStorage.getItem("case_sim_inventory_v3");
         if (savedInventory) {
@@ -983,7 +1024,7 @@
                         const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
                         inventory = oldParsed.map(record => ({
                             id: record.id,
-                            date: `Дата получения: ${formatter.format(new Date(record.date || new Date()))}`
+                            date: formatter.format(new Date(record.date || new Date()))
                         }));
                     } else {
                         inventory = [];
@@ -998,7 +1039,7 @@
                         const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
                         inventory = oldParsed.map(id => ({
                             id: id,
-                            date: `Дата получения: ${formatter.format(new Date())}`
+                            date: formatter.format(new Date())
                         }));
                     } else {
                         inventory = [];
@@ -1056,6 +1097,7 @@
             }
         }
         
+        loadExtendedStats();
         updateUI();
         updateStatsDisplay();
     }
@@ -1075,7 +1117,7 @@
     function addItem(item) {
         if (!hasItem(item.id)) {
             const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-            const dateStr = `${formatter.format(new Date())}`;
+            const dateStr = formatter.format(new Date());
             
             // Фиксируем порядковый номер крутки, на которой выпал предмет (текущие крутки + 1)
             const rollNum = stats.total + 1;
@@ -1407,6 +1449,26 @@
         let btn = document.getElementById("openCaseBtn");
         if (isSpinning || btn.disabled) return;
         
+        // ==================== РАСШИРЕННАЯ СТАТИСТИКА ====================
+        // Добавляем +1 к глобальным круткам за ВСЕ время
+        extendedStats.totalRollsEver++;
+        
+        // Прибавляем чистое время вращения барабана (200 шагов анимации с задержками дают примерно 14.5 секунд на одну крутку)
+        extendedStats.spinTimeMs += 14500;
+        
+        // Фиксация суточного календаря активности
+        const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+        const todayStr = formatter.format(new Date());
+        extendedStats.dailyCalendar[todayStr] = (extendedStats.dailyCalendar[todayStr] || 0) + 1;
+        
+        // Сравниваем с историческим рекордом за 24 часа
+        if (extendedStats.dailyCalendar[todayStr] > extendedStats.mostRollsInDayCount) {
+            extendedStats.mostRollsInDayCount = extendedStats.dailyCalendar[todayStr];
+            extendedStats.mostRollsInDayDate = todayStr;
+        }
+        saveExtendedStats();
+        // ==================== КОНЕЦ РАСШИРЕННОЙ СТАТИСТИКИ ====================
+        
         isSpinning = true;
         btn.disabled = true;
         removeGlow();
@@ -1426,6 +1488,33 @@
         
         showResult(won, isNew);
         addItem(won);
+        
+        // ==================== РАСШИРЕННАЯ СТАТИСТИКА (продолжение) ====================
+        if (isNew) {
+            // Если выбит первый предмет за всю историю аккаунта
+            if (inventory.length === 1) {
+                extendedStats.firstItemName = won.name;
+            }
+            
+            // Проверяем, тяжелее ли этот предмет дался, чем предыдущий рекордсмен
+            const currentRollsToDrop = stats.total; // Номер крутки
+            if (currentRollsToDrop > extendedStats.heavyItemRolls) {
+                extendedStats.heavyItemRolls = currentRollsToDrop;
+                extendedStats.heavyItemName = won.name;
+                extendedStats.heavyItemRarity = won.rarityKey;
+            }
+            
+            // Прерываем серию сухости (повторов)
+            extendedStats.currentDryStreak = 0;
+        } else {
+            // Если выпал повтор, увеличиваем текущую серию
+            extendedStats.currentDryStreak++;
+            if (extendedStats.currentDryStreak > extendedStats.maxDryStreak) {
+                extendedStats.maxDryStreak = extendedStats.currentDryStreak;
+            }
+        }
+        saveExtendedStats();
+        // ==================== КОНЕЦ РАСШИРЕННОЙ СТАТИСТИКИ ====================
         
         // Если предмет новый — зажигаем красную точку уведомления на кнопке инвентаря
         if (isNew) {
@@ -1464,8 +1553,23 @@
         if (confirm("Сбросить прогресс?")) {
             inventory = [];
             stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+            extendedStats = {
+                totalRollsEver: 0,
+                spinTimeMs: 0,
+                firstItemName: "Нет предметов",
+                maxDryStreak: 0,
+                currentDryStreak: 0,
+                heavyItemName: "Нет предметов",
+                heavyItemRarity: "common",
+                heavyItemRolls: 0,
+                mostRollsInDayDate: "--",
+                mostRollsInDayCount: 0,
+                dailyCalendar: {},
+                itemClicks: {}
+            };
             saveData();
             saveStats();
+            saveExtendedStats();
             resetToInitialState();
             updateUI();
             updateStatsDisplay();
@@ -1508,7 +1612,6 @@
                         </div>
                         <div class="items-grid" style="width:100%;">
                     `;
-                    // Добавлен клик только на карточки инвентаря
                     invHtml += itemsInRarity.map(i => {
                         let rarity = getItemRarity(i);
                         let rarityClass = getRarityClass(i.rarityKey);
@@ -1530,7 +1633,6 @@
         let missing = getMissing();
         
         if (missing.length === 0) {
-            // Кнопка удалена, оставлен только требуемый текст триумфа
             collDiv.innerHTML = `<div class="celebration"><h1>🏆 ВСЕ СОБРАНО! 🏆</h1><p style="font-size:1.5rem; font-weight:bold; margin-top:10px;">Все предметы собраны! Ур-рааааа!</p></div>`;
         } else {
             let collHtml = "";
@@ -1544,7 +1646,6 @@
                     let hrLine = !isFirstColl ? `<hr style="border: none; height: 1px; background: rgba(255,255,255,0.15); margin: 40px 10px 20px 10px; width: 100%;">` : '';
                     isFirstColl = false;
                     
-                    // ФИКС: Заголовки в коллекции теперь строго черно-белые (#aaa) без цветных теней
                     collHtml += `
                         ${hrLine}
                         <div style="width:100%; margin-top:10px; margin-bottom:10px;">
@@ -1568,6 +1669,63 @@
             collDiv.innerHTML = collHtml;
         }
         
+        // 3. ОТРИСОВКА И РАСЧЕТ НОВОЙ ВКЛАДКИ СТАТИСТИКИ
+        let statsContainer = document.getElementById("globalStatsContainer");
+        if (statsContainer) {
+            // Расчет времени вращения
+            let totalSeconds = Math.floor(extendedStats.spinTimeMs / 1000);
+            let hours = Math.floor(totalSeconds / 3600);
+            let minutes = Math.floor((totalSeconds % 3600) / 60);
+            let timeStr = `Барабан вращался: ${hours} часов ${minutes} минут`;
+            
+            // Вычисление любимого предмета (по макс. количеству кликов)
+            let favoriteItemName = "Нет любимого предмета";
+            let maxClicks = 0;
+            for (let id in extendedStats.itemClicks) {
+                if (extendedStats.itemClicks[id] > maxClicks) {
+                    maxClicks = extendedStats.itemClicks[id];
+                    let foundItem = ITEMS.find(item => item.id == id);
+                    if (foundItem) favoriteItemName = foundItem.name;
+                }
+            }
+            if (maxClicks > 0) {
+                favoriteItemName = `${favoriteItemName} (Открыт ${maxClicks} раз)`;
+            }
+            
+            // Математика процентов с округлением вниз (Math.floor)
+            let uniqueCollected = collected.length;
+            let totalPossible = ITEMS.length;
+            let percentRaw = totalPossible > 0 ? (uniqueCollected / totalPossible) * 100 : 0;
+            let percentFloor = Math.floor(percentRaw);
+            let percentColor = percentFloor === 100 ? "#00ff66" : "#ffffff";
+            let percentSpan = `<span style="color: ${percentColor}; font-weight: bold;">${percentFloor}%</span>`;
+            
+            // Расчет сокровищ (Кол-во мифических + легендарных предметов в инвентаре)
+            let treasureCount = collected.filter(i => i.rarityKey === 'mythic' || i.rarityKey === 'legendary').length;
+            
+            // Окрашивание тяжелого предмета
+            let heavyItemStyled = "Нет";
+            if (extendedStats.heavyItemRolls > 0) {
+                let heavyColor = getRarityByKey(extendedStats.heavyItemRarity).color;
+                heavyItemStyled = `<span style="color: ${heavyColor}; font-weight: bold;">${extendedStats.heavyItemName}</span> (Потребовалось <span style="color: #ff1414; font-weight: bold;">${extendedStats.heavyItemRolls}</span> круток)`;
+            }
+            
+            statsContainer.innerHTML = `
+                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">Потрачено виртуального времени: ${timeStr}</div>
+                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">Тяжелее всего дался: ${heavyItemStyled}</div>
+                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">Первый выпавший предмет: <span style="color: #fff; font-weight: bold;">${extendedStats.firstItemName}</span></div>
+                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">Рекордная серия повторов: <span style="color: #fff; font-weight: bold;">${extendedStats.maxDryStreak}</span></div>
+                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">Всего круток совершено: <span style="color: #fff; font-weight: bold;">${extendedStats.totalRollsEver}</span></div>
+                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">Больше всего круток совершено: <span style="color: #fff; font-weight: bold;">${extendedStats.mostRollsInDayDate} (${extendedStats.mostRollsInDayCount})</span></div>
+                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">Всего предметов собрано: <span style="color: #fff; font-weight: bold;">${uniqueCollected}/${totalPossible}</span> (Собрано ${percentSpan} от всей коллекции)</div>
+                <div style="padding-left: 20px; font-size: 1.25rem; color: #fff; font-weight: bold; text-shadow: 0 0 10px rgba(255,255,255,0.1);">
+                    Из них сокровищ: <span style="color: #ffc800; font-size: 1.4rem;">${treasureCount}</span>
+                    <span style="font-size: 0.95rem; font-weight: normal; color: #aaa; margin-left: 10px;">(Сокровищами считаются предметы <span style="color: ${RARITIES.mythic.color}; font-weight: bold;">мифической</span> и <span style="color: ${RARITIES.legendary.color}; font-weight: bold;">легендарной</span> редкости)</span>
+                </div>
+                <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; margin-top: 10px;">Любимый предмет: <span style="color: #00ff66; font-weight: bold;">${favoriteItemName}</span></div>
+            `;
+        }
+        
         document.getElementById("totalItemsCount").innerText = inventory.length;
         document.getElementById("remainingCount").innerText = missing.length;
     }
@@ -1582,9 +1740,9 @@
                 document.getElementById("caseTab").classList.remove("active");
                 document.getElementById("inventoryTab").classList.remove("active");
                 document.getElementById("collectionTab").classList.remove("active");
+                document.getElementById("statsTab").classList.remove("active");
                 document.getElementById(id + "Tab").classList.add("active");
                 
-                // ФИКС: Если открыли вкладку инвентаря, убираем красную точку уведомления
                 if (id === "inventory") {
                     const dot = document.getElementById("invDot");
                     if (dot) dot.style.display = "none";
@@ -1615,6 +1773,10 @@
     function openItemDescription(id) {
         const item = ITEMS.find(i => i.id === id);
         if (!item) return;
+        
+        // Счетчик открытий для любимого предмета
+        extendedStats.itemClicks[id] = (extendedStats.itemClicks[id] || 0) + 1;
+        saveExtendedStats();
         
         const invRecord = inventory.find(record => record.id === id);
         
@@ -1664,6 +1826,21 @@
         let btn = document.getElementById("openCaseBtn");
         if (isSpinning || btn.disabled) return;
         
+        // ==================== РАСШИРЕННАЯ СТАТИСТИКА ====================
+        extendedStats.totalRollsEver++;
+        extendedStats.spinTimeMs += 14500;
+        
+        const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+        const todayStr = formatter.format(new Date());
+        extendedStats.dailyCalendar[todayStr] = (extendedStats.dailyCalendar[todayStr] || 0) + 1;
+        
+        if (extendedStats.dailyCalendar[todayStr] > extendedStats.mostRollsInDayCount) {
+            extendedStats.mostRollsInDayCount = extendedStats.dailyCalendar[todayStr];
+            extendedStats.mostRollsInDayDate = todayStr;
+        }
+        saveExtendedStats();
+        // ==================== КОНЕЦ РАСШИРЕННОЙ СТАТИСТИКИ ====================
+        
         const filteredItems = ITEMS.filter(i => i.rarityKey === rarityKey);
         if (filteredItems.length === 0) {
             alert("В массиве ITEMS нет предметов с редкостью: " + rarityKey);
@@ -1692,6 +1869,29 @@
         
         showResult(won, isNew);
         addItem(won);
+        
+        // ==================== РАСШИРЕННАЯ СТАТИСТИКА (продолжение) ====================
+        if (isNew) {
+            if (inventory.length === 1) {
+                extendedStats.firstItemName = won.name;
+            }
+            
+            const currentRollsToDrop = stats.total;
+            if (currentRollsToDrop > extendedStats.heavyItemRolls) {
+                extendedStats.heavyItemRolls = currentRollsToDrop;
+                extendedStats.heavyItemName = won.name;
+                extendedStats.heavyItemRarity = won.rarityKey;
+            }
+            
+            extendedStats.currentDryStreak = 0;
+        } else {
+            extendedStats.currentDryStreak++;
+            if (extendedStats.currentDryStreak > extendedStats.maxDryStreak) {
+                extendedStats.maxDryStreak = extendedStats.currentDryStreak;
+            }
+        }
+        saveExtendedStats();
+        // ==================== КОНЕЦ РАСШИРЕННОЙ СТАТИСТИКИ ====================
         
         // Если предмет новый — зажигаем красную точку уведомления на кнопке инвентаря (для теста)
         if (isNew) {
@@ -1725,6 +1925,7 @@
     document.addEventListener("DOMContentLoaded", () => {
         initTabs();
         loadData();
+        loadExtendedStats();
         initAudioControls();
         const openBtn = document.getElementById("openCaseBtn");
         openBtn.onclick = async () => {
