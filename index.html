@@ -34,18 +34,19 @@
             padding: 20px;
         }
         
-        /* ФИКС: Возвращаем стандартные отступы карточки */
         .auth-card {
             background: #0d1326;
             border-radius: 36px;
-            padding: 40px; 
+            padding: 40px; /* Идеальные одинаковые отступы со всех сторон ячейки */
             max-width: 540px; 
             width: 100%;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6);
             border: 1px solid rgba(255,255,255,0.1);
             box-sizing: border-box;
-            text-align: center;
-            position: relative; 
+            
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Центрирование всех внутренних блоков по горизонтали */
         }
         
         .auth-input {
@@ -71,25 +72,25 @@
             width: 100%;
         }
 
-        /* Заголовок зафиксирован сверху ровно на 30px от края */
+        /* ФИКС: Обычный блочный элемент с жестким зазором 30px снизу для идеальной симметрии */
         .auth-project-title {
             font-family: 'Brush Script MT', 'Comic Sans MS', cursive, sans-serif !important;
             font-size: 3rem !important;
             font-weight: bold !important;
             color: #ff18ab !important;
             text-shadow: 0 0 15px rgba(255, 24, 171, 0.6) !important;
+            
+            display: block !important;
+            width: max-content !important; /* Сжимаем рамку строго по ширине букв */
+            
+            /* Идеальное авто-центрирование по бокам и фиксированный зазор 30px снизу */
+            margin: 0 auto 30px auto !important; 
+            padding: 0 !important;
             letter-spacing: 0px !important;
+            
             white-space: nowrap !important;
             box-sizing: border-box !important;
-            
-            position: absolute !important;
-            top: 30px; 
-            left: 50% !important;
-            transform: translateX(-50%) !important; 
-            
-            width: max-content !important;
-            margin: 0 !important;
-            padding: 0 !important;
+            transform: none !important; /* Убираем любые сторонние сдвиги */
         }
 
         /* ФИКС: Анимация проседания кнопки ВОЙТИ (Один в один как у кнопки ЗАКРЫТЬ) */
@@ -844,8 +845,8 @@
     <div class="auth-card">
         <div class="auth-project-title">The Roulette of Love</div>
         
-        <!-- ФИКС: Установлен твой новый текст и добавлен margin-top для создания симметричного зазора снизу от заголовка -->
-        <h2 style="font-size: 1.1rem; font-weight: 600; margin-top: 55px !important; margin-bottom: 24px; color: #fff !important; line-height: 1.5; text-align: center; width: 100%; box-sizing: border-box;">Приветики пистолетики! Ой а что это у нас тут такое? нужен вход на сайт? ёб твою мать! Ну что ж. ХЗАЗАЗАЗ, ПЛЗЩЛЦЗЛП, пцорц9грпцдлп,</h2>
+        <!-- ФИКС: Очищен верхний отступ, теперь расстояние сверху до края ячейки и до заголовка будет идеально симметричным по 30px-40px -->
+        <h2 style="font-size: 1.1rem; font-weight: 600; margin-top: 0 !important; margin-bottom: 24px; color: #fff !important; line-height: 1.5; text-align: center; width: 100%; box-sizing: border-box;">Приветики пистолетики! Ой а что это у нас тут такое? нужен вход на сайт? ёб твою мать! Ну что ж. ХЗАЗАЗАЗ, ПЛЗЩЛЦЗЛП, пцорц9грпцдлп,</h2>
         
         <input type="email" id="authEmail" class="auth-input" placeholder="Email" style="width: 100%;">
         <input type="password" id="authPassword" class="auth-input" placeholder="Пароль" style="width: 100%;">
