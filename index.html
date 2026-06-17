@@ -60,7 +60,7 @@
         .auth-btn-group {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 24px; /* Увеличено в 2 раза, чтобы кнопка опустилась ниже */
             margin-top: 10px;
         }
 
@@ -796,16 +796,19 @@
 </head>
 <body>
 
-<!-- ОКНО АВТОРИЗАЦИИ FIREBASE -->
+<!-- ОБНОВЛЕННАЯ ФОРМА АВТОРИЗАЦИИ С КАСТОМНЫМ ТЕКСТОМ -->
 <div id="authOverlay" class="auth-overlay">
     <div class="auth-card">
-        <h2 style="font-size: 1.8rem; font-weight: bold; margin-bottom: 24px; color: #fff;">🔑 Вход в аккаунт</h2>
+        <!-- ФИКС: Установлен твой фирменный заголовок -->
+        <h2 style="font-size: 1.4rem; font-weight: bold; margin-bottom: 24px; color: #fff; line-height: 1.4; text-align: center;">Приветики пистолетики! Ой а что это у нас тут такое? нужен вход на сайт? ёб твою мать! Ну что ж поделать! похоже без него тут никак не обойтись..</h2>
+        
         <input type="email" id="authEmail" class="auth-input" placeholder="Ваш Email">
         <input type="password" id="authPassword" class="auth-input" placeholder="Пароль">
         <div id="authError" style="color: #ff1414; font-size: 0.9rem; margin-bottom: 12px; display: none;"></div>
         <div class="auth-btn-group">
             <button id="signInBtn" class="open-btn" style="font-size: 1.2rem; padding: 12px; margin: 0;">ВОЙТИ</button>
-            <button id="signUpBtn" class="small-reset" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); padding: 10px; border-radius: 20px;">Зарегистрироваться</button>
+            <!-- ФИКС: Текст переведен в КРУПНЫЙ РЕГИСТР -->
+            <button id="signUpBtn" class="small-reset" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); padding: 12px; border-radius: 20px; font-weight: bold; cursor: pointer; letter-spacing: 1px;">ЗАРЕГИСТРИРОВАТЬСЯ</button>
         </div>
     </div>
 </div>
