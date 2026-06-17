@@ -34,10 +34,11 @@
             padding: 20px;
         }
         
+        /* ФИКС: Верхний паддинг уменьшен на 10px для плотности */
         .auth-card {
             background: #0d1326;
             border-radius: 36px;
-            padding: 40px; 
+            padding: 30px 40px 40px 40px; /* Сверху 30px, по бокам и снизу по 40px */
             max-width: 540px; 
             width: 100%;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6);
@@ -73,7 +74,7 @@
             width: 100%;
         }
 
-        /* ФИКС: Сбалансированный микро-сдвиг для достижения абсолютного центра по горизонтали */
+        /* ФИКС: Нижний маргин уменьшен на 10px (до 20px). Сохранен идеальный центр (-2px) */
         .auth-project-title {
             font-family: 'Brush Script MT', 'Comic Sans MS', cursive, sans-serif !important;
             font-size: 3rem !important;
@@ -85,15 +86,14 @@
             width: max-content !important;
             text-align: center !important;
             
-            /* Идеальный вертикальный зазор до приветствия сохранен */
-            margin: 0 0 30px 0 !important; 
+            /* Отступ снизу уменьшен до 20px для зеркальной симметрии */
+            margin: 0 auto 20px auto !important; 
             padding: 0 !important;
             letter-spacing: 0px !important;
             white-space: nowrap !important;
             box-sizing: border-box !important;
             
-            /* ФИКС: Финальная ювелирная калибровка - сдвиг до -2px для пиксель-в-пиксель центрирования */
-            transform: translateX(-2px) !important; 
+            transform: translateX(-2px) !important; /* Удержание безупречного горизонтального центра */
         }
 
         /* ФИКС: Анимация проседания кнопки ВОЙТИ (Один в один как у кнопки ЗАКРЫТЬ) */
