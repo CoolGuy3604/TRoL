@@ -34,11 +34,11 @@
             padding: 20px;
         }
         
-        /* ФИКС: Верхний паддинг уменьшен на 10px для плотности */
+        /* ВОЗВРАТ К ПРЕДЫДУЩЕМУ РАБОЧЕМУ ВАРИАНТУ ОТСТУПОВ КАРТОЧКИ */
         .auth-card {
             background: #0d1326;
             border-radius: 36px;
-            padding: 30px 40px 40px 40px; /* Сверху 30px, по бокам и снизу по 40px */
+            padding: 40px; /* Вернули прежний просторный паддинг */
             max-width: 540px; 
             width: 100%;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6);
@@ -74,7 +74,7 @@
             width: 100%;
         }
 
-        /* ФИКС: Нижний маргин уменьшен на 10px (до 20px). Сохранен идеальный центр (-2px) */
+        /* ВОЗВРАТ К ПРЕДЫДУЩЕМУ ВАРИАНТУ ОТСТУПОВ ЗАГОЛОВКА + СДВИГ НА 1px ВПРАВО */
         .auth-project-title {
             font-family: 'Brush Script MT', 'Comic Sans MS', cursive, sans-serif !important;
             font-size: 3rem !important;
@@ -86,14 +86,14 @@
             width: max-content !important;
             text-align: center !important;
             
-            /* Отступ снизу уменьшен до 20px для зеркальной симметрии */
-            margin: 0 auto 20px auto !important; 
+            margin: 0 auto 30px auto !important; /* Вернули прежний просторный зазор до текста приветствия */
             padding: 0 !important;
             letter-spacing: 0px !important;
             white-space: nowrap !important;
             box-sizing: border-box !important;
             
-            transform: translateX(-2px) !important; /* Удержание безупречного горизонтального центра */
+            /* ФИКС: Сдвиг изменен на -1px, что подвинуло строку ровно на 1 пиксель вправо */
+            transform: translateX(-1px) !important; 
         }
 
         /* ФИКС: Анимация проседания кнопки ВОЙТИ (Один в один как у кнопки ЗАКРЫТЬ) */
