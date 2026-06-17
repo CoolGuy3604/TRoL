@@ -34,7 +34,6 @@
             padding: 20px;
         }
         
-        /* Карточка принудительно выравнивает всё строго по своей центральной оси */
         .auth-card {
             background: #0d1326;
             border-radius: 36px;
@@ -47,7 +46,7 @@
             
             display: flex !important;
             flex-direction: column !important;
-            align-items: center !important; /* Намертво центрирует все блоки внутри по горизонтали */
+            align-items: center !important;
             justify-content: center !important;
         }
         
@@ -74,7 +73,7 @@
             width: 100%;
         }
 
-        /* ФИКС: Обычный поток для вертикали + микро-сдвиг влево для идеального горизонтального центра */
+        /* ФИКС: Сбалансированный микро-сдвиг для достижения абсолютного центра по горизонтали */
         .auth-project-title {
             font-family: 'Brush Script MT', 'Comic Sans MS', cursive, sans-serif !important;
             font-size: 3rem !important;
@@ -83,18 +82,18 @@
             text-shadow: 0 0 15px rgba(255, 24, 171, 0.6) !important;
             
             display: inline-block !important;
-            width: max-content !important; /* Сжимаем рамку строго по ширине букв */
+            width: max-content !important;
             text-align: center !important;
             
-            /* Идеальный вертикальный зазор 30px до текста "Приветики..." */
+            /* Идеальный вертикальный зазор до приветствия сохранен */
             margin: 0 0 30px 0 !important; 
             padding: 0 !important;
             letter-spacing: 0px !important;
             white-space: nowrap !important;
             box-sizing: border-box !important;
             
-            /* ФИКС ТУПИЗНЫ ДИПСАЙДА: Микро-сдвиг влево на 12 пикселей, который полностью съедает наклонный хвост шрифта и сажает слово пиксель в пиксель по центру ячейки */
-            transform: translateX(-12px) !important; 
+            /* ФИКС: Сдвиг уменьшен до -6px для идеального выравнивания по середине */
+            transform: translateX(-6px) !important; 
         }
 
         /* ФИКС: Анимация проседания кнопки ВОЙТИ (Один в один как у кнопки ЗАКРЫТЬ) */
