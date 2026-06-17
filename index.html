@@ -34,16 +34,18 @@
             padding: 20px;
         }
         
+        /* ФИКС: Добавляем position: relative и увеличиваем верхний отступ, чтобы освободить место под абсолютный заголовок */
         .auth-card {
             background: #0d1326;
             border-radius: 36px;
-            padding: 40px;
+            padding: 90px 40px 40px 40px; /* Верхний паддинг увеличен до 90px */
             max-width: 540px; 
             width: 100%;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6);
             border: 1px solid rgba(255,255,255,0.1);
             box-sizing: border-box;
             text-align: center;
+            position: relative; /* Обязательно для отсчета координат заголовка */
         }
         
         .auth-input {
@@ -69,26 +71,26 @@
             width: 100%;
         }
 
-        /* ФИКС: Сжатие блока по краям букв для уничтожения правого сдвига */
+        /* ФИКС: Железное математическое центрирование по горизонтали через absolute и transform */
         .auth-project-title {
             font-family: 'Brush Script MT', 'Comic Sans MS', cursive, sans-serif !important;
             font-size: 3rem !important;
             font-weight: bold !important;
             color: #ff18ab !important;
             text-shadow: 0 0 15px rgba(255, 24, 171, 0.6) !important;
-            
-            /* Жесткое сжатие рамки строго по ширине букв */
-            display: inline-block !important;
-            width: max-content !important; 
-            
-            /* Сброс всех интервалов и идеальное авто-центрирование */
             letter-spacing: 0px !important;
-            padding: 0 !important;
-            margin: 0 auto 20px auto !important;
-            
             white-space: nowrap !important;
             box-sizing: border-box !important;
-            transform: none !important;
+            
+            /* Абсолютное позиционирование строго по центру карточки */
+            position: absolute !important;
+            top: 30px; /* Дистанция от верхнего края ячейки */
+            left: 50% !important;
+            transform: translateX(-50%) !important; /* Сдвиг ровно на центр по горизонтали */
+            
+            width: max-content !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
 
         /* ФИКС: Анимация проседания кнопки ВОЙТИ (Один в один как у кнопки ЗАКРЫТЬ) */
@@ -841,8 +843,7 @@
 
 <div id="authOverlay" class="auth-overlay">
     <div class="auth-card">
-        <!-- ФИКС: Браузерное центрирование сжатого блока через тег center -->
-        <center><div class="auth-project-title">The Roulette of Love</div></center>
+        <div class="auth-project-title">The Roulette of Love</div>
         
         <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 24px; color: #fff !important; line-height: 1.5; text-align: center; width: 100%; box-sizing: border-box;">Приветики пистолетики! Ой а что это у нас тут такое? нужен вход на сайт? ёб твою мать! Ну что ж. ХЗАЗАЗАЗ, ПЛЗЩЛЦЗЛП, пцорц9грпцдлп, ооооооооо, 3---39-203, Л_)ЛЦПЦППППП,</h2>
         
