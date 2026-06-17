@@ -72,7 +72,7 @@
             margin-top: 10px;
         }
 
-        /* ФИКС: Жесткое и безупречное центрирование названия по горизонтали */
+        /* ФИКС: Тотальное обнуление скрытых отступов шрифта для идеального центра */
         .auth-project-title {
             font-family: 'Brush Script MT', 'Comic Sans MS', cursive, sans-serif;
             font-size: 3rem;
@@ -80,13 +80,31 @@
             color: #ff18ab;
             text-shadow: 0 0 15px rgba(255, 24, 171, 0.6);
             
-            display: block; /* Превращаем в блочный элемент для работы авто-отступов */
-            width: fit-content; /* Ширина строго по размеру текста */
-            margin: 0 auto 15px auto; /* Центрирование по горизонтали и отступ 15px снизу */
-            text-align: center;
-            white-space: nowrap; 
+            display: block !important;
+            width: 100% !important; /* Занимает всю ширину карточки */
+            text-align: center !important; /* Идеальное центрирование букв по середине */
+            
+            /* СБРОС БАГОВ ШРИФТА: Обнуляем интервалы и паддинги, которые толкали слово вправо */
+            letter-spacing: 0 !important;
+            padding: 0 !important;
+            margin: 0 0 15px 0 !important;
+            
+            white-space: nowrap;
             box-sizing: border-box;
-            transform: none !important; /* Полностью блокируем любые случайные наклоны или сдвиги */
+            transform: none !important;
+        }
+
+        /* ФИКС: Анимация проседания кнопки ВОЙТИ (Один в один как у кнопки ЗАКРЫТЬ) */
+        #signInBtn {
+            transition: all 0.2s ease;
+        }
+        #signInBtn:hover {
+            transform: translateY(2px) !important;
+            box-shadow: 0 6px 0 #009933 !important;
+        }
+        #signInBtn:active {
+            transform: translateY(6px) !important;
+            box-shadow: 0 2px 0 #009933 !important;
         }
 
         .app {
