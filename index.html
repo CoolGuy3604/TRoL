@@ -72,19 +72,21 @@
             margin-top: 10px;
         }
 
-        /* ФИКС: Полное центрирование названия без вылетов за рамки */
+        /* ФИКС: Жесткое и безупречное центрирование названия по горизонтали */
         .auth-project-title {
             font-family: 'Brush Script MT', 'Comic Sans MS', cursive, sans-serif;
             font-size: 3rem;
             font-weight: bold;
             color: #ff18ab;
             text-shadow: 0 0 15px rgba(255, 24, 171, 0.6);
-            margin-bottom: 15px;
             
-            width: 100%;
-            text-align: center; /* Четкое выравнивание по середине */
+            display: block; /* Превращаем в блочный элемент для работы авто-отступов */
+            width: fit-content; /* Ширина строго по размеру текста */
+            margin: 0 auto 15px auto; /* Центрирование по горизонтали и отступ 15px снизу */
+            text-align: center;
             white-space: nowrap; 
             box-sizing: border-box;
+            transform: none !important; /* Полностью блокируем любые случайные наклоны или сдвиги */
         }
 
         .app {
@@ -819,15 +821,16 @@
 </head>
 <body>
 
-<!-- ОБНОВЛЕННАЯ ФОРМА АВТОРИЗАЦИИ С ТОЧНЫМИ ОТСТУПАМИ -->
+<!-- ИСПРАВЛЕННАЯ ФОРМА АВТОРИЗАЦИИ С ИДЕАЛЬНЫМ ЦЕНТРИРОВАНИЕМ -->
 <div id="authOverlay" class="auth-overlay">
     <div class="auth-card">
         <div class="auth-project-title">The Roulette of Love</div>
         
-        <!-- ФИКС: Установлен твой новый точный текст, сохранен белый цвет и полужирный стиль -->
-        <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 24px; color: #fff !important; line-height: 1.5; text-align: center; width: 100%; box-sizing: border-box;">Приветики пистолетики! Ой а что это у нас тут такое? нужен вход на сайт? ёб твою мать! Ну что ж. ХЗАЗАЗАЗ, ПЛЗЩЛЦЗЛП, пцорц9грпцдлп, ооооооооо, 3---39-203, Л_)ЛЦПЦППППП, ЧТОТОТОТОДАДАДАДАДАДА</h2>
+        <!-- ФИКС: Установлен твой новый точный текст, цвет белый -->
+        <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 24px; color: #fff !important; line-height: 1.5; text-align: center; width: 100%; box-sizing: border-box;">Приветики пистолетики! Ой а что это у нас тут такое? нужен вход на сайт? ёб твою мать! Ну что ж. ХЗАЗАЗАЗ, ПЛЗЩЛЦЗЛП, пцорц9грпцдлп, ооооооооо, 3---39-203, Л_)ЛЦПЦППППП,</h2>
         
-        <input type="email" id="authEmail" class="auth-input" placeholder="Ваш Email" style="width: 100%;">
+        <!-- ФИКС: Текст плейсхолдера изменен на Email -->
+        <input type="email" id="authEmail" class="auth-input" placeholder="Email" style="width: 100%;">
         <input type="password" id="authPassword" class="auth-input" placeholder="Пароль" style="width: 100%;">
         <div id="authError" style="color: #ff1414; font-size: 0.9rem; margin-bottom: 12px; display: none;"></div>
         <div class="auth-btn-group" style="width: 100%;">
