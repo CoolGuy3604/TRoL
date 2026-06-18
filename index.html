@@ -1099,6 +1099,7 @@
     function saveStats() { saveAllDataToCloud(); }
     function saveExtendedStats() { saveAllDataToCloud(); }
 
+    // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ ====================
     async function loadData() {
         if (!currentUserUid) return;
         const dbRef = ref(db);
@@ -1124,10 +1125,23 @@
                     mostRollsInDayCount: 0, dailyCalendar: {}, itemClicks: {}, itemRollCounters: {}
                 };
             }
+            // Принудительно обновляем UI даже при успешной загрузке
             updateUI();
             updateStatsDisplay();
         } catch (error) {
-            console.error("Ошибка загрузки из Firebase:", error);
+            console.error("КРИТИЧЕСКАЯ ОШИБКА ЗАГРУЗКИ:", error);
+            // Инициализируем дефолтные значения, чтобы интерфейс работал
+            inventory = [];
+            stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+            extendedStats = {
+                totalRollsEver: 0, spinTimeMs: 0, firstItemName: "Нет предметов",
+                maxDryStreak: 0, currentDryStreak: 0, heavyItemName: "Нет предметов",
+                heavyItemRarity: "common", heavyItemRolls: 0, mostRollsInDayDate: "--",
+                mostRollsInDayCount: 0, dailyCalendar: {}, itemClicks: {}, itemRollCounters: {}
+            };
+            // ВАЖНО: Обновляем UI даже при ошибке, чтобы кнопки разблокировались
+            updateUI();
+            updateStatsDisplay();
         }
     }
 
@@ -1972,7 +1986,7 @@
             }
         });
 
-        // Кнопка ВОЙТИ (Исправленный перехват любых ошибок)
+        // Кнопка ВОЙТИ (с улучшенной обработкой сетевых ошибок)
         document.getElementById("signInBtn").onclick = () => {
             const email = emailInput.value.trim();
             const password = passwordInput.value;
@@ -1986,10 +2000,13 @@
             
             signInWithEmailAndPassword(auth, email, password)
                 .catch(error => {
-                    console.error(error);
-                    // Выводим понятную ошибку или системное сообщение от Firebase
-                    if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
-                        errorDiv.innerText = "Неверный email или пароль.";
+                    console.error("Детали ошибки входа:", error);
+                    
+                    // Проверяем на сетевую ошибку
+                    if (error.code === 'auth/network-request-failed') {
+                        errorDiv.innerText = "Ошибка сети: Не удалось подключиться к серверам Firebase. Проверьте интернет или VPN.";
+                    } else if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
+                        errorDiv.innerText = "Ошибка входа: Неверный email или пароль.";
                     } else if (error.code === "auth/operation-not-allowed") {
                         errorDiv.innerText = "Ошибка: В консоли Firebase не включен способ входа по Email/Паролю!";
                     } else {
@@ -1999,7 +2016,7 @@
                 });
         };
 
-        // Кнопка Зарегистрироваться (Исправленный перехват любых ошибок)
+        // Кнопка Зарегистрироваться (с улучшенной обработкой сетевых ошибок)
         document.getElementById("signUpBtn").onclick = () => {
             const email = emailInput.value.trim();
             const password = passwordInput.value;
@@ -2019,9 +2036,13 @@
             
             createUserWithEmailAndPassword(auth, email, password)
                 .catch(error => {
-                    console.error(error);
-                    if (error.code === "auth/email-already-in-use") {
-                        errorDiv.innerText = "Этот Email уже зарегистрирован другим пользователем.";
+                    console.error("Детали ошибки регистрации:", error);
+                    
+                    // Проверяем на сетевую ошибку
+                    if (error.code === 'auth/network-request-failed') {
+                        errorDiv.innerText = "Ошибка сети: Не удалось подключиться к серверам Firebase. Проверьте интернет или VPN.";
+                    } else if (error.code === "auth/email-already-in-use") {
+                        errorDiv.innerText = "Этот Email уже зарегистрирован.";
                     } else if (error.code === "auth/invalid-email") {
                         errorDiv.innerText = "Неверный формат Email. Пример: user@mail.ru";
                     } else if (error.code === "auth/operation-not-allowed") {
@@ -2033,9 +2054,10 @@
                 });
         };
 
-        // Кнопка открытия кейса
+        // Кнопка открытия кейса (с логгированием для отладки)
         const openBtn = document.getElementById("openCaseBtn");
         openBtn.onclick = async () => {
+            console.log("Клик по кнопке зафиксирован, isSpinning =", isSpinning);
             if (isResultScreen) {
                 resetToInitialState();
             } else {
