@@ -26,7 +26,7 @@
         .auth-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: #0a101f;
+            background: linear-gradient(145deg, #0a0f1e 0%, #0c1222 100%);
             z-index: 200000;
             display: flex;
             justify-content: center;
@@ -34,27 +34,16 @@
             padding: 20px;
         }
         
-        /* Холст зафиксирован на заднем плане внутри экрана входа */
-        .auth-bg-canvas {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 1;
-            display: block;
-        }
-        
         .auth-card {
             background: #0d1326;
             border-radius: 36px;
-            padding: 40px;
+            padding: 40px; 
             max-width: 540px; 
             width: 100%;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6);
             border: 1px solid rgba(255,255,255,0.1);
             box-sizing: border-box;
-            text-align: center;
-            position: relative;
-            z-index: 10;
+            
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
@@ -855,11 +844,7 @@
 </head>
 <body>
 
-<!-- ЭКРАН ВХОДА С АНИМИРОВАННЫМ ОБЛАЧНЫМ ФОНОМ СЕРДЕЦ -->
 <div id="authOverlay" class="auth-overlay">
-    <!-- Холст для рисования зацикленных сердец -->
-    <canvas id="authHeartsCanvas" class="auth-bg-canvas"></canvas>
-    
     <div class="auth-card">
         <div class="auth-project-title">The Roulette of Love</div>
         
@@ -1965,149 +1950,6 @@
     window.closeItemDescription = closeItemDescription;
     window.resetGame = resetGame;
 
-    // ==================== ДВИЖОК МУЛЬТИ-КОНВЕЙЕРНЫХ БАРАБАННЫХ ЛЕНТ С РЕВЕРСОМ ====================
-    let isAuthBackgroundActive = true;
-    const BG_HEX = '#0a101f';
-    const HEART_HEX = '#ff18ab';
-    const CELL_SIZE = 90;    // Размер каждого квадрата (рамки) на ленте
-    const BASE_SPEED = 240;  // Высокая скорость движения барабанов
-    const GLOW_BLUR = 6;     // Аккуратный glow сердец
-
-    const canvas = document.getElementById('authHeartsCanvas');
-    const ctx = canvas.getContext('2d', { alpha: false });
-    let W = 0, H = 0, DPR = Math.max(1, window.devicePixelRatio || 1);
-
-    function resizeCanvas() {
-        if (!isAuthBackgroundActive) return;
-        W = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-        H = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-        canvas.width = Math.round(W * DPR);
-        canvas.height = Math.round(H * DPR);
-        canvas.style.width = W + 'px';
-        canvas.style.height = H + 'px';
-        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    }
-    window.addEventListener('resize', resizeCanvas);
-
-    // Векторный путь сердца
-    function drawHeartPath(context) {
-        context.beginPath();
-        context.moveTo(0, -0.35);
-        context.bezierCurveTo(0.35, -0.72, 1.15, -0.2, 0, 0.6);
-        context.bezierCurveTo(-1.15, -0.2, -0.35, -0.72, 0, -0.35);
-        context.closePath();
-    }
-
-    // Класс одной ячейки (слота) на конвейерной ленте
-    class SlotCell {
-        constructor(trackIndex, offsetFactor) {
-            this.trackIndex = trackIndex; // Номер дорожки
-            // Определяем направление дорожки: чётные летят вниз-влево (1), нечётные летят вверх-вправо (-1)
-            this.direction = (trackIndex % 2 === 0) ? 1 : -1;
-            
-            this.size = CELL_SIZE;
-            this.speed = BASE_SPEED;
-            
-            // Базовый сдвиг ячейки вдоль её оси, чтобы заполнить всю дорожку
-            this.progress = offsetFactor * this.size;
-        }
-
-        update(dt, maxDistance) {
-            // Двигаем ячейку вперед по оси в зависимости от направления дорожки
-            this.progress += this.speed * dt;
-            
-            // Зацикливание: если ячейка улетела за край — перекидываем назад в бесконечный цикл
-            if (this.progress > maxDistance) {
-                this.progress -= maxDistance;
-            }
-        }
-
-        draw(context) {
-            // Расчет диагональных дорожек под углом 45 градусов
-            // Шаг между параллельными линиями барабанов
-            const trackSpacing = this.size * 0.95; 
-            
-            // Базовая стартовая координата для текущей дорожки
-            let startX = (this.trackIndex - 4) * trackSpacing;
-            let startY = -this.size * 2;
-
-            // Вычисляем текущие X и Y ячейки в зависимости от её прогресса и направления
-            let currentX, currentY;
-            
-            if (this.direction === 1) {
-                // Движение: Сверху-Справа -> Вниз-Влево
-                currentX = (W + startX) - this.progress * 0.707;
-                currentY = startY + this.progress * 0.707;
-            } else {
-                // Движение: Снизу-Влево -> Вверх-Справа
-                currentX = startX + this.progress * 0.707;
-                currentY = (H - startY) - this.progress * 0.707;
-            }
-
-            // Оптимизация: Рисуем только если ячейка видна на экране
-            if (currentX < -this.size || currentX > W + this.size || currentY < -this.size || currentY > H + this.size) {
-                return;
-            }
-
-            context.save();
-            context.translate(currentX + this.size / 2, currentY + this.size / 2);
-
-            // 1. РИСУЕМ БЕЛУЮ КВАДРАТНУЮ РАМКУ (Как в твоем барабане кейсов)
-            context.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-            context.lineWidth = 1.5;
-            context.strokeRect(-this.size / 2, -this.size / 2, this.size, this.size);
-
-            // 2. РИСУЕМ МИНИМАЛИСТИЧНОЕ РОЗОВОЕ СЕРДЦЕ СТРОГО ПО ЦЕНТРУ РАМКИ
-            context.save();
-            const heartScale = this.size * 0.35; // Аккуратный аккуратный размер сердца внутри рамки
-            context.scale(heartScale, heartScale);
-            
-            context.shadowColor = HEART_HEX;
-            context.shadowBlur = GLOW_BLUR;
-            context.fillStyle = HEART_HEX;
-            
-            drawHeartPath(context);
-            context.fill();
-            context.restore();
-
-            context.restore();
-        }
-    }
-
-    // Автоматическая генерация сетки конвейерных лент под разрешение экрана
-    const cells = [];
-    const maxTrackDistance = Math.max(window.innerWidth, window.innerHeight) * 2.5;
-    const cellsPerTrack = Math.ceil(maxTrackDistance / CELL_SIZE) + 2;
-    const totalTracks = 24; // Количество накладывающихся друг на друга диагональных лент
-
-    for (let t = 0; t < totalTracks; t++) {
-        for (let c = 0; c < cellsPerTrack; c++) {
-            // Создаем ячейки друг за дружкой с равномерным шагом
-            cells.push(new SlotCell(t, c));
-        }
-    }
-
-    let last = performance.now();
-    function loop(now) {
-        if (!isAuthBackgroundActive) return;
-        const dt = Math.min(0.05, (now - last) / 1000);
-        last = now;
-
-        ctx.fillStyle = BG_HEX;
-        ctx.fillRect(0, 0, W, H);
-        
-        // Обновляем и рендерим все конвейерные ячейки
-        for (let cell of cells) {
-            cell.update(dt, maxTrackDistance);
-            cell.draw(ctx);
-        }
-        
-        requestAnimationFrame(loop);
-    }
-
-    resizeCanvas();
-    requestAnimationFrame(loop);
-
     // ==================== ИНИЦИАЛИЗАЦИЯ ====================
     document.addEventListener("DOMContentLoaded", () => {
         initTabs();
@@ -2123,19 +1965,10 @@
             if (user) {
                 currentUserUid = user.uid;
                 authOverlay.style.display = "none";
-                
-                // ФИКС: Выключаем и полностью замораживаем холст с летящими сердцами, чтобы разгрузить ПК игрока
-                isAuthBackgroundActive = false;
-                
                 loadData();
             } else {
                 currentUserUid = null;
                 authOverlay.style.display = "flex";
-                
-                // Включаем обратно, если разлогинился
-                isAuthBackgroundActive = true;
-                resizeCanvas();
-                requestAnimationFrame(loop);
             }
         });
 
