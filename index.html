@@ -1972,24 +1972,44 @@
             }
         });
 
-        // Кнопка ВОЙТИ
+        // Кнопка ВОЙТИ (Исправленный перехват любых ошибок)
         document.getElementById("signInBtn").onclick = () => {
-            const email = emailInput.value;
+            const email = emailInput.value.trim();
             const password = passwordInput.value;
             errorDiv.style.display = "none";
             
+            if (!email || !password) {
+                errorDiv.innerText = "Заполните все поля.";
+                errorDiv.style.display = "block";
+                return;
+            }
+            
             signInWithEmailAndPassword(auth, email, password)
                 .catch(error => {
-                    errorDiv.innerText = "Ошибка входа: Неверный email или пароль.";
+                    console.error(error);
+                    // Выводим понятную ошибку или системное сообщение от Firebase
+                    if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
+                        errorDiv.innerText = "Неверный email или пароль.";
+                    } else if (error.code === "auth/operation-not-allowed") {
+                        errorDiv.innerText = "Ошибка: В консоли Firebase не включен способ входа по Email/Паролю!";
+                    } else {
+                        errorDiv.innerText = "Ошибка входа: " + error.message;
+                    }
                     errorDiv.style.display = "block";
                 });
         };
 
-        // Кнопка ЗАРЕГИСТРИРОВАТЬСЯ
+        // Кнопка Зарегистрироваться (Исправленный перехват любых ошибок)
         document.getElementById("signUpBtn").onclick = () => {
-            const email = emailInput.value;
+            const email = emailInput.value.trim();
             const password = passwordInput.value;
             errorDiv.style.display = "none";
+            
+            if (!email || !password) {
+                errorDiv.innerText = "Заполните все поля для регистрации.";
+                errorDiv.style.display = "block";
+                return;
+            }
             
             if (password.length < 6) {
                 errorDiv.innerText = "Пароль должен быть не менее 6 символов.";
@@ -1999,7 +2019,16 @@
             
             createUserWithEmailAndPassword(auth, email, password)
                 .catch(error => {
-                    errorDiv.innerText = "Ошибка регистрации. Проверьте формат Email.";
+                    console.error(error);
+                    if (error.code === "auth/email-already-in-use") {
+                        errorDiv.innerText = "Этот Email уже зарегистрирован другим пользователем.";
+                    } else if (error.code === "auth/invalid-email") {
+                        errorDiv.innerText = "Неверный формат Email. Пример: user@mail.ru";
+                    } else if (error.code === "auth/operation-not-allowed") {
+                        errorDiv.innerText = "Ошибка: В консоли Firebase не включен способ входа по Email/Паролю!";
+                    } else {
+                        errorDiv.innerText = "Ошибка регистрации: " + error.message;
+                    }
                     errorDiv.style.display = "block";
                 });
         };
