@@ -1445,6 +1445,7 @@
         });
     }
 
+    // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ openCase ====================
     async function openCase() {
         let btn = document.getElementById("openCaseBtn");
         if (isSpinning || btn.disabled) return;
@@ -1454,11 +1455,13 @@
         
         const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
         const todayStr = formatter.format(new Date());
-        extendedStats.dailyCalendar[todayStr] = (extendedStats.dailyCalendar[todayStr] || 0) + 1;
+        // Очищаем строку от запрещённых символов для Firebase (точки, $, #, [, ])
+        const safeDateKey = todayStr.replace(/[\.\$\#\[\]]/g, "");
+        extendedStats.dailyCalendar[safeDateKey] = (extendedStats.dailyCalendar[safeDateKey] || 0) + 1;
         
-        if (extendedStats.dailyCalendar[todayStr] > extendedStats.mostRollsInDayCount) {
-            extendedStats.mostRollsInDayCount = extendedStats.dailyCalendar[todayStr];
-            extendedStats.mostRollsInDayDate = todayStr;
+        if (extendedStats.dailyCalendar[safeDateKey] > extendedStats.mostRollsInDayCount) {
+            extendedStats.mostRollsInDayCount = extendedStats.dailyCalendar[safeDateKey];
+            extendedStats.mostRollsInDayDate = todayStr; // оставляем красивую дату для отображения
         }
         
         ITEMS.forEach(i => {
@@ -1835,7 +1838,7 @@
         document.getElementById("descModal").style.display = "none";
     }
 
-    // ==================== ТЕСТОВЫЕ ФУНКЦИИ ====================
+    // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ testOpenCaseWithRarity ====================
     async function testOpenCaseWithRarity(rarityKey) {
         let btn = document.getElementById("openCaseBtn");
         if (isSpinning || btn.disabled) return;
@@ -1845,11 +1848,13 @@
         
         const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
         const todayStr = formatter.format(new Date());
-        extendedStats.dailyCalendar[todayStr] = (extendedStats.dailyCalendar[todayStr] || 0) + 1;
+        // Очищаем строку от запрещённых символов для Firebase (точки, $, #, [, ])
+        const safeDateKey = todayStr.replace(/[\.\$\#\[\]]/g, "");
+        extendedStats.dailyCalendar[safeDateKey] = (extendedStats.dailyCalendar[safeDateKey] || 0) + 1;
         
-        if (extendedStats.dailyCalendar[todayStr] > extendedStats.mostRollsInDayCount) {
-            extendedStats.mostRollsInDayCount = extendedStats.dailyCalendar[todayStr];
-            extendedStats.mostRollsInDayDate = todayStr;
+        if (extendedStats.dailyCalendar[safeDateKey] > extendedStats.mostRollsInDayCount) {
+            extendedStats.mostRollsInDayCount = extendedStats.dailyCalendar[safeDateKey];
+            extendedStats.mostRollsInDayDate = todayStr; // оставляем красивую дату для отображения
         }
         
         ITEMS.forEach(i => {
