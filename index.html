@@ -1103,6 +1103,10 @@
             console.error("🔴 ОШИБКА СОХРАНЕНИЯ В ОБЛАКО:", error);
             console.error("🔴 Код ошибки:", error.code);
             console.error("🔴 Сообщение:", error.message);
+            
+            // При ошибке сохранения показываем предупреждение и перезагружаем страницу
+            alert("Ошибка синхронизации! Проверьте сетевое подключение, иначе прогресс будет утерян.");
+            window.location.reload();
         });
     }
 
@@ -1110,7 +1114,7 @@
     function saveStats() { saveAllDataToCloud(); }
     function saveExtendedStats() { saveAllDataToCloud(); }
 
-    // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ С ЛОГИРОВАНИЕМ ====================
+    // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ С ЖЁСТКОЙ ПРИВЯЗКОЙ К ОБЛАКУ ====================
     async function loadData() {
         if (!currentUserUid) {
             console.warn("⚠️ Нет авторизованного пользователя для загрузки данных.");
@@ -1133,7 +1137,6 @@
                 };
                 console.log("🟢 Данные пользователя успешно загружены из облака Firebase.");
                 console.log("📊 Загружено предметов в инвентаре:", inventory.length);
-                console.log("📊 Статистика открытий:", stats);
             } else {
                 inventory = [];
                 stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
@@ -1145,14 +1148,26 @@
                 };
                 console.log("🟡 Аккаунт новый, в облаке нет старых данных. Инициализированы дефолтные значения.");
             }
-            // Принудительно обновляем UI даже при успешной загрузке
+            // Принудительно обновляем UI
             updateUI();
             updateStatsDisplay();
         } catch (error) {
             console.error("🔴 КРИТИЧЕСКАЯ ОШИБКА ЗАГРУЗКИ:", error);
             console.error("🔴 Код ошибки:", error.code);
             console.error("🔴 Сообщение:", error.message);
-            // Инициализируем дефолтные значения, чтобы интерфейс работал
+            
+            // Жёсткая привязка к облаку: показываем окно авторизации при ошибке сети
+            const authOverlay = document.getElementById("authOverlay");
+            const errorDiv = document.getElementById("authError");
+            
+            authOverlay.style.display = "flex";
+            errorDiv.innerText = "Ошибка подключения: Не удалось синхронизировать данные с сервером. Повторите попытку позже.";
+            errorDiv.style.display = "block";
+            
+            // Сбрасываем пользователя, чтобы заблокировать доступ к игре
+            currentUserUid = null;
+            
+            // Инициализируем дефолтные значения
             inventory = [];
             stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
             extendedStats = {
@@ -1161,8 +1176,7 @@
                 heavyItemRarity: "common", heavyItemRolls: 0, mostRollsInDayDate: "--",
                 mostRollsInDayCount: 0, dailyCalendar: {}, itemClicks: {}, itemRollCounters: {}
             };
-            console.log("🟡 Инициализированы дефолтные значения из-за ошибки загрузки.");
-            // ВАЖНО: Обновляем UI даже при ошибке, чтобы кнопки разблокировались
+            
             updateUI();
             updateStatsDisplay();
         }
@@ -2016,7 +2030,7 @@
             }
         });
 
-        // Кнопка ВОЙТИ (с улучшенной обработкой сетевых ошибок)
+        // Кнопка ВОЙТИ (с нейтральным сообщением о сетевой ошибке)
         document.getElementById("signInBtn").onclick = () => {
             const email = emailInput.value.trim();
             const password = passwordInput.value;
@@ -2038,7 +2052,7 @@
                     
                     // Проверяем на сетевую ошибку
                     if (error.code === 'auth/network-request-failed') {
-                        errorDiv.innerText = "Ошибка сети: Не удалось подключиться к серверам Firebase. Проверьте интернет или VPN.";
+                        errorDiv.innerText = "Ошибка сети: Сервер недоступен. Проверьте интернет-соединение.";
                     } else if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
                         errorDiv.innerText = "Ошибка входа: Неверный email или пароль.";
                     } else if (error.code === "auth/operation-not-allowed") {
@@ -2050,7 +2064,7 @@
                 });
         };
 
-        // Кнопка Зарегистрироваться (с улучшенной обработкой сетевых ошибок)
+        // Кнопка Зарегистрироваться (с нейтральным сообщением о сетевой ошибке)
         document.getElementById("signUpBtn").onclick = () => {
             const email = emailInput.value.trim();
             const password = passwordInput.value;
@@ -2078,7 +2092,7 @@
                     
                     // Проверяем на сетевую ошибку
                     if (error.code === 'auth/network-request-failed') {
-                        errorDiv.innerText = "Ошибка сети: Не удалось подключиться к серверам Firebase. Проверьте интернет или VPN.";
+                        errorDiv.innerText = "Ошибка сети: Сервер недоступен. Проверьте интернет-соединение.";
                     } else if (error.code === "auth/email-already-in-use") {
                         errorDiv.innerText = "Этот Email уже зарегистрирован.";
                     } else if (error.code === "auth/invalid-email") {
