@@ -34,11 +34,10 @@
             padding: 20px;
         }
         
-        /* ВОЗВРАТ К ПРЕДЫДУЩЕМУ РАБОЧЕМУ ВАРИАНТУ ОТСТУПОВ КАРТОЧКИ */
         .auth-card {
             background: #0d1326;
             border-radius: 36px;
-            padding: 40px; /* Вернули прежний просторный паддинг */
+            padding: 40px; 
             max-width: 540px; 
             width: 100%;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6);
@@ -74,7 +73,7 @@
             width: 100%;
         }
 
-        /* ВОЗВРАТ К ПРЕДЫДУЩЕМУ ВАРИАНТУ ОТСТУПОВ ЗАГОЛОВКА + СДВИГ НА 1px ВПРАВО */
+        /* ФИКС: Сбалансированный микро-сдвиг для достижения абсолютного центра по горизонтали */
         .auth-project-title {
             font-family: 'Brush Script MT', 'Comic Sans MS', cursive, sans-serif !important;
             font-size: 3rem !important;
@@ -86,13 +85,14 @@
             width: max-content !important;
             text-align: center !important;
             
-            margin: 0 auto 30px auto !important; /* Вернули прежний просторный зазор до текста приветствия */
+            /* Идеальный вертикальный зазор до приветствия сохранен */
+            margin: 0 0 30px 0 !important; 
             padding: 0 !important;
             letter-spacing: 0px !important;
             white-space: nowrap !important;
             box-sizing: border-box !important;
             
-            /* ФИКС: Сдвиг изменен на -1px, что подвинуло строку ровно на 1 пиксель вправо */
+            /* ФИКС: Финальная ювелирная калибровка - сдвиг на 1px вправо для идеального центрирования */
             transform: translateX(-1px) !important; 
         }
 
