@@ -851,6 +851,37 @@
             cursor: pointer;
             font-weight: bold;
         }
+
+        /* ===== МОБИЛЬНЫЙ ПРИНУДИТЕЛЬНЫЙ ПЕРЕВОРОТ ===== */
+        @media (max-width: 1024px) and (orientation: portrait) {
+            body {
+                overflow: hidden !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .app {
+                position: fixed !important;
+                width: 100vh !important;
+                height: 100vw !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) rotate(90deg) !important;
+                transform-origin: center center !important;
+                border-radius: 0 !important;
+                padding: 16px !important;
+                overflow-y: auto !important;
+                display: block !important;
+            }
+
+            #globalVideoBg {
+                width: 100vh !important;
+                height: 100vw !important;
+                transform: translate(-50%, -50%) rotate(90deg) !important;
+            }
+        }
     </style>
 </head>
 <body>
