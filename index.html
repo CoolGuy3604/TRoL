@@ -1158,7 +1158,7 @@
         function saveStats() { saveAllDataToCloud(); }
         function saveExtendedStats() { saveAllDataToCloud(); }
 
-        // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ С ТАЙМАУТОМ ====================
+        // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ С ЗАЩИТОЙ ОТ UNDEFINED ====================
         async function loadData() {
             if (!currentUserUid) {
                 console.warn("⚠️ Нет авторизованного пользователя для загрузки данных.");
@@ -1169,12 +1169,10 @@
             const dbRef = ref(db);
             
             try {
-                // Таймаут на 2.5 секунды для проверки сети
                 const timeoutPromise = new Promise((_, reject) => {
                     setTimeout(() => reject(new Error("TIMEOUT")), 2500);
                 });
                 
-                // Гонка между запросом к БД и таймаутом
                 const snapshot = await Promise.race([
                     get(child(dbRef, `users/${currentUserUid}`)),
                     timeoutPromise
@@ -1184,12 +1182,20 @@
                     const data = snapshot.val();
                     inventory = data.inventory || [];
                     stats = data.stats || { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+                    
+                    // ЖЕЛЕЗНАЯ ЗАЩИТА ОТ UNDEFINED: принудительно создаём все вложенные объекты, если их нет
                     extendedStats = data.extendedStats || {
                         totalRollsEver: 0, spinTimeMs: 0, firstItemName: "Нет предметов",
                         maxDryStreak: 0, currentDryStreak: 0, heavyItemName: "Нет предметов",
                         heavyItemRarity: "common", heavyItemRolls: 0, mostRollsInDayDate: "--",
                         mostRollsInDayCount: 0, dailyCalendar: {}, itemClicks: {}, itemRollCounters: {}
                     };
+                    
+                    // Гарантируем, что все вложенные объекты существуют
+                    if (!extendedStats.dailyCalendar) extendedStats.dailyCalendar = {};
+                    if (!extendedStats.itemClicks) extendedStats.itemClicks = {};
+                    if (!extendedStats.itemRollCounters) extendedStats.itemRollCounters = {};
+                    
                     console.log("🟢 Данные пользователя успешно загружены из облака Firebase.");
                     console.log("📊 Загружено предметов в инвентаре:", inventory.length);
                 } else {
@@ -1211,13 +1217,10 @@
                 console.error("🔴 Код ошибки:", error.code);
                 console.error("🔴 Сообщение:", error.message);
                 
-                // Жёсткая блокировка: если не удалось загрузить данные, выкидываем пользователя
                 console.log("🔴 Выполняется принудительный выход из-за ошибки сети...");
                 
-                // Сбрасываем пользователя
                 currentUserUid = null;
                 
-                // Принудительный логаут из Firebase
                 try {
                     await auth.signOut();
                     console.log("🟢 Пользователь принудительно разлогинен.");
@@ -1225,7 +1228,6 @@
                     console.error("⚠️ Ошибка при принудительном выходе:", signOutError);
                 }
                 
-                // Скрываем приложение и показываем форму входа
                 document.querySelector(".app").style.display = "none";
                 const authOverlay = document.getElementById("authOverlay");
                 const errorDiv = document.getElementById("authError");
@@ -1233,8 +1235,6 @@
                 authOverlay.style.display = "flex";
                 errorDiv.innerText = "Ошибка сети: Не удалось синхронизировать данные с сервером. Проверьте интернет-соединение.";
                 errorDiv.style.display = "block";
-                
-                // НЕ вызываем updateUI() и updateStatsDisplay() при ошибке
             }
         }
 
@@ -1538,10 +1538,16 @@
             });
         }
 
-        // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ openCase ====================
+        // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ openCase С ЗАЩИТОЙ ОТ UNDEFINED ====================
         async function openCase() {
             let btn = document.getElementById("openCaseBtn");
             if (isSpinning || btn.disabled) return;
+            
+            // ЖЕЛЕЗНАЯ ЗАЩИТА ОТ UNDEFINED: инициализируем все вложенные объекты
+            if (!extendedStats) extendedStats = {};
+            if (!extendedStats.dailyCalendar) extendedStats.dailyCalendar = {};
+            if (!extendedStats.itemRollCounters) extendedStats.itemRollCounters = {};
+            if (!extendedStats.itemClicks) extendedStats.itemClicks = {};
             
             extendedStats.totalRollsEver++;
             extendedStats.spinTimeMs += 14500;
@@ -1559,6 +1565,8 @@
             
             ITEMS.forEach(i => {
                 if (!hasItem(i.id)) {
+                    // Дополнительная сейф-проверка, чтобы точно не упасть в undefined
+                    if (!extendedStats.itemRollCounters) extendedStats.itemRollCounters = {};
                     extendedStats.itemRollCounters[i.id] = (extendedStats.itemRollCounters[i.id] || 0) + 1;
                 }
             });
@@ -1985,10 +1993,16 @@
             console.log("❌ Модалка закрыта");
         }
 
-        // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ testOpenCaseWithRarity ====================
+        // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ testOpenCaseWithRarity С ЗАЩИТОЙ ОТ UNDEFINED ====================
         async function testOpenCaseWithRarity(rarityKey) {
             let btn = document.getElementById("openCaseBtn");
             if (isSpinning || btn.disabled) return;
+            
+            // ЖЕЛЕЗНАЯ ЗАЩИТА ОТ UNDEFINED: инициализируем все вложенные объекты
+            if (!extendedStats) extendedStats = {};
+            if (!extendedStats.dailyCalendar) extendedStats.dailyCalendar = {};
+            if (!extendedStats.itemRollCounters) extendedStats.itemRollCounters = {};
+            if (!extendedStats.itemClicks) extendedStats.itemClicks = {};
             
             extendedStats.totalRollsEver++;
             extendedStats.spinTimeMs += 14500;
@@ -2006,6 +2020,8 @@
             
             ITEMS.forEach(i => {
                 if (!hasItem(i.id)) {
+                    // Дополнительная сейф-проверка, чтобы точно не упасть в undefined
+                    if (!extendedStats.itemRollCounters) extendedStats.itemRollCounters = {};
                     extendedStats.itemRollCounters[i.id] = (extendedStats.itemRollCounters[i.id] || 0) + 1;
                 }
             });
