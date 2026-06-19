@@ -844,8 +844,8 @@
     </style>
 </head>
 <body>
-    <!-- ГЛОБАЛЬНЫЙ ВИДЕО-ФОН (независимый от авторизации) -->
-    <video autoplay muted loop playsinline id="globalVideoBg" style="position: fixed !important; top: 50% !important; left: 50% !important; min-width: 100% !important; min-height: 100% !important; width: auto !important; height: auto !important; z-index: -100 !important; transform: translate(-50%, -50%) !important; object-fit: cover !important; pointer-events: none !important;">
+    <!-- ГЛОБАЛЬНЫЙ ВИДЕО-ФОН С ОТЛАДКОЙ -->
+    <video autoplay muted loop playsinline id="globalVideoBg" style="position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: -100 !important; object-fit: cover !important; pointer-events: none !important;" oncanplay="console.log('🟢 Видео-фон готов к воспроизведению')" onerror="console.error('🔴 Ошибка загрузки видео-файла! Проверьте путь images/auth-bg.mp4')">
         <source src="images/auth-bg.mp4" type="video/mp4">
     </video>
 
@@ -1631,6 +1631,7 @@
         }
 
         function updateUI() {
+            console.log("🔄 Обновление UI...");
             const rarityOrder = ['common', 'rare', 'superRare', 'epic', 'mythic', 'legendary'];
             
             const pluralRarityNames = {
@@ -1642,7 +1643,7 @@
                 legendary: "Легендарные"
             };
             
-            // ===== ИНВЕНТАРЬ (через DOM-элементы с addEventListener) =====
+            // ===== ИНВЕНТАРЬ (с data-атрибутами для глобального делегата) =====
             let invDiv = document.getElementById("inventoryGrid");
             let collected = getCollected();
             
@@ -1685,15 +1686,20 @@
                             
                             let card = document.createElement('div');
                             card.className = `item-card ${rarityClass}`;
+                            // Добавляем data-атрибут для глобального делегата
+                            card.setAttribute('data-item-id', item.id);
                             card.innerHTML = `
                                 <img src="${item.img}" class="grid-img" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
                                 <div class="item-name">${escapeHtml(item.name)}</div>
                                 <div class="badge ${textClass}">${rarity.name}</div>
                             `;
                             
-                            // Намертво привязываем клик через addEventListener
-                            card.addEventListener('click', function() {
-                                window.openItemDescription(item.id);
+                            // Также оставляем addEventListener для надежности
+                            card.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                const id = parseInt(this.getAttribute('data-item-id'));
+                                console.log("🖱️ Клик по карточке (addEventListener) с ID:", id);
+                                window.openItemDescription(id);
                             });
                             
                             grid.appendChild(card);
@@ -1842,6 +1848,7 @@
             
             document.getElementById("totalItemsCount").innerText = inventory.length;
             document.getElementById("remainingCount").innerText = missing.length;
+            console.log("✅ UI обновлён");
         }
 
         function initTabs() {
@@ -1883,14 +1890,18 @@
             });
         }
 
-        // ==================== МОДАЛЬНОЕ ОКНО (ИСПРАВЛЕННАЯ ФУНКЦИЯ) ====================
+        // ==================== МОДАЛЬНОЕ ОКНО С ОТЛАДКОЙ ====================
         function openItemDescription(id) {
-            console.log("Клик по предмету с ID:", id);
+            alert("Клик сработал для предмета ID: " + id);
+            console.log("🟢 Вызов модалки для ID:", id);
+            
             const item = ITEMS.find(i => i.id === id);
             if (!item) {
-                console.error("Предмет с ID", id, "не найден!");
+                console.error("❌ Предмет с ID", id, "не найден!");
                 return;
             }
+            
+            console.log("🔍 Найден предмет:", item.name);
             
             extendedStats.itemClicks[id] = (extendedStats.itemClicks[id] || 0) + 1;
             saveExtendedStats();
@@ -1926,11 +1937,15 @@
             }
             
             sidePanel.style.borderColor = rarity.color;
-            modal.style.display = "flex";
+            
+            // Жёсткое принудительное отображение модалки
+            modal.setAttribute("style", "display: flex !important; visibility: visible !important; opacity: 1 !important; z-index: 999999 !important;");
+            console.log("✅ Модалка принудительно показана");
         }
 
         function closeItemDescription() {
             document.getElementById("descModal").style.display = "none";
+            console.log("❌ Модалка закрыта");
         }
 
         // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ testOpenCaseWithRarity ====================
@@ -2066,6 +2081,8 @@
 
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
         document.addEventListener("DOMContentLoaded", () => {
+            console.log("🚀 DOM полностью загружен, инициализация...");
+            
             initTabs();
             initAudioControls();
             
@@ -2075,8 +2092,29 @@
             const errorDiv = document.getElementById("authError");
             const videoBg = document.getElementById("globalVideoBg");
             
+            // === ГЛОБАЛЬНЫЙ ДЕЛЕГАТ КЛИКОВ ДЛЯ ИНВЕНТАРЯ (Бронебойный метод) ===
+            const inventoryGrid = document.getElementById("inventoryGrid");
+            if (inventoryGrid) {
+                inventoryGrid.addEventListener("click", (e) => {
+                    const card = e.target.closest(".item-card");
+                    if (card) {
+                        const id = parseInt(card.getAttribute("data-item-id"));
+                        console.log("🌐 Глобальный перехват клика по карточке с ID:", id);
+                        if (!isNaN(id)) {
+                            window.openItemDescription(id);
+                        } else {
+                            console.warn("⚠️ ID не найден в data-атрибуте карточки");
+                        }
+                    }
+                });
+                console.log("✅ Глобальный делегат кликов для инвентаря установлен");
+            } else {
+                console.error("❌ inventoryGrid не найден!");
+            }
+            
             // Отслеживание состояния аккаунта
             onAuthStateChanged(auth, (user) => {
+                console.log("📡 onAuthStateChanged вызван, user:", user ? "есть" : "нет");
                 if (user) {
                     currentUserUid = user.uid;
                     console.log("✅ Пользователь авторизован, UID:", currentUserUid);
@@ -2098,7 +2136,7 @@
                 }
             });
 
-            // Кнопка ВОЙТИ (с принудительной загрузкой данных после успешного входа)
+            // Кнопка ВОЙТИ
             document.getElementById("signInBtn").onclick = () => {
                 const email = emailInput.value.trim();
                 const password = passwordInput.value;
@@ -2115,8 +2153,6 @@
                 signInWithEmailAndPassword(auth, email, password)
                     .then((userCredential) => {
                         console.log("✅ Вход выполнен успешно!");
-                        // Принудительно вызываем loadData() после успешного входа
-                        // Это гарантирует проверку соединения с базой данных
                         currentUserUid = userCredential.user.uid;
                         loadData();
                     })
@@ -2125,7 +2161,6 @@
                         console.error("🔴 Код ошибки:", error.code);
                         console.error("🔴 Сообщение:", error.message);
                         
-                        // Проверяем на сетевую ошибку
                         if (error.code === 'auth/network-request-failed') {
                             errorDiv.innerText = "Ошибка сети: Сервер недоступен. Проверьте интернет-соединение.";
                         } else if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
@@ -2139,7 +2174,7 @@
                     });
             };
 
-            // Кнопка Зарегистрироваться (с принудительной загрузкой данных после успешной регистрации)
+            // Кнопка Зарегистрироваться
             document.getElementById("signUpBtn").onclick = () => {
                 const email = emailInput.value.trim();
                 const password = passwordInput.value;
@@ -2162,8 +2197,6 @@
                 createUserWithEmailAndPassword(auth, email, password)
                     .then((userCredential) => {
                         console.log("✅ Регистрация выполнена успешно!");
-                        // Принудительно вызываем loadData() после успешной регистрации
-                        // Это гарантирует проверку соединения с базой данных
                         currentUserUid = userCredential.user.uid;
                         loadData();
                     })
@@ -2172,7 +2205,6 @@
                         console.error("🔴 Код ошибки:", error.code);
                         console.error("🔴 Сообщение:", error.message);
                         
-                        // Проверяем на сетевую ошибку
                         if (error.code === 'auth/network-request-failed') {
                             errorDiv.innerText = "Ошибка сети: Сервер недоступен. Проверьте интернет-соединение.";
                         } else if (error.code === "auth/email-already-in-use") {
@@ -2188,7 +2220,7 @@
                     });
             };
 
-            // Кнопка открытия кейса (с логгированием для отладки)
+            // Кнопка открытия кейса
             const openBtn = document.getElementById("openCaseBtn");
             openBtn.onclick = async () => {
                 console.log("🎯 Клик по кнопке зафиксирован, isSpinning =", isSpinning);
@@ -2201,6 +2233,8 @@
 
             // Кнопка сброса прогресса
             document.getElementById("resetProgressBtn").onclick = resetGame;
+            
+            console.log("🚀 Инициализация завершена");
         });
     </script>
 </body>
