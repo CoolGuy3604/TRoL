@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=1366, initial-scale=0.3, minimum-scale=0.1, maximum-scale=1.0, user-scalable=yes">
     <title>Симулятор кейсов | ЭЛИТНЫЙ ДИЗАЙН</title>
     <style>
         * {
@@ -774,7 +774,6 @@
             box-sizing: border-box;
         }
         
-        /* ===== ИСПРАВЛЕННЫЙ МЕДИА-ЗАПРОС (без display: none) ===== */
         @media (max-width: 1180px) {
             .modal-overlay { 
                 flex-direction: column; 
@@ -850,62 +849,6 @@
             border-radius: 12px;
             cursor: pointer;
             font-weight: bold;
-        }
-
-        /* ===== НОВЫЙ БРОНЕБОЙНЫЙ МЕДИА-ЗАПРОС ДЛЯ МОБИЛЬНЫХ ===== */
-        @media (max-width: 1024px) {
-            /* Фиксируем body под размеры широкого экрана в горизонтальном положении */
-            body {
-                width: 100vh !important;
-                height: 100vw !important;
-                position: fixed !important;
-                top: 50% !important;
-                left: 50% !important;
-                transform: translate(-50%, -50%) rotate(90deg) !important;
-                transform-origin: center center !important;
-                overflow: hidden !important;
-                background: #0a0f1e !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-
-            /* Превращаем экран авторизации в полноценный широкий контейнер */
-            .auth-overlay {
-                position: absolute !important;
-                width: 1366px !important;
-                height: 768px !important;
-                top: 50% !important;
-                left: 50% !important;
-                transform: translate(-50%, -50%) scale(calc(100vh / 1366)) !important;
-                transform-origin: center center !important;
-                background: none !important;
-            }
-
-            /* Превращаем само приложение в полноценный широкий контейнер ПК-размера */
-            .app {
-                display: block !important;
-                position: absolute !important;
-                width: 1366px !important;
-                height: 768px !important;
-                top: 50% !important;
-                left: 50% !important;
-                transform: translate(-50%, -50%) scale(calc(100vh / 1366)) !important;
-                transform-origin: center center !important;
-                border-radius: 0 !important;
-                padding: 40px !important;
-                overflow-y: auto !important;
-            }
-
-            /* Поворачиваем видео-фон вслед за экраном */
-            #globalVideoBg {
-                position: absolute !important;
-                width: 1366px !important;
-                height: 768px !important;
-                top: 50% !important;
-                left: 50% !important;
-                transform: translate(-50%, -50%) !important;
-                object-fit: cover !important;
-            }
         }
     </style>
 </head>
@@ -1961,7 +1904,7 @@
             });
         }
 
-        // ==================== МОДАЛЬНОЕ ОКНО С ОТЛАДКОЙ (БЕЗ ALERT) ====================
+        // ==================== МОДАЛЬНОЕ ОКНО (БЕЗ ALERT) ====================
         function openItemDescription(id) {
             console.log("🟢 Вызов модалки для ID:", id);
             
@@ -2008,13 +1951,13 @@
             
             sidePanel.style.borderColor = rarity.color;
             
-            // Жёсткое принудительное отображение модалки
-            modal.setAttribute("style", "display: flex !important; visibility: visible !important; opacity: 1 !important; z-index: 999999 !important;");
-            console.log("✅ Модалка принудительно показана");
+            // Показываем модалку через класс active
+            modal.classList.add("active");
+            console.log("✅ Модалка показана через класс active");
         }
 
         function closeItemDescription() {
-            document.getElementById("descModal").style.display = "none";
+            document.getElementById("descModal").classList.remove("active");
             console.log("❌ Модалка закрыта");
         }
 
