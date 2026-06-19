@@ -22,16 +22,18 @@
             color: #eee;
         }
 
-        /* Стили окна входа/регистрации (ПРОЗРАЧНЫЙ ФОН) */
+        /* Стили окна входа/регистрации с резервным фоном */
         .auth-overlay {
             position: fixed !important;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0 !important; left: 0 !important; 
+            width: 100% !important; height: 100% !important;
+            background: linear-gradient(145deg, #070a14 0%, #0d1326 100%) !important;
             z-index: 200000 !important;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: transparent !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
             padding: 20px !important;
+            overflow: hidden !important;
         }
         
         .auth-card {
@@ -709,16 +711,24 @@
             border-radius: 20px;
         }
 
+        /* ===== ИСПРАВЛЕННАЯ МОДАЛКА С .active ===== */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 7, 15, 0.85);
-            backdrop-filter: blur(12px);
-            z-index: 100000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            position: fixed !important;
+            top: 0 !important; left: 0 !important; 
+            width: 100% !important; height: 100% !important;
+            background: rgba(5, 7, 15, 0.85) !important;
+            backdrop-filter: blur(12px) !important;
+            z-index: 999999 !important;
+            display: none !important;
+            justify-content: center !important;
+            align-items: center !important;
+            padding: 20px !important;
+            box-sizing: border-box !important;
+        }
+
+        /* Этот класс принудительно показывает модалку */
+        .modal-overlay.active {
+            display: flex !important;
         }
         
         .modal-card {
@@ -775,7 +785,7 @@
         }
         
         @media (max-width: 1180px) {
-            .modal-overlay { display: none; flex-direction: column; gap: 16px; justify-content: flex-start; overflow-y: auto; }
+            .modal-overlay { flex-direction: column; gap: 16px; justify-content: flex-start; overflow-y: auto; }
             .modal-side-panel { position: static; max-width: 580px; margin-top: 10px; }
         }
         
@@ -844,12 +854,12 @@
     </style>
 </head>
 <body>
-    <!-- ГЛОБАЛЬНЫЙ ВИДЕО-ФОН С ИСПРАВЛЕННЫМ ПУТЁМ -->
+    <!-- ГЛОБАЛЬНЫЙ ВИДЕО-ФОН (путь с маленькой буквы) -->
     <video autoplay muted loop playsinline id="globalVideoBg" style="position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: -100 !important; object-fit: cover !important; pointer-events: none !important;">
         <source src="./images/auth-bg.mp4" type="video/mp4">
     </video>
 
-    <!-- ЭКРАН ВХОДА С ПРОЗРАЧНЫМ ФОНОМ -->
+    <!-- ЭКРАН ВХОДА С РЕЗЕРВНЫМ ГРАДИЕНТОМ -->
     <div id="authOverlay" class="auth-overlay">
         <div class="auth-card">
             <div class="auth-project-title">The Roulette of Love</div>
@@ -929,7 +939,8 @@
         <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
     </div>
 
-    <div id="descModal" class="modal-overlay" onclick="window.closeItemDescription()">
+    <!-- МОДАЛЬНОЕ ОКНО -->
+    <div id="descModal" class="modal-overlay">
         <div class="modal-card" id="modalCard" onclick="event.stopPropagation()">
             <img id="modalImg" src="" style="width: 100.15%; height: auto; object-fit: contain; margin-bottom: 20px;" alt="">
             <h2 id="modalName"></h2>
@@ -1119,7 +1130,7 @@
         function saveStats() { saveAllDataToCloud(); }
         function saveExtendedStats() { saveAllDataToCloud(); }
 
-        // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ С БЕЗОПАСНЫМ ВЫХОДОМ ====================
+        // ==================== ФУНКЦИЯ ЗАГРУЗКИ ====================
         async function loadData() {
             if (!currentUserUid) {
                 console.warn("⚠️ Нет авторизованного пользователя для загрузки данных.");
@@ -1188,7 +1199,6 @@
                 errorDiv.innerText = "Ошибка сети: Не удалось синхронизировать данные с сервером. Проверьте интернет-соединение.";
                 errorDiv.style.display = "block";
                 
-                // ВАЖНО: возвращаем управление, чтобы не ломать остальной JS
                 return;
             }
         }
@@ -1876,9 +1886,8 @@
             });
         }
 
-        // ==================== МОДАЛЬНОЕ ОКНО С ОТЛАДКОЙ ====================
+        // ==================== ФИНАЛЬНАЯ ФУНКЦИЯ openItemDescription (через класс .active) ====================
         function openItemDescription(id) {
-            alert("Клик сработал для предмета ID: " + id);
             console.log("🟢 Вызов модалки для ID:", id);
             
             const item = ITEMS.find(i => i.id === id);
@@ -1924,16 +1933,17 @@
             
             sidePanel.style.borderColor = rarity.color;
             
-            modal.setAttribute("style", "display: flex !important; visibility: visible !important; opacity: 1 !important; z-index: 999999 !important;");
-            console.log("✅ Модалка принудительно показана");
+            // Включаем видимость через класс active
+            modal.classList.add("active");
+            console.log("✅ Модалка показана через класс active");
         }
 
         function closeItemDescription() {
-            document.getElementById("descModal").style.display = "none";
+            document.getElementById("descModal").classList.remove("active");
             console.log("❌ Модалка закрыта");
         }
 
-        // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ testOpenCaseWithRarity ====================
+        // ==================== ФУНКЦИЯ testOpenCaseWithRarity ====================
         async function testOpenCaseWithRarity(rarityKey) {
             let btn = document.getElementById("openCaseBtn");
             if (isSpinning || btn.disabled) return;
@@ -2108,7 +2118,6 @@
                         document.getElementById("authOverlay").style.display = "none";
                         if (videoBg) videoBg.style.display = "none";
                         
-                        // Вызов loadData обёрнут в try-catch, чтобы ошибка не ломала остальной JS
                         loadData();
                     } else {
                         currentUserUid = null;
