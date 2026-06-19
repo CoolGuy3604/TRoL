@@ -22,18 +22,16 @@
             color: #eee;
         }
 
-        /* Стили окна входа/регистрации */
+        /* Стили окна входа/регистрации (ПРОЗРАЧНЫЙ ФОН) */
         .auth-overlay {
             position: fixed !important;
-            top: 0 !important; left: 0 !important; 
-            width: 100% !important; height: 100% !important;
-            background: linear-gradient(145deg, #070a14 0%, #0d1326 100%) !important;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: 200000 !important;
-            display: flex !important;
-            justify-content: center !important;
-            align-items: center !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent !important;
             padding: 20px !important;
-            overflow: hidden !important;
         }
         
         .auth-card {
@@ -712,17 +710,15 @@
         }
 
         .modal-overlay {
-            position: fixed !important;
-            top: 0 !important; left: 0 !important; 
-            width: 100% !important; height: 100% !important;
-            background: rgba(5, 7, 15, 0.85) !important;
-            backdrop-filter: blur(12px) !important;
-            z-index: 999999 !important;
-            display: none !important;
-            justify-content: center !important;
-            align-items: center !important;
-            padding: 20px !important;
-            box-sizing: border-box !important;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 7, 15, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 100000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
         
         .modal-card {
@@ -779,7 +775,7 @@
         }
         
         @media (max-width: 1180px) {
-            .modal-overlay { flex-direction: column; gap: 16px; justify-content: flex-start; overflow-y: auto; }
+            .modal-overlay { display: none; flex-direction: column; gap: 16px; justify-content: flex-start; overflow-y: auto; }
             .modal-side-panel { position: static; max-width: 580px; margin-top: 10px; }
         }
         
@@ -848,12 +844,12 @@
     </style>
 </head>
 <body>
-    <!-- ГЛОБАЛЬНЫЙ ВИДЕО-ФОН -->
-    <video autoplay muted loop playsinline id="globalVideoBg" style="position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: -100 !important; object-fit: cover !important; pointer-events: none !important;">
-        <source src="./images/auth-bg.mp4" type="video/mp4">
+    <!-- ГЛОБАЛЬНЫЙ ВИДЕО-ФОН С ОТЛАДКОЙ -->
+    <video autoplay muted loop playsinline id="globalVideoBg" style="position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: -100 !important; object-fit: cover !important; pointer-events: none !important;" oncanplay="console.log('🟢 Видео-фон готов к воспроизведению')" onerror="console.error('🔴 Ошибка загрузки видео-файла! Проверьте путь images/auth-bg.mp4')">
+        <source src="images/auth-bg.mp4" type="video/mp4">
     </video>
 
-    <!-- ЭКРАН ВХОДА -->
+    <!-- ЭКРАН ВХОДА С ПРОЗРАЧНЫМ ФОНОМ -->
     <div id="authOverlay" class="auth-overlay">
         <div class="auth-card">
             <div class="auth-project-title">The Roulette of Love</div>
@@ -933,7 +929,7 @@
         <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
     </div>
 
-    <div id="descModal" class="modal-overlay">
+    <div id="descModal" class="modal-overlay" onclick="window.closeItemDescription()">
         <div class="modal-card" id="modalCard" onclick="event.stopPropagation()">
             <img id="modalImg" src="" style="width: 100.15%; height: auto; object-fit: contain; margin-bottom: 20px;" alt="">
             <h2 id="modalName"></h2>
@@ -1092,29 +1088,60 @@
             itemRollCounters: {}
         };
 
-        // ==================== ОБЛАЧНЫЕ ФУНКЦИИ СОХРАНЕНИЯ ====================
+        // ==================== ОБЛАЧНЫЕ ФУНКЦИИ СОХРАНЕНИЯ С ЛОГИРОВАНИЕМ ====================
         function saveAllDataToCloud() {
             if (!currentUserUid) {
-                console.warn("Нет авторизованного пользователя. Данные не сохранены.");
+                console.warn("⚠️ Нет авторизованного пользователя. Данные не сохранены.");
                 return;
             }
+            
+            console.log("🔄 Попытка сохранить данные в облако Firebase...");
+            
             set(ref(db, `users/${currentUserUid}`), {
                 inventory: inventory,
                 stats: stats,
                 extendedStats: extendedStats
-            }).catch((error) => console.error("Ошибка сохранения в облако:", error));
+            })
+            .then(() => {
+                console.log("🟢 Данные успешно сохранены в облако Firebase для UID:", currentUserUid);
+            })
+            .catch((error) => {
+                console.error("🔴 ОШИБКА СОХРАНЕНИЯ В ОБЛАКО:", error);
+                console.error("🔴 Код ошибки:", error.code);
+                console.error("🔴 Сообщение:", error.message);
+                
+                // При ошибке сохранения показываем предупреждение и перезагружаем страницу
+                alert("Ошибка синхронизации! Проверьте сетевое подключение, иначе прогресс будет утерян.");
+                window.location.reload();
+            });
         }
 
         function saveData() { saveAllDataToCloud(); }
         function saveStats() { saveAllDataToCloud(); }
         function saveExtendedStats() { saveAllDataToCloud(); }
 
-        // ==================== СТАНДАРТНАЯ ФУНКЦИЯ ЗАГРУЗКИ ====================
+        // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ С ТАЙМАУТОМ ====================
         async function loadData() {
-            if (!currentUserUid) return;
+            if (!currentUserUid) {
+                console.warn("⚠️ Нет авторизованного пользователя для загрузки данных.");
+                return;
+            }
+            
+            console.log("🔄 Попытка загрузить данные пользователя из облака Firebase...");
             const dbRef = ref(db);
+            
             try {
-                const snapshot = await get(child(dbRef, `users/${currentUserUid}`));
+                // Таймаут на 2.5 секунды для проверки сети
+                const timeoutPromise = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error("TIMEOUT")), 2500);
+                });
+                
+                // Гонка между запросом к БД и таймаутом
+                const snapshot = await Promise.race([
+                    get(child(dbRef, `users/${currentUserUid}`)),
+                    timeoutPromise
+                ]);
+                
                 if (snapshot.exists()) {
                     const data = snapshot.val();
                     inventory = data.inventory || [];
@@ -1125,6 +1152,8 @@
                         heavyItemRarity: "common", heavyItemRolls: 0, mostRollsInDayDate: "--",
                         mostRollsInDayCount: 0, dailyCalendar: {}, itemClicks: {}, itemRollCounters: {}
                     };
+                    console.log("🟢 Данные пользователя успешно загружены из облака Firebase.");
+                    console.log("📊 Загружено предметов в инвентаре:", inventory.length);
                 } else {
                     inventory = [];
                     stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
@@ -1134,14 +1163,40 @@
                         heavyItemRarity: "common", heavyItemRolls: 0, mostRollsInDayDate: "--",
                         mostRollsInDayCount: 0, dailyCalendar: {}, itemClicks: {}, itemRollCounters: {}
                     };
+                    console.log("🟡 Аккаунт новый, в облаке нет старых данных. Инициализированы дефолтные значения.");
                 }
+                // Принудительно обновляем UI только при успешной загрузке
                 updateUI();
                 updateStatsDisplay();
             } catch (error) {
-                console.error("Ошибка загрузки из Firebase:", error);
-                // При ошибке все равно обновляем интерфейс из локальных данных, чтобы сайт не вис
-                updateUI();
-                updateStatsDisplay();
+                console.error("🔴 КРИТИЧЕСКАЯ ОШИБКА ЗАГРУЗКИ:", error);
+                console.error("🔴 Код ошибки:", error.code);
+                console.error("🔴 Сообщение:", error.message);
+                
+                // Жёсткая блокировка: если не удалось загрузить данные, выкидываем пользователя
+                console.log("🔴 Выполняется принудительный выход из-за ошибки сети...");
+                
+                // Сбрасываем пользователя
+                currentUserUid = null;
+                
+                // Принудительный логаут из Firebase
+                try {
+                    await auth.signOut();
+                    console.log("🟢 Пользователь принудительно разлогинен.");
+                } catch (signOutError) {
+                    console.error("⚠️ Ошибка при принудительном выходе:", signOutError);
+                }
+                
+                // Скрываем приложение и показываем форму входа
+                document.querySelector(".app").style.display = "none";
+                const authOverlay = document.getElementById("authOverlay");
+                const errorDiv = document.getElementById("authError");
+                
+                authOverlay.style.display = "flex";
+                errorDiv.innerText = "Ошибка сети: Не удалось синхронизировать данные с сервером. Проверьте интернет-соединение.";
+                errorDiv.style.display = "block";
+                
+                // НЕ вызываем updateUI() и updateStatsDisplay() при ошибке
             }
         }
 
@@ -1445,7 +1500,7 @@
             });
         }
 
-        // ==================== ФУНКЦИЯ openCase ====================
+        // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ openCase ====================
         async function openCase() {
             let btn = document.getElementById("openCaseBtn");
             if (isSpinning || btn.disabled) return;
@@ -1455,12 +1510,13 @@
             
             const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
             const todayStr = formatter.format(new Date());
+            // Очищаем строку от запрещённых символов для Firebase (точки, $, #, [, ])
             const safeDateKey = todayStr.replace(/[\.\$\#\[\]]/g, "");
             extendedStats.dailyCalendar[safeDateKey] = (extendedStats.dailyCalendar[safeDateKey] || 0) + 1;
             
             if (extendedStats.dailyCalendar[safeDateKey] > extendedStats.mostRollsInDayCount) {
                 extendedStats.mostRollsInDayCount = extendedStats.dailyCalendar[safeDateKey];
-                extendedStats.mostRollsInDayDate = todayStr;
+                extendedStats.mostRollsInDayDate = todayStr; // оставляем красивую дату для отображения
             }
             
             ITEMS.forEach(i => {
@@ -1575,6 +1631,7 @@
         }
 
         function updateUI() {
+            console.log("🔄 Обновление UI...");
             const rarityOrder = ['common', 'rare', 'superRare', 'epic', 'mythic', 'legendary'];
             
             const pluralRarityNames = {
@@ -1586,85 +1643,127 @@
                 legendary: "Легендарные"
             };
             
+            // ===== ИНВЕНТАРЬ (с data-атрибутами для глобального делегата) =====
             let invDiv = document.getElementById("inventoryGrid");
             let collected = getCollected();
+            
+            // Очищаем контейнер
+            invDiv.innerHTML = "";
             
             if (collected.length === 0) {
                 invDiv.innerHTML = '<div style="text-align:center;padding:40px;width:100%;">🧸 Инвентарь пуст...</div>';
             } else {
-                let invHtml = "";
                 let isFirstInv = true;
                 
                 rarityOrder.forEach(key => {
                     let itemsInRarity = collected.filter(i => i.rarityKey === key);
                     if (itemsInRarity.length > 0) {
                         let rarityName = pluralRarityNames[key];
-                        let hrLine = !isFirstInv ? `<hr style="border: none; height: 1px; background: rgba(255,255,255,0.15); margin: 40px 10px 20px 10px; width: 100%;">` : '';
+                        
+                        // Разделитель между группами редкостей
+                        if (!isFirstInv) {
+                            let hr = document.createElement('hr');
+                            hr.style.cssText = 'border: none; height: 1px; background: rgba(255,255,255,0.15); margin: 40px 10px 20px 10px; width: 100%;';
+                            invDiv.appendChild(hr);
+                        }
                         isFirstInv = false;
                         
-                        invHtml += `
-                            ${hrLine}
-                            <div style="width:100%; margin-top:10px; margin-bottom:10px;">
-                                <h3 style="font-size:1.5rem; margin:0; padding-left:10px; color:${getRarityByKey(key).color}; text-shadow: 0 0 10px ${hexToRgba(getRarityByKey(key).color, 0.3)};">${rarityName}</h3>
-                            </div>
-                            <div class="items-grid" style="width:100%;">
-                        `;
-                        invHtml += itemsInRarity.map(i => {
-                            let rarity = getItemRarity(i);
-                            let rarityClass = getRarityClass(i.rarityKey);
-                            let textClass = getRarityTextClass(i.rarityKey);
-                            return `<div class="item-card ${rarityClass}" data-item-id="${i.id}">
-                                        <img src="${i.img}" class="grid-img" alt="${escapeHtml(i.name)}" onerror="this.style.display='none'">
-                                        <div class="item-name">${escapeHtml(i.name)}</div>
-                                        <div class="badge ${textClass}">${rarity.name}</div>
-                                    </div>`;
-                        }).join('');
-                        invHtml += `</div>`;
+                        // Заголовок группы
+                        let headerDiv = document.createElement('div');
+                        headerDiv.style.cssText = 'width:100%; margin-top:10px; margin-bottom:10px;';
+                        headerDiv.innerHTML = `<h3 style="font-size:1.5rem; margin:0; padding-left:10px; color:${getRarityByKey(key).color}; text-shadow: 0 0 10px ${hexToRgba(getRarityByKey(key).color, 0.3)};">${rarityName}</h3>`;
+                        invDiv.appendChild(headerDiv);
+                        
+                        // Сетка карточек
+                        let grid = document.createElement('div');
+                        grid.className = 'items-grid';
+                        grid.style.cssText = 'width:100%;';
+                        
+                        itemsInRarity.forEach(item => {
+                            let rarity = getItemRarity(item);
+                            let rarityClass = getRarityClass(item.rarityKey);
+                            let textClass = getRarityTextClass(item.rarityKey);
+                            
+                            let card = document.createElement('div');
+                            card.className = `item-card ${rarityClass}`;
+                            // Добавляем data-атрибут для глобального делегата
+                            card.setAttribute('data-item-id', item.id);
+                            card.innerHTML = `
+                                <img src="${item.img}" class="grid-img" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
+                                <div class="item-name">${escapeHtml(item.name)}</div>
+                                <div class="badge ${textClass}">${rarity.name}</div>
+                            `;
+                            
+                            // Также оставляем addEventListener для надежности
+                            card.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                const id = parseInt(this.getAttribute('data-item-id'));
+                                console.log("🖱️ Клик по карточке (addEventListener) с ID:", id);
+                                window.openItemDescription(id);
+                            });
+                            
+                            grid.appendChild(card);
+                        });
+                        
+                        invDiv.appendChild(grid);
                     }
                 });
-                invDiv.innerHTML = invHtml;
             }
             
+            // ===== КОЛЛЕКЦИЯ =====
             let collDiv = document.getElementById("collectionContainer");
             let missing = getMissing();
+            collDiv.innerHTML = "";
             
             if (missing.length === 0) {
                 collDiv.innerHTML = `<div class="celebration"><h1>🏆 ВСЕ СОБРАНО! 🏆</h1><p style="font-size:1.5rem; font-weight:bold; margin-top:10px;">Все предметы собраны! Ур-рааааа!</p></div>`;
             } else {
-                let collHtml = "";
                 let isFirstColl = true;
                 
                 rarityOrder.forEach(key => {
                     let missingInRarity = missing.filter(i => i.rarityKey === key);
-                    
                     if (missingInRarity.length > 0) {
                         let rarityName = pluralRarityNames[key];
-                        let hrLine = !isFirstColl ? `<hr style="border: none; height: 1px; background: rgba(255,255,255,0.15); margin: 40px 10px 20px 10px; width: 100%;">` : '';
+                        
+                        if (!isFirstColl) {
+                            let hr = document.createElement('hr');
+                            hr.style.cssText = 'border: none; height: 1px; background: rgba(255,255,255,0.15); margin: 40px 10px 20px 10px; width: 100%;';
+                            collDiv.appendChild(hr);
+                        }
                         isFirstColl = false;
                         
-                        collHtml += `
-                            ${hrLine}
-                            <div style="width:100%; margin-top:10px; margin-bottom:10px;">
-                                <h3 style="font-size:1.5rem; margin:0; padding-left:10px; color:#aaa;">${rarityName}</h3>
-                            </div>
-                            <div class="items-grid" style="width:100%;">
-                        `;
-                        collHtml += missingInRarity.map(i => {
-                            let rarity = getItemRarity(i);
-                            let rarityClass = getRarityClass(i.rarityKey);
-                            let textClass = getRarityTextClass(i.rarityKey);
-                            return `<div class="item-card ${rarityClass}" style="filter: grayscale(1); opacity: 0.4;">
-                                        <img src="${i.img}" class="grid-img" alt="${escapeHtml(i.name)}" onerror="this.style.display='none'">
-                                        <div class="item-name">${escapeHtml(i.name)}</div>
-                                        <div class="badge ${textClass}">${rarity.name}</div>
-                                    </div>`;
-                        }).join('');
-                        collHtml += `</div>`;
+                        let headerDiv = document.createElement('div');
+                        headerDiv.style.cssText = 'width:100%; margin-top:10px; margin-bottom:10px;';
+                        headerDiv.innerHTML = `<h3 style="font-size:1.5rem; margin:0; padding-left:10px; color:#aaa;">${rarityName}</h3>`;
+                        collDiv.appendChild(headerDiv);
+                        
+                        let grid = document.createElement('div');
+                        grid.className = 'items-grid';
+                        grid.style.cssText = 'width:100%;';
+                        
+                        missingInRarity.forEach(item => {
+                            let rarity = getItemRarity(item);
+                            let rarityClass = getRarityClass(item.rarityKey);
+                            let textClass = getRarityTextClass(item.rarityKey);
+                            
+                            let card = document.createElement('div');
+                            card.className = `item-card ${rarityClass}`;
+                            card.style.cssText = 'filter: grayscale(1); opacity: 0.4;';
+                            card.innerHTML = `
+                                <img src="${item.img}" class="grid-img" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
+                                <div class="item-name">${escapeHtml(item.name)}</div>
+                                <div class="badge ${textClass}">${rarity.name}</div>
+                            `;
+                            
+                            grid.appendChild(card);
+                        });
+                        
+                        collDiv.appendChild(grid);
                     }
                 });
-                collDiv.innerHTML = collHtml;
             }
             
+            // ===== СТАТИСТИКА =====
             let statsContainer = document.getElementById("globalStatsContainer");
             if (statsContainer) {
                 let totalSeconds = Math.floor(extendedStats.spinTimeMs / 1000);
@@ -1749,6 +1848,7 @@
             
             document.getElementById("totalItemsCount").innerText = inventory.length;
             document.getElementById("remainingCount").innerText = missing.length;
+            console.log("✅ UI обновлён");
         }
 
         function initTabs() {
@@ -1790,10 +1890,18 @@
             });
         }
 
-        // ==================== УЛЬТИМАТИВНЫЙ ФИКС МОДАЛКИ ====================
+        // ==================== МОДАЛЬНОЕ ОКНО С ОТЛАДКОЙ ====================
         function openItemDescription(id) {
+            alert("Клик сработал для предмета ID: " + id);
+            console.log("🟢 Вызов модалки для ID:", id);
+            
             const item = ITEMS.find(i => i.id === id);
-            if (!item) return;
+            if (!item) {
+                console.error("❌ Предмет с ID", id, "не найден!");
+                return;
+            }
+            
+            console.log("🔍 Найден предмет:", item.name);
             
             extendedStats.itemClicks[id] = (extendedStats.itemClicks[id] || 0) + 1;
             saveExtendedStats();
@@ -1830,22 +1938,17 @@
             
             sidePanel.style.borderColor = rarity.color;
             
-            // Включаем видимость модального окна напрямую, перекрывая любой CSS
-            modal.style.setProperty("display", "flex", "important");
-            modal.style.setProperty("visibility", "visible", "important");
-            modal.style.setProperty("opacity", "1", "important");
-            modal.style.setProperty("z-index", "999999", "important");
+            // Жёсткое принудительное отображение модалки
+            modal.setAttribute("style", "display: flex !important; visibility: visible !important; opacity: 1 !important; z-index: 999999 !important;");
+            console.log("✅ Модалка принудительно показана");
         }
 
         function closeItemDescription() {
-            const modal = document.getElementById("descModal");
-            modal.style.setProperty("display", "none", "important");
+            document.getElementById("descModal").style.display = "none";
+            console.log("❌ Модалка закрыта");
         }
 
-        window.openItemDescription = openItemDescription;
-        window.closeItemDescription = closeItemDescription;
-
-        // ==================== ФУНКЦИЯ testOpenCaseWithRarity ====================
+        // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ testOpenCaseWithRarity ====================
         async function testOpenCaseWithRarity(rarityKey) {
             let btn = document.getElementById("openCaseBtn");
             if (isSpinning || btn.disabled) return;
@@ -1855,12 +1958,13 @@
             
             const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
             const todayStr = formatter.format(new Date());
+            // Очищаем строку от запрещённых символов для Firebase (точки, $, #, [, ])
             const safeDateKey = todayStr.replace(/[\.\$\#\[\]]/g, "");
             extendedStats.dailyCalendar[safeDateKey] = (extendedStats.dailyCalendar[safeDateKey] || 0) + 1;
             
             if (extendedStats.dailyCalendar[safeDateKey] > extendedStats.mostRollsInDayCount) {
                 extendedStats.mostRollsInDayCount = extendedStats.dailyCalendar[safeDateKey];
-                extendedStats.mostRollsInDayDate = todayStr;
+                extendedStats.mostRollsInDayDate = todayStr; // оставляем красивую дату для отображения
             }
             
             ITEMS.forEach(i => {
@@ -1977,6 +2081,8 @@
 
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
         document.addEventListener("DOMContentLoaded", () => {
+            console.log("🚀 DOM полностью загружен, инициализация...");
+            
             initTabs();
             initAudioControls();
             
@@ -1984,30 +2090,49 @@
             const emailInput = document.getElementById("authEmail");
             const passwordInput = document.getElementById("authPassword");
             const errorDiv = document.getElementById("authError");
+            const videoBg = document.getElementById("globalVideoBg");
             
-            // Глобальный делегат кликов для инвентаря
-            document.getElementById("inventoryGrid").addEventListener("click", (e) => {
-                const card = e.target.closest(".item-card");
-                if (card) {
-                    const id = parseInt(card.getAttribute("data-item-id"));
-                    console.log("Глобальный перехват клика по карточке с ID:", id);
-                    window.openItemDescription(id);
-                }
-            });
+            // === ГЛОБАЛЬНЫЙ ДЕЛЕГАТ КЛИКОВ ДЛЯ ИНВЕНТАРЯ (Бронебойный метод) ===
+            const inventoryGrid = document.getElementById("inventoryGrid");
+            if (inventoryGrid) {
+                inventoryGrid.addEventListener("click", (e) => {
+                    const card = e.target.closest(".item-card");
+                    if (card) {
+                        const id = parseInt(card.getAttribute("data-item-id"));
+                        console.log("🌐 Глобальный перехват клика по карточке с ID:", id);
+                        if (!isNaN(id)) {
+                            window.openItemDescription(id);
+                        } else {
+                            console.warn("⚠️ ID не найден в data-атрибуте карточки");
+                        }
+                    }
+                });
+                console.log("✅ Глобальный делегат кликов для инвентаря установлен");
+            } else {
+                console.error("❌ inventoryGrid не найден!");
+            }
             
             // Отслеживание состояния аккаунта
             onAuthStateChanged(auth, (user) => {
+                console.log("📡 onAuthStateChanged вызван, user:", user ? "есть" : "нет");
                 if (user) {
                     currentUserUid = user.uid;
-                    authOverlay.style.display = "none";
+                    console.log("✅ Пользователь авторизован, UID:", currentUserUid);
+                    
+                    // Показываем приложение, скрываем окно авторизации и выключаем видео
                     document.querySelector(".app").style.display = "block";
-                    document.getElementById("globalVideoBg").style.display = "none";
+                    document.getElementById("authOverlay").style.display = "none";
+                    if (videoBg) videoBg.style.display = "none";
+                    
                     loadData();
                 } else {
                     currentUserUid = null;
-                    authOverlay.style.display = "flex";
+                    console.log("👤 Пользователь не авторизован");
+                    
+                    // Скрываем приложение, показываем окно авторизации и включаем видео
                     document.querySelector(".app").style.display = "none";
-                    document.getElementById("globalVideoBg").style.display = "block";
+                    document.getElementById("authOverlay").style.display = "flex";
+                    if (videoBg) videoBg.style.display = "block";
                 }
             });
 
@@ -2023,11 +2148,25 @@
                     return;
                 }
                 
+                console.log("🔄 Попытка входа для:", email);
+                
                 signInWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        console.log("✅ Вход выполнен успешно!");
+                        currentUserUid = userCredential.user.uid;
+                        loadData();
+                    })
                     .catch(error => {
-                        console.error("Детали ошибки входа:", error);
-                        if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
-                            errorDiv.innerText = "Неверный email или пароль.";
+                        console.error("🔴 Детали ошибки входа:", error);
+                        console.error("🔴 Код ошибки:", error.code);
+                        console.error("🔴 Сообщение:", error.message);
+                        
+                        if (error.code === 'auth/network-request-failed') {
+                            errorDiv.innerText = "Ошибка сети: Сервер недоступен. Проверьте интернет-соединение.";
+                        } else if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
+                            errorDiv.innerText = "Ошибка входа: Неверный email или пароль.";
+                        } else if (error.code === "auth/operation-not-allowed") {
+                            errorDiv.innerText = "Ошибка: В консоли Firebase не включен способ входа по Email/Паролю!";
                         } else {
                             errorDiv.innerText = "Ошибка входа: " + error.message;
                         }
@@ -2053,13 +2192,27 @@
                     return;
                 }
                 
+                console.log("🔄 Попытка регистрации для:", email);
+                
                 createUserWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        console.log("✅ Регистрация выполнена успешно!");
+                        currentUserUid = userCredential.user.uid;
+                        loadData();
+                    })
                     .catch(error => {
-                        console.error("Детали ошибки регистрации:", error);
-                        if (error.code === "auth/email-already-in-use") {
-                            errorDiv.innerText = "Этот Email уже зарегистрирован другим пользователем.";
+                        console.error("🔴 Детали ошибки регистрации:", error);
+                        console.error("🔴 Код ошибки:", error.code);
+                        console.error("🔴 Сообщение:", error.message);
+                        
+                        if (error.code === 'auth/network-request-failed') {
+                            errorDiv.innerText = "Ошибка сети: Сервер недоступен. Проверьте интернет-соединение.";
+                        } else if (error.code === "auth/email-already-in-use") {
+                            errorDiv.innerText = "Этот Email уже зарегистрирован.";
                         } else if (error.code === "auth/invalid-email") {
                             errorDiv.innerText = "Неверный формат Email. Пример: user@mail.ru";
+                        } else if (error.code === "auth/operation-not-allowed") {
+                            errorDiv.innerText = "Ошибка: В консоли Firebase не включен способ входа по Email/Паролю!";
                         } else {
                             errorDiv.innerText = "Ошибка регистрации: " + error.message;
                         }
@@ -2070,6 +2223,7 @@
             // Кнопка открытия кейса
             const openBtn = document.getElementById("openCaseBtn");
             openBtn.onclick = async () => {
+                console.log("🎯 Клик по кнопке зафиксирован, isSpinning =", isSpinning);
                 if (isResultScreen) {
                     resetToInitialState();
                 } else {
@@ -2079,6 +2233,8 @@
 
             // Кнопка сброса прогресса
             document.getElementById("resetProgressBtn").onclick = resetGame;
+            
+            console.log("🚀 Инициализация завершена");
         });
     </script>
 </body>
