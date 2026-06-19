@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1366, initial-scale=0.3, minimum-scale=0.1, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Симулятор кейсов | ЭЛИТНЫЙ ДИЗАЙН</title>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
     <style>
@@ -23,10 +23,26 @@
             color: #eee;
         }
 
-        .main-wrapper {
-            width: 100%;
-            height: 100%;
-            position: relative;
+        .orientation-warning {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #0a0f1e;
+            z-index: 9999999;
+            color: #fff;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-family: sans-serif;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 1024px) and (orientation: portrait) {
+            .orientation-warning {
+                display: flex !important;
+            }
         }
 
         /* Стили окна входа/регистрации (ПРОЗРАЧНЫЙ ФОН) */
@@ -859,133 +875,112 @@
             cursor: pointer;
             font-weight: bold;
         }
-
-        /* ===== ПРИНУДИТЕЛЬНЫЙ ПОВОРОТ ЧЕРЕЗ .main-wrapper ===== */
-        @media (max-width: 1024px) {
-            body {
-                margin: 0 !important; padding: 0 !important;
-                overflow: hidden !important;
-                width: 100vw !important; height: 100vh !important;
-                background: #0a0f1e !important;
-            }
-            .main-wrapper {
-                position: fixed !important;
-                width: 1366px !important;
-                height: 768px !important;
-                top: 50% !important; left: 50% !important;
-                transform: translate(-50%, -50%) rotate(90deg) scale(calc(100vh / 1366)) !important;
-                transform-origin: center center !important;
-            }
-            #globalVideoBg {
-                position: absolute !important;
-                width: 100% !important; height: 100% !important;
-                top: 0 !important; left: 0 !important;
-                transform: none !important;
-                object-fit: cover !important;
-            }
-        }
     </style>
 </head>
 <body>
-    <div class="main-wrapper">
-        <!-- ГЛОБАЛЬНЫЙ ВИДЕО-ФОН С ОТЛАДКОЙ -->
-        <video autoplay muted loop playsinline id="globalVideoBg" style="position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: -100 !important; object-fit: cover !important; pointer-events: none !important;" oncanplay="console.log('🟢 Видео-фон готов к воспроизведению')" onerror="console.error('🔴 Ошибка загрузки видео-файла! Проверьте путь images/auth-bg.mp4')">
-            <source src="images/auth-bg.mp4" type="video/mp4">
-        </video>
+    <div class="orientation-warning">
+        <div style="font-size: 5rem; margin-bottom: 20px;">🔄</div>
+        <div style="font-size: 2rem; font-weight: bold;">Пожалуйста, переверните телефон боком</div>
+        <div style="font-size: 1.2rem; color: #666; margin-top: 10px;">Для идеального отображения игры необходим горизонтальный режим.</div>
+    </div>
 
-        <!-- ЭКРАН ВХОДА С ПРОЗРАЧНЫМ ФОНОМ -->
-        <div id="authOverlay" class="auth-overlay">
-            <div class="auth-card">
-                <div class="auth-project-title">The Roulette of Love</div>
-                
-                <h2 style="font-size: 1.1rem; font-weight: 600; margin-top: 0 !important; margin-bottom: 24px; color: #fff !important; line-height: 1.5; text-align: center; width: 100%; box-sizing: border-box;">Приветики пистолетики! Ой а что это у нас тут такое? нужен вход на сайт? ёб твою мать! Ну что ж. ХЗАЗАЗАЗ, ПЛЗЩЛЦЗЛП, пцорц9грпцдлп,</h2>
-                
-                <input type="email" id="authEmail" class="auth-input" placeholder="Email" style="width: 100%;">
-                <input type="password" id="authPassword" class="auth-input" placeholder="Пароль" style="width: 100%;">
-                <div id="authError" style="color: #ff1414; font-size: 0.9rem; margin-bottom: 12px; display: none;"></div>
-                <div class="auth-btn-group" style="width: 100%;">
-                    <button id="signInBtn" class="open-btn" style="font-size: 1.2rem; padding: 12px; margin: 0; width: 100%;">ВОЙТИ</button>
-                    <button id="signUpBtn" class="small-reset" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); padding: 12px; border-radius: 20px; font-weight: bold; cursor: pointer; letter-spacing: 1px; width: 100%;">Зарегистрироваться</button>
+    <!-- ГЛОБАЛЬНЫЙ ВИДЕО-ФОН С ОТЛАДКОЙ -->
+    <video autoplay muted loop playsinline id="globalVideoBg" style="position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: -100 !important; object-fit: cover !important; pointer-events: none !important;" oncanplay="console.log('🟢 Видео-фон готов к воспроизведению')" onerror="console.error('🔴 Ошибка загрузки видео-файла! Проверьте путь images/auth-bg.mp4')">
+        <source src="images/auth-bg.mp4" type="video/mp4">
+    </video>
+
+    <!-- ЭКРАН ВХОДА С ПРОЗРАЧНЫМ ФОНОМ -->
+    <div id="authOverlay" class="auth-overlay">
+        <div class="auth-card">
+            <div class="auth-project-title">The Roulette of Love</div>
+            
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-top: 0 !important; margin-bottom: 24px; color: #fff !important; line-height: 1.5; text-align: center; width: 100%; box-sizing: border-box;">Приветики пистолетики! Ой а что это у нас тут такое? нужен вход на сайт? ёб твою мать! Ну что ж. ХЗАЗАЗАЗ, ПЛЗЩЛЦЗЛП, пцорц9грпцдлп,</h2>
+            
+            <input type="email" id="authEmail" class="auth-input" placeholder="Email" style="width: 100%;">
+            <input type="password" id="authPassword" class="auth-input" placeholder="Пароль" style="width: 100%;">
+            <div id="authError" style="color: #ff1414; font-size: 0.9rem; margin-bottom: 12px; display: none;"></div>
+            <div class="auth-btn-group" style="width: 100%;">
+                <button id="signInBtn" class="open-btn" style="font-size: 1.2rem; padding: 12px; margin: 0; width: 100%;">ВОЙТИ</button>
+                <button id="signUpBtn" class="small-reset" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); padding: 12px; border-radius: 20px; font-weight: bold; cursor: pointer; letter-spacing: 1px; width: 100%;">Зарегистрироваться</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="app">
+        <div class="audio-controls">
+            <button id="muteBtn" class="small-reset" style="background: none; padding: 0; font-size: 1.2rem; cursor: pointer;">🔊</button>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.5" style="cursor: pointer; accent-color: #00ff66; width: 100px;">
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="case">📦 Кейс</button>
+            <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot" style="display: none; position: absolute; top: 2px; right: 6px; width: 12px; height: 12px; background-color: #ff1414; border-radius: 50%; box-shadow: 0 0 8px #ff1414;"></span></button>
+            <button class="tab-btn" data-tab="collection">🏆 Коллекция</button>
+            <button class="tab-btn" data-tab="stats">📊 Статистика</button>
+        </div>
+
+        <div id="caseTab" class="tab-content active">
+            <div class="slot-machine">
+                <div class="slot-window" id="slotWindow">
+                    <div class="arrow-top animate" id="arrowTop"></div>
+                    <div class="arrow-bottom animate" id="arrowBottom"></div>
+                    <div class="center-indicator"></div>
+                    <div class="center-highlight" id="centerHighlight">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
                 </div>
+                <button class="open-btn" id="openCaseBtn">🔓 ОТКРЫТЬ КЕЙС 🔓</button>
+                <div class="result-area" id="rollResult">✨ Готов к крутке? Жми на кнопку! ✨</div>
+            </div>
+            <div class="stats">
+                <span>💰 Уникальных предметов: <strong id="totalItemsCount">0</strong></span>
+                <span>⭐ Осталось выбить: <strong id="remainingCount">0</strong></span>
+                <button class="small-reset" id="resetProgressBtn">♻️ Сбросить прогресс</button>
+            </div>
+            <div class="test-admin-panel">
+                <button onclick="window.testOpenCaseWithRarity('common')" style="background: #dee3f2; color: #000;">⚪ Common</button>
+                <button onclick="window.testOpenCaseWithRarity('rare')" style="background: #184cff; color: #fff;">🔵 Rare</button>
+                <button onclick="window.testOpenCaseWithRarity('superRare')" style="background: #8e18ff; color: #fff;">🟣 SuperRare</button>
+                <button onclick="window.testOpenCaseWithRarity('epic')" style="background: #ff18ab; color: #fff;">🩷 Epic</button>
+                <button onclick="window.testOpenCaseWithRarity('mythic')" style="background: #ff1414; color: #fff;">🔴 Mythic</button>
+                <button onclick="window.testOpenCaseWithRarity('legendary')" style="background: #ffc800; color: #000;">🟡 Legendary</button>
+            </div>
+            <div class="stats-panel" id="statsPanel">
+                <div class="stat-item">📊 Открыто: 0</div>
+                <div class="stat-item">⚪ Обычных: 0 (0%)</div>
+                <div class="stat-item">🔵 Редких: 0 (0%)</div>
+                <div class="stat-item">🟣 Сверхредких: 0 (0%)</div>
+                <div class="stat-item">🩷 Эпических: 0 (0%)</div>
+                <div class="stat-item">🔴 Мифических: 0 (0%)</div>
+                <div class="stat-item">🟡 Легендарных: 0 (0%)</div>
             </div>
         </div>
 
-        <div class="app">
-            <div class="audio-controls">
-                <button id="muteBtn" class="small-reset" style="background: none; padding: 0; font-size: 1.2rem; cursor: pointer;">🔊</button>
-                <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.5" style="cursor: pointer; accent-color: #00ff66; width: 100px;">
-            </div>
-            
-            <div class="tabs">
-                <button class="tab-btn active" data-tab="case">📦 Кейс</button>
-                <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot" style="display: none; position: absolute; top: 2px; right: 6px; width: 12px; height: 12px; background-color: #ff1414; border-radius: 50%; box-shadow: 0 0 8px #ff1414;"></span></button>
-                <button class="tab-btn" data-tab="collection">🏆 Коллекция</button>
-                <button class="tab-btn" data-tab="stats">📊 Статистика</button>
-            </div>
-
-            <div id="caseTab" class="tab-content active">
-                <div class="slot-machine">
-                    <div class="slot-window" id="slotWindow">
-                        <div class="arrow-top animate" id="arrowTop"></div>
-                        <div class="arrow-bottom animate" id="arrowBottom"></div>
-                        <div class="center-indicator"></div>
-                        <div class="center-highlight" id="centerHighlight">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
-                    </div>
-                    <button class="open-btn" id="openCaseBtn">🔓 ОТКРЫТЬ КЕЙС 🔓</button>
-                    <div class="result-area" id="rollResult">✨ Готов к крутке? Жми на кнопку! ✨</div>
-                </div>
-                <div class="stats">
-                    <span>💰 Уникальных предметов: <strong id="totalItemsCount">0</strong></span>
-                    <span>⭐ Осталось выбить: <strong id="remainingCount">0</strong></span>
-                    <button class="small-reset" id="resetProgressBtn">♻️ Сбросить прогресс</button>
-                </div>
-                <div class="test-admin-panel">
-                    <button onclick="window.testOpenCaseWithRarity('common')" style="background: #dee3f2; color: #000;">⚪ Common</button>
-                    <button onclick="window.testOpenCaseWithRarity('rare')" style="background: #184cff; color: #fff;">🔵 Rare</button>
-                    <button onclick="window.testOpenCaseWithRarity('superRare')" style="background: #8e18ff; color: #fff;">🟣 SuperRare</button>
-                    <button onclick="window.testOpenCaseWithRarity('epic')" style="background: #ff18ab; color: #fff;">🩷 Epic</button>
-                    <button onclick="window.testOpenCaseWithRarity('mythic')" style="background: #ff1414; color: #fff;">🔴 Mythic</button>
-                    <button onclick="window.testOpenCaseWithRarity('legendary')" style="background: #ffc800; color: #000;">🟡 Legendary</button>
-                </div>
-                <div class="stats-panel" id="statsPanel">
-                    <div class="stat-item">📊 Открыто: 0</div>
-                    <div class="stat-item">⚪ Обычных: 0 (0%)</div>
-                    <div class="stat-item">🔵 Редких: 0 (0%)</div>
-                    <div class="stat-item">🟣 Сверхредких: 0 (0%)</div>
-                    <div class="stat-item">🩷 Эпических: 0 (0%)</div>
-                    <div class="stat-item">🔴 Мифических: 0 (0%)</div>
-                    <div class="stat-item">🟡 Легендарных: 0 (0%)</div>
-                </div>
-            </div>
-
-            <div id="inventoryTab" class="tab-content">
-                <div id="inventoryGrid"></div>
-            </div>
-
-            <div id="collectionTab" class="tab-content">
-                <div id="collectionContainer"></div>
-            </div>
-
-            <div id="statsTab" class="tab-content">
-                <div class="stats-panel-rows" id="globalStatsContainer" style="display: flex; flex-direction: column; gap: 20px; padding: 20px 10px; font-size: 1.15rem; color: #fff;"></div>
-            </div>
-            
-            <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
+        <div id="inventoryTab" class="tab-content">
+            <div id="inventoryGrid"></div>
         </div>
 
-        <div id="descModal" class="modal-overlay" onclick="window.closeItemDescription()">
-            <div class="modal-card" id="modalCard" onclick="event.stopPropagation()">
-                <img id="modalImg" src="" style="width: 100.15%; height: auto; object-fit: contain; margin-bottom: 20px;" alt="">
-                <h2 id="modalName"></h2>
-                <div id="modalBadge" class="badge"></div>
-                <div id="modalDesc" class="modal-desc"></div>
-                <button class="open-btn" onclick="window.closeItemDescription()" style="font-size: 1.2rem; padding: 10px 30px; margin: 10px 0 0 0;">ЗАКРЫТЬ</button>
-            </div>
-            <div class="modal-side-panel" id="modalSidePanel" onclick="event.stopPropagation()">
-                <div style="font-size: 1.1rem; font-weight: bold; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 4px;">Статистика предмета</div>
-                <div class="modal-side-row" id="infoDateRow">📅 Дата получения: <strong>--</strong></div>
-                <div class="modal-side-row" id="infoRollsRow">🎰 Круток потребовалось: <strong>--</strong></div>
-            </div>
+        <div id="collectionTab" class="tab-content">
+            <div id="collectionContainer"></div>
+        </div>
+
+        <div id="statsTab" class="tab-content">
+            <div class="stats-panel-rows" id="globalStatsContainer" style="display: flex; flex-direction: column; gap: 20px; padding: 20px 10px; font-size: 1.15rem; color: #fff;"></div>
+        </div>
+        
+        <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
+    </div>
+
+    <div id="descModal" class="modal-overlay" onclick="window.closeItemDescription()">
+        <div class="modal-card" id="modalCard" onclick="event.stopPropagation()">
+            <img id="modalImg" src="" style="width: 100.15%; height: auto; object-fit: contain; margin-bottom: 20px;" alt="">
+            <h2 id="modalName"></h2>
+            <div id="modalBadge" class="badge"></div>
+            <div id="modalDesc" class="modal-desc"></div>
+            <button class="open-btn" onclick="window.closeItemDescription()" style="font-size: 1.2rem; padding: 10px 30px; margin: 10px 0 0 0;">ЗАКРЫТЬ</button>
+        </div>
+        <div class="modal-side-panel" id="modalSidePanel" onclick="event.stopPropagation()">
+            <div style="font-size: 1.1rem; font-weight: bold; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 4px;">Статистика предмета</div>
+            <div class="modal-side-row" id="infoDateRow">📅 Дата получения: <strong>--</strong></div>
+            <div class="modal-side-row" id="infoRollsRow">🎰 Круток потребовалось: <strong>--</strong></div>
         </div>
     </div>
 
@@ -1446,7 +1441,7 @@
             isResultScreen = true;
         }
 
-        // ==================== НОВАЯ ФУНКЦИЯ startSpin НА requestAnimationFrame ====================
+        // ==================== ОРИГИНАЛЬНАЯ ФУНКЦИЯ startSpin (setTimeout) ====================
         async function startSpin(finalItem) {
             let win = document.getElementById("slotWindow");
             const SLOTS_COUNT = 7;
@@ -1494,44 +1489,48 @@
             renderSlots();
             
             return new Promise((resolve) => {
-                let startTime = null;
-                const duration = 5000; // Ровно 5 секунд на всю анимацию, как на ПК!
-                
-                function animate(timestamp) {
-                    if (!startTime) startTime = timestamp;
-                    const elapsed = timestamp - startTime;
-                    
-                    // Вычисляем текущий шаг на основе прошедшего времени (всего 200 шагов за 5 сек)
-                    let calculatedStep = Math.floor((elapsed / duration) * TOTAL_STEPS);
-                    if (calculatedStep > TOTAL_STEPS) calculatedStep = TOTAL_STEPS;
-                    
-                    if (calculatedStep > currentStep) {
-                        const diff = calculatedStep - currentStep;
-                        for (let d = 0; d < diff; d++) {
-                            for (let i = 0; i < SLOTS_COUNT - 1; i++) {
-                                currentItems[i] = currentItems[i + 1];
-                            }
-                            currentItems[SLOTS_COUNT - 1] = fullSequence[queueIndex % fullSequence.length];
-                            queueIndex++;
-                            
-                            if (!isMuted) {
-                                let clone = clickAudio.cloneNode();
-                                clone.volume = currentVolume;
-                                clone.play().catch(() => {});
-                            }
-                        }
-                        currentStep = calculatedStep;
+                function step() {
+                    if (currentStep >= TOTAL_STEPS) {
                         renderSlots();
+                        setTimeout(() => {
+                            resolve(finalItem);
+                        }, 1000);
+                        return;
                     }
                     
-                    if (elapsed < duration) {
-                        requestAnimationFrame(animate);
+                    const progress = currentStep / TOTAL_STEPS;
+                    let delay;
+                    if (progress < 0.5) {
+                        delay = 12;
+                    } else if (progress < 0.75) {
+                        delay = 35;
+                    } else if (progress < 0.88) {
+                        delay = 90;
+                    } else if (progress < 0.95) {
+                        delay = 220;
                     } else {
-                        renderSlots();
-                        setTimeout(() => { resolve(finalItem); }, 1000);
+                        delay = 500;
                     }
+                    
+                    for (let i = 0; i < SLOTS_COUNT - 1; i++) {
+                        currentItems[i] = currentItems[i + 1];
+                    }
+                    currentItems[SLOTS_COUNT - 1] = fullSequence[queueIndex % fullSequence.length];
+                    queueIndex++;
+                    
+                    renderSlots();
+                    
+                    if (!isMuted) {
+                        let clone = clickAudio.cloneNode();
+                        clone.volume = currentVolume;
+                        clone.play().catch(() => {});
+                    }
+                    
+                    currentStep++;
+                    setTimeout(step, delay);
                 }
-                requestAnimationFrame(animate);
+                
+                step();
             });
         }
 
@@ -1968,7 +1967,6 @@
             
             sidePanel.style.borderColor = rarity.color;
             
-            // Жёсткое принудительное отображение модалки через setProperty с important
             modal.style.setProperty("display", "flex", "important");
             modal.style.setProperty("visibility", "visible", "important");
             modal.style.setProperty("opacity", "1", "important");
