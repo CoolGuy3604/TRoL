@@ -717,7 +717,7 @@
             background: rgba(5, 7, 15, 0.85) !important;
             backdrop-filter: blur(12px) !important;
             z-index: 999999 !important;
-            display: none;
+            display: none !important;
             justify-content: center !important;
             align-items: center !important;
             padding: 20px !important;
@@ -854,7 +854,8 @@
             font-weight: bold;
         }
 
-        @media (max-width: 1024px) and (orientation: portrait) {
+        /* ЖЕСТКИЙ ПОСТОЯННЫЙ ПОВОРОТ ДЛЯ МОБИЛЬНЫХ (без проверки ориентации) */
+        @media (max-width: 1024px) {
             body {
                 width: 100vh !important;
                 height: 100vw !important;
