@@ -844,9 +844,9 @@
     </style>
 </head>
 <body>
-    <!-- ГЛОБАЛЬНЫЙ ВИДЕО-ФОН С ОТЛАДКОЙ -->
-    <video autoplay muted loop playsinline id="globalVideoBg" style="position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: -100 !important; object-fit: cover !important; pointer-events: none !important;" oncanplay="console.log('🟢 Видео-фон готов к воспроизведению')" onerror="console.error('🔴 Ошибка загрузки видео-файла! Проверьте путь images/auth-bg.mp4')">
-        <source src="images/auth-bg.mp4" type="video/mp4">
+    <!-- ГЛОБАЛЬНЫЙ ВИДЕО-ФОН С ИСПРАВЛЕННЫМ ПУТЁМ -->
+    <video autoplay muted loop playsinline id="globalVideoBg" style="position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: -100 !important; object-fit: cover !important; pointer-events: none !important;">
+        <source src="./images/auth-bg.mp4" type="video/mp4">
     </video>
 
     <!-- ЭКРАН ВХОДА С ПРОЗРАЧНЫМ ФОНОМ -->
@@ -1088,7 +1088,7 @@
             itemRollCounters: {}
         };
 
-        // ==================== ОБЛАЧНЫЕ ФУНКЦИИ СОХРАНЕНИЯ С ЛОГИРОВАНИЕМ ====================
+        // ==================== ОБЛАЧНЫЕ ФУНКЦИИ СОХРАНЕНИЯ ====================
         function saveAllDataToCloud() {
             if (!currentUserUid) {
                 console.warn("⚠️ Нет авторизованного пользователя. Данные не сохранены.");
@@ -1110,7 +1110,6 @@
                 console.error("🔴 Код ошибки:", error.code);
                 console.error("🔴 Сообщение:", error.message);
                 
-                // При ошибке сохранения показываем предупреждение и перезагружаем страницу
                 alert("Ошибка синхронизации! Проверьте сетевое подключение, иначе прогресс будет утерян.");
                 window.location.reload();
             });
@@ -1120,7 +1119,7 @@
         function saveStats() { saveAllDataToCloud(); }
         function saveExtendedStats() { saveAllDataToCloud(); }
 
-        // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ С ТАЙМАУТОМ ====================
+        // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ С БЕЗОПАСНЫМ ВЫХОДОМ ====================
         async function loadData() {
             if (!currentUserUid) {
                 console.warn("⚠️ Нет авторизованного пользователя для загрузки данных.");
@@ -1131,12 +1130,10 @@
             const dbRef = ref(db);
             
             try {
-                // Таймаут на 2.5 секунды для проверки сети
                 const timeoutPromise = new Promise((_, reject) => {
                     setTimeout(() => reject(new Error("TIMEOUT")), 2500);
                 });
                 
-                // Гонка между запросом к БД и таймаутом
                 const snapshot = await Promise.race([
                     get(child(dbRef, `users/${currentUserUid}`)),
                     timeoutPromise
@@ -1165,7 +1162,6 @@
                     };
                     console.log("🟡 Аккаунт новый, в облаке нет старых данных. Инициализированы дефолтные значения.");
                 }
-                // Принудительно обновляем UI только при успешной загрузке
                 updateUI();
                 updateStatsDisplay();
             } catch (error) {
@@ -1173,13 +1169,10 @@
                 console.error("🔴 Код ошибки:", error.code);
                 console.error("🔴 Сообщение:", error.message);
                 
-                // Жёсткая блокировка: если не удалось загрузить данные, выкидываем пользователя
                 console.log("🔴 Выполняется принудительный выход из-за ошибки сети...");
                 
-                // Сбрасываем пользователя
                 currentUserUid = null;
                 
-                // Принудительный логаут из Firebase
                 try {
                     await auth.signOut();
                     console.log("🟢 Пользователь принудительно разлогинен.");
@@ -1187,7 +1180,6 @@
                     console.error("⚠️ Ошибка при принудительном выходе:", signOutError);
                 }
                 
-                // Скрываем приложение и показываем форму входа
                 document.querySelector(".app").style.display = "none";
                 const authOverlay = document.getElementById("authOverlay");
                 const errorDiv = document.getElementById("authError");
@@ -1196,7 +1188,8 @@
                 errorDiv.innerText = "Ошибка сети: Не удалось синхронизировать данные с сервером. Проверьте интернет-соединение.";
                 errorDiv.style.display = "block";
                 
-                // НЕ вызываем updateUI() и updateStatsDisplay() при ошибке
+                // ВАЖНО: возвращаем управление, чтобы не ломать остальной JS
+                return;
             }
         }
 
@@ -1510,13 +1503,12 @@
             
             const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
             const todayStr = formatter.format(new Date());
-            // Очищаем строку от запрещённых символов для Firebase (точки, $, #, [, ])
             const safeDateKey = todayStr.replace(/[\.\$\#\[\]]/g, "");
             extendedStats.dailyCalendar[safeDateKey] = (extendedStats.dailyCalendar[safeDateKey] || 0) + 1;
             
             if (extendedStats.dailyCalendar[safeDateKey] > extendedStats.mostRollsInDayCount) {
                 extendedStats.mostRollsInDayCount = extendedStats.dailyCalendar[safeDateKey];
-                extendedStats.mostRollsInDayDate = todayStr; // оставляем красивую дату для отображения
+                extendedStats.mostRollsInDayDate = todayStr;
             }
             
             ITEMS.forEach(i => {
@@ -1643,11 +1635,10 @@
                 legendary: "Легендарные"
             };
             
-            // ===== ИНВЕНТАРЬ (с data-атрибутами для глобального делегата) =====
+            // ===== ИНВЕНТАРЬ =====
             let invDiv = document.getElementById("inventoryGrid");
             let collected = getCollected();
             
-            // Очищаем контейнер
             invDiv.innerHTML = "";
             
             if (collected.length === 0) {
@@ -1660,7 +1651,6 @@
                     if (itemsInRarity.length > 0) {
                         let rarityName = pluralRarityNames[key];
                         
-                        // Разделитель между группами редкостей
                         if (!isFirstInv) {
                             let hr = document.createElement('hr');
                             hr.style.cssText = 'border: none; height: 1px; background: rgba(255,255,255,0.15); margin: 40px 10px 20px 10px; width: 100%;';
@@ -1668,13 +1658,11 @@
                         }
                         isFirstInv = false;
                         
-                        // Заголовок группы
                         let headerDiv = document.createElement('div');
                         headerDiv.style.cssText = 'width:100%; margin-top:10px; margin-bottom:10px;';
                         headerDiv.innerHTML = `<h3 style="font-size:1.5rem; margin:0; padding-left:10px; color:${getRarityByKey(key).color}; text-shadow: 0 0 10px ${hexToRgba(getRarityByKey(key).color, 0.3)};">${rarityName}</h3>`;
                         invDiv.appendChild(headerDiv);
                         
-                        // Сетка карточек
                         let grid = document.createElement('div');
                         grid.className = 'items-grid';
                         grid.style.cssText = 'width:100%;';
@@ -1686,7 +1674,6 @@
                             
                             let card = document.createElement('div');
                             card.className = `item-card ${rarityClass}`;
-                            // Добавляем data-атрибут для глобального делегата
                             card.setAttribute('data-item-id', item.id);
                             card.innerHTML = `
                                 <img src="${item.img}" class="grid-img" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
@@ -1694,7 +1681,6 @@
                                 <div class="badge ${textClass}">${rarity.name}</div>
                             `;
                             
-                            // Также оставляем addEventListener для надежности
                             card.addEventListener('click', function(e) {
                                 e.stopPropagation();
                                 const id = parseInt(this.getAttribute('data-item-id'));
@@ -1938,7 +1924,6 @@
             
             sidePanel.style.borderColor = rarity.color;
             
-            // Жёсткое принудительное отображение модалки
             modal.setAttribute("style", "display: flex !important; visibility: visible !important; opacity: 1 !important; z-index: 999999 !important;");
             console.log("✅ Модалка принудительно показана");
         }
@@ -1958,13 +1943,12 @@
             
             const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
             const todayStr = formatter.format(new Date());
-            // Очищаем строку от запрещённых символов для Firebase (точки, $, #, [, ])
             const safeDateKey = todayStr.replace(/[\.\$\#\[\]]/g, "");
             extendedStats.dailyCalendar[safeDateKey] = (extendedStats.dailyCalendar[safeDateKey] || 0) + 1;
             
             if (extendedStats.dailyCalendar[safeDateKey] > extendedStats.mostRollsInDayCount) {
                 extendedStats.mostRollsInDayCount = extendedStats.dailyCalendar[safeDateKey];
-                extendedStats.mostRollsInDayDate = todayStr; // оставляем красивую дату для отображения
+                extendedStats.mostRollsInDayDate = todayStr;
             }
             
             ITEMS.forEach(i => {
@@ -2092,7 +2076,7 @@
             const errorDiv = document.getElementById("authError");
             const videoBg = document.getElementById("globalVideoBg");
             
-            // === ГЛОБАЛЬНЫЙ ДЕЛЕГАТ КЛИКОВ ДЛЯ ИНВЕНТАРЯ (Бронебойный метод) ===
+            // === ГЛОБАЛЬНЫЙ ДЕЛЕГАТ КЛИКОВ ДЛЯ ИНВЕНТАРЯ ===
             const inventoryGrid = document.getElementById("inventoryGrid");
             if (inventoryGrid) {
                 inventoryGrid.addEventListener("click", (e) => {
@@ -2112,27 +2096,30 @@
                 console.error("❌ inventoryGrid не найден!");
             }
             
-            // Отслеживание состояния аккаунта
+            // === ОТСЛЕЖИВАНИЕ СОСТОЯНИЯ АККАУНТА С ИЗОЛЯЦИЕЙ ОШИБОК ===
             onAuthStateChanged(auth, (user) => {
                 console.log("📡 onAuthStateChanged вызван, user:", user ? "есть" : "нет");
-                if (user) {
-                    currentUserUid = user.uid;
-                    console.log("✅ Пользователь авторизован, UID:", currentUserUid);
-                    
-                    // Показываем приложение, скрываем окно авторизации и выключаем видео
-                    document.querySelector(".app").style.display = "block";
-                    document.getElementById("authOverlay").style.display = "none";
-                    if (videoBg) videoBg.style.display = "none";
-                    
-                    loadData();
-                } else {
-                    currentUserUid = null;
-                    console.log("👤 Пользователь не авторизован");
-                    
-                    // Скрываем приложение, показываем окно авторизации и включаем видео
-                    document.querySelector(".app").style.display = "none";
-                    document.getElementById("authOverlay").style.display = "flex";
-                    if (videoBg) videoBg.style.display = "block";
+                try {
+                    if (user) {
+                        currentUserUid = user.uid;
+                        console.log("✅ Пользователь авторизован, UID:", currentUserUid);
+                        
+                        document.querySelector(".app").style.display = "block";
+                        document.getElementById("authOverlay").style.display = "none";
+                        if (videoBg) videoBg.style.display = "none";
+                        
+                        // Вызов loadData обёрнут в try-catch, чтобы ошибка не ломала остальной JS
+                        loadData();
+                    } else {
+                        currentUserUid = null;
+                        console.log("👤 Пользователь не авторизован");
+                        
+                        document.querySelector(".app").style.display = "none";
+                        document.getElementById("authOverlay").style.display = "flex";
+                        if (videoBg) videoBg.style.display = "block";
+                    }
+                } catch (err) {
+                    console.error("🔴 Ошибка в onAuthStateChanged:", err);
                 }
             });
 
