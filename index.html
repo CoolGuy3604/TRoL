@@ -22,33 +22,16 @@
             color: #eee;
         }
 
-        /* Стили окна входа/регистрации */
+        /* Стили окна входа/регистрации (ПРОЗРАЧНЫЙ ФОН) */
         .auth-overlay {
             position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            background: none !important;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: 200000 !important;
-            display: flex !important;
-            justify-content: center !important;
-            align-items: center !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent !important;
             padding: 20px !important;
-            overflow: hidden !important;
-        }
-        
-        .auth-video-bg {
-            position: absolute !important;
-            top: 50% !important;
-            left: 50% !important;
-            min-width: 100% !important;
-            min-height: 100% !important;
-            width: auto !important;
-            height: auto !important;
-            z-index: -1 !important;
-            transform: translate(-50%, -50%) !important;
-            object-fit: cover !important;
         }
         
         .auth-card {
@@ -861,307 +844,1198 @@
     </style>
 </head>
 <body>
-
-<!-- ЭКРАН ВХОДА С ВИДЕО-ФОНОМ -->
-<div id="authOverlay" class="auth-overlay">
-    <!-- Видео-фон для экрана авторизации -->
-    <video autoplay muted loop playsinline class="auth-video-bg">
+    <!-- ГЛОБАЛЬНЫЙ ВИДЕО-ФОН (независимый от авторизации) -->
+    <video autoplay muted loop playsinline id="globalVideoBg" style="position: fixed !important; top: 50% !important; left: 50% !important; min-width: 100% !important; min-height: 100% !important; width: auto !important; height: auto !important; z-index: -100 !important; transform: translate(-50%, -50%) !important; object-fit: cover !important; pointer-events: none !important;">
         <source src="images/auth-bg.mp4" type="video/mp4">
     </video>
-    
-    <div class="auth-card">
-        <div class="auth-project-title">The Roulette of Love</div>
-        
-        <h2 style="font-size: 1.1rem; font-weight: 600; margin-top: 0 !important; margin-bottom: 24px; color: #fff !important; line-height: 1.5; text-align: center; width: 100%; box-sizing: border-box;">Приветики пистолетики! Ой а что это у нас тут такое? нужен вход на сайт? ёб твою мать! Ну что ж. ХЗАЗАЗАЗ, ПЛЗЩЛЦЗЛП, пцорц9грпцдлп,</h2>
-        
-        <input type="email" id="authEmail" class="auth-input" placeholder="Email" style="width: 100%;">
-        <input type="password" id="authPassword" class="auth-input" placeholder="Пароль" style="width: 100%;">
-        <div id="authError" style="color: #ff1414; font-size: 0.9rem; margin-bottom: 12px; display: none;"></div>
-        <div class="auth-btn-group" style="width: 100%;">
-            <button id="signInBtn" class="open-btn" style="font-size: 1.2rem; padding: 12px; margin: 0; width: 100%;">ВОЙТИ</button>
-            <button id="signUpBtn" class="small-reset" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); padding: 12px; border-radius: 20px; font-weight: bold; cursor: pointer; letter-spacing: 1px; width: 100%;">Зарегистрироваться</button>
+
+    <!-- ЭКРАН ВХОДА С ПРОЗРАЧНЫМ ФОНОМ -->
+    <div id="authOverlay" class="auth-overlay">
+        <div class="auth-card">
+            <div class="auth-project-title">The Roulette of Love</div>
+            
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-top: 0 !important; margin-bottom: 24px; color: #fff !important; line-height: 1.5; text-align: center; width: 100%; box-sizing: border-box;">Приветики пистолетики! Ой а что это у нас тут такое? нужен вход на сайт? ёб твою мать! Ну что ж. ХЗАЗАЗАЗ, ПЛЗЩЛЦЗЛП, пцорц9грпцдлп,</h2>
+            
+            <input type="email" id="authEmail" class="auth-input" placeholder="Email" style="width: 100%;">
+            <input type="password" id="authPassword" class="auth-input" placeholder="Пароль" style="width: 100%;">
+            <div id="authError" style="color: #ff1414; font-size: 0.9rem; margin-bottom: 12px; display: none;"></div>
+            <div class="auth-btn-group" style="width: 100%;">
+                <button id="signInBtn" class="open-btn" style="font-size: 1.2rem; padding: 12px; margin: 0; width: 100%;">ВОЙТИ</button>
+                <button id="signUpBtn" class="small-reset" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); padding: 12px; border-radius: 20px; font-weight: bold; cursor: pointer; letter-spacing: 1px; width: 100%;">Зарегистрироваться</button>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="app">
-    <div class="audio-controls">
-        <button id="muteBtn" class="small-reset" style="background: none; padding: 0; font-size: 1.2rem; cursor: pointer;">🔊</button>
-        <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.5" style="cursor: pointer; accent-color: #00ff66; width: 100px;">
-    </div>
-    
-    <div class="tabs">
-        <button class="tab-btn active" data-tab="case">📦 Кейс</button>
-        <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot" style="display: none; position: absolute; top: 2px; right: 6px; width: 12px; height: 12px; background-color: #ff1414; border-radius: 50%; box-shadow: 0 0 8px #ff1414;"></span></button>
-        <button class="tab-btn" data-tab="collection">🏆 Коллекция</button>
-        <button class="tab-btn" data-tab="stats">📊 Статистика</button>
+    <div class="app">
+        <div class="audio-controls">
+            <button id="muteBtn" class="small-reset" style="background: none; padding: 0; font-size: 1.2rem; cursor: pointer;">🔊</button>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.5" style="cursor: pointer; accent-color: #00ff66; width: 100px;">
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="case">📦 Кейс</button>
+            <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot" style="display: none; position: absolute; top: 2px; right: 6px; width: 12px; height: 12px; background-color: #ff1414; border-radius: 50%; box-shadow: 0 0 8px #ff1414;"></span></button>
+            <button class="tab-btn" data-tab="collection">🏆 Коллекция</button>
+            <button class="tab-btn" data-tab="stats">📊 Статистика</button>
+        </div>
+
+        <div id="caseTab" class="tab-content active">
+            <div class="slot-machine">
+                <div class="slot-window" id="slotWindow">
+                    <div class="arrow-top animate" id="arrowTop"></div>
+                    <div class="arrow-bottom animate" id="arrowBottom"></div>
+                    <div class="center-indicator"></div>
+                    <div class="center-highlight" id="centerHighlight">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
+                </div>
+                <button class="open-btn" id="openCaseBtn">🔓 ОТКРЫТЬ КЕЙС 🔓</button>
+                <div class="result-area" id="rollResult">✨ Готов к крутке? Жми на кнопку! ✨</div>
+            </div>
+            <div class="stats">
+                <span>💰 Уникальных предметов: <strong id="totalItemsCount">0</strong></span>
+                <span>⭐ Осталось выбить: <strong id="remainingCount">0</strong></span>
+                <button class="small-reset" id="resetProgressBtn">♻️ Сбросить прогресс</button>
+            </div>
+            <div class="test-admin-panel">
+                <button onclick="window.testOpenCaseWithRarity('common')" style="background: #dee3f2; color: #000;">⚪ Common</button>
+                <button onclick="window.testOpenCaseWithRarity('rare')" style="background: #184cff; color: #fff;">🔵 Rare</button>
+                <button onclick="window.testOpenCaseWithRarity('superRare')" style="background: #8e18ff; color: #fff;">🟣 SuperRare</button>
+                <button onclick="window.testOpenCaseWithRarity('epic')" style="background: #ff18ab; color: #fff;">🩷 Epic</button>
+                <button onclick="window.testOpenCaseWithRarity('mythic')" style="background: #ff1414; color: #fff;">🔴 Mythic</button>
+                <button onclick="window.testOpenCaseWithRarity('legendary')" style="background: #ffc800; color: #000;">🟡 Legendary</button>
+            </div>
+            <div class="stats-panel" id="statsPanel">
+                <div class="stat-item">📊 Открыто: 0</div>
+                <div class="stat-item">⚪ Обычных: 0 (0%)</div>
+                <div class="stat-item">🔵 Редких: 0 (0%)</div>
+                <div class="stat-item">🟣 Сверхредких: 0 (0%)</div>
+                <div class="stat-item">🩷 Эпических: 0 (0%)</div>
+                <div class="stat-item">🔴 Мифических: 0 (0%)</div>
+                <div class="stat-item">🟡 Легендарных: 0 (0%)</div>
+            </div>
+        </div>
+
+        <div id="inventoryTab" class="tab-content">
+            <div id="inventoryGrid"></div>
+        </div>
+
+        <div id="collectionTab" class="tab-content">
+            <div id="collectionContainer"></div>
+        </div>
+
+        <div id="statsTab" class="tab-content">
+            <div class="stats-panel-rows" id="globalStatsContainer" style="display: flex; flex-direction: column; gap: 20px; padding: 20px 10px; font-size: 1.15rem; color: #fff;"></div>
+        </div>
+        
+        <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
     </div>
 
-    <div id="caseTab" class="tab-content active">
-        <div class="slot-machine">
-            <div class="slot-window" id="slotWindow">
+    <div id="descModal" class="modal-overlay" onclick="window.closeItemDescription()">
+        <div class="modal-card" id="modalCard" onclick="event.stopPropagation()">
+            <img id="modalImg" src="" style="width: 100.15%; height: auto; object-fit: contain; margin-bottom: 20px;" alt="">
+            <h2 id="modalName"></h2>
+            <div id="modalBadge" class="badge"></div>
+            <div id="modalDesc" class="modal-desc"></div>
+            <button class="open-btn" onclick="window.closeItemDescription()" style="font-size: 1.2rem; padding: 10px 30px; margin: 10px 0 0 0;">ЗАКРЫТЬ</button>
+        </div>
+        <div class="modal-side-panel" id="modalSidePanel" onclick="event.stopPropagation()">
+            <div style="font-size: 1.1rem; font-weight: bold; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 4px;">Статистика предмета</div>
+            <div class="modal-side-row" id="infoDateRow">📅 Дата получения: <strong>--</strong></div>
+            <div class="modal-side-row" id="infoRollsRow">🎰 Круток потребовалось: <strong>--</strong></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // ==================== ПОДКЛЮЧЕНИЕ FIREBASE ====================
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAhFEJ1AZRntBc_Qyrhd-D3klK_kQawSt0",
+            authDomain: "case-simulator-e2e36.firebaseapp.com",
+            projectId: "case-simulator-e2e36",
+            storageBucket: "case-simulator-e2e36.firebasestorage.app",
+            messagingSenderId: "820284500611",
+            appId: "1:820284500611:web:1f7eb404a8296fd5a349b6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let currentUserUid = null;
+
+        // ==================== ЗВУКОВОЙ ДВИЖОК ====================
+        const clickAudio = new Audio('click.mp3');
+        const winAudio = new Audio('win.mp3');
+        let isMuted = false;
+        let currentVolume = 0.5;
+        
+        clickAudio.volume = currentVolume;
+        winAudio.volume = currentVolume;
+
+        // ==================== СИСТЕМА РЕДКОСТЕЙ ====================
+        const RARITIES = {
+            common: { name: "Обычный", color: "#dee3f2", totalChance: 95.234 },
+            rare: { name: "Редкий", color: "#184cff", totalChance: 3.809 },
+            superRare: { name: "Сверхредкий", color: "#8e18ff", totalChance: 0.762 },
+            epic: { name: "Эпический", color: "#ff18ab", totalChance: 0.152 },
+            mythic: { name: "Мифический", color: "#ff1414", totalChance: 0.030 },
+            legendary: { name: "Легендарный", color: "#ffc800", totalChance: 0.012 }
+        };
+
+        const ITEMS = [
+            { id: 0, name: "★ Нож-бабочка", img: "images/item3.png", rarityKey: "legendary", description: "Редчайший нож с уникальной анимацией осмотра. Мечта любого коллекционера." },
+            { id: 1, name: "AWP | Dragon Lore", img: "images/item3.png", rarityKey: "mythic", description: "Легендарная снайперская винтовка, украшенная рисунком огнедышащего дракона." },
+            { id: 2, name: "AK-47 | Fire Serpent", img: "images/item3.png", rarityKey: "mythic", description: "Автомат с изображением огненного змея из мифологии майя." },
+            { id: 3, name: "M4A4 | Howl", img: "images/item3.png", rarityKey: "mythic", description: "Засекреченная штурмовая винтовка с изображением свирепого волка." },
+            { id: 4, name: "Desert Eagle | Blaze", img: "images/item3.png", rarityKey: "epic", description: "Мощный пистолет с языками пламени, нанесенными на хромированную поверхность." },
+            { id: 5, name: "SSG 08 | Blood in the Water", img: "images/item3.png", rarityKey: "epic", description: "Еп твою мать! Это что вообще такое? Ты думаешь я ради этого покупал ее? Еп твою мать! Это что вообще такое? Ты думаешь я ради этого покупал ее? Еп твою мать! Это что вообще такое? Ты думаешь я ради этого покупал ее??" },
+            { id: 6, name: "USP-S | Kill Confirmed", img: "images/item3.png", rarityKey: "superRare", description: "Бесшумный пистолет со стильным рисунком пробитого черепа." },
+            { id: 7, name: "Glock-18 | Fade", img: "images/item3.png", rarityKey: "superRare", description: "Стандартный пистолет террористов с хромированным градиентным напылением." },
+            { id: 8, name: "P250 | Splash", img: "images/item3.png", rarityKey: "rare", description: "Простой и надежный пистолет с яркими брызгами краски на корпусе." },
+            { id: 9, name: "MP7 | Nemesis", img: "images/item3.png", rarityKey: "rare", description: "Пистолет-пулемет с геометрическим футуристическим паттерном монстра." },
+            { id: 10, name: "Galil AR | Chatterbox", img: "images/item3.png", rarityKey: "rare", description: "Грубо раскрашенный автомат с имитацией клацающей пасти на затворе." },
+            { id: 11, name: "Tec-9 | Ice Cap", img: "images/item3.png", rarityKey: "common", description: "Пистолет для ведения огня на ходу, покрытый узором арктического льда." },
+            { id: 12, name: "MAG-7 | Hazard", img: "images/item3.png", rarityKey: "common", description: "Дробовик в яркой промышленной окраске, предупреждающей об опасности." },
+            { id: 13, name: "Negev | Lionfish", img: "images/item3.png", rarityKey: "common", description: "Тяжелый пулемет с камуфляжем в стиле ядовитой рыбы-льва." },
+            { id: 14, name: "★ Перчатки (Crimson Web)", img: "images/item3.png", rarityKey: "legendary", description: "Стильные кожаные перчатки, покрытые узором из кровавой паутины." }
+        ];
+
+        const itemsCountByRarity = {};
+        for (const item of ITEMS) itemsCountByRarity[item.rarityKey] = (itemsCountByRarity[item.rarityKey] || 0) + 1;
+
+        const cumulativeItems = [];
+        let cumulativeSum = 0;
+        for (const item of ITEMS) {
+            const itemChance = RARITIES[item.rarityKey].totalChance / itemsCountByRarity[item.rarityKey];
+            cumulativeSum += itemChance;
+            cumulativeItems.push({ item, cumulative: cumulativeSum });
+        }
+
+        function getRandomItem() {
+            const rand = Math.random() * 100;
+            for (const entry of cumulativeItems) {
+                if (rand <= entry.cumulative) return entry.item;
+            }
+            return ITEMS[0];
+        }
+
+        function getRandomItemByRarity() {
+            const rand = Math.random() * 100;
+            if (rand < 79.6) {
+                const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'common');
+                if (itemsOfThisRarity.length === 0) return ITEMS[0];
+                return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
+            } else if (rand < 94.6) {
+                const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'rare');
+                if (itemsOfThisRarity.length === 0) return ITEMS[0];
+                return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
+            } else if (rand < 97.6) {
+                const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'superRare');
+                if (itemsOfThisRarity.length === 0) return ITEMS[0];
+                return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
+            } else if (rand < 99.4) {
+                const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'epic');
+                if (itemsOfThisRarity.length === 0) return ITEMS[0];
+                return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
+            } else if (rand < 99.7) {
+                const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'mythic');
+                if (itemsOfThisRarity.length === 0) return ITEMS[0];
+                return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
+            } else {
+                const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'legendary');
+                if (itemsOfThisRarity.length === 0) return ITEMS[0];
+                return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
+            }
+        }
+
+        function getItemChance(item) {
+            return (RARITIES[item.rarityKey].totalChance / itemsCountByRarity[item.rarityKey]).toFixed(4);
+        }
+
+        function getRarityByKey(key) { return RARITIES[key] || RARITIES.common; }
+        function getItemRarity(item) { return getRarityByKey(item.rarityKey); }
+        function getRarityName(rarityKey) { return RARITIES[rarityKey]?.name || "Обычный"; }
+        function getRarityClass(rarityKey) {
+            const map = { common: "rarity-common", rare: "rarity-rare", superRare: "rarity-superRare", epic: "rarity-epic", mythic: "rarity-mythic", legendary: "rarity-legendary" };
+            return map[rarityKey] || "rarity-common";
+        }
+        function getRarityTextClass(rarityKey) {
+            const map = { common: "rarity-text-common", rare: "rarity-text-rare", superRare: "rarity-text-superRare", epic: "rarity-text-epic", mythic: "rarity-text-mythic", legendary: "rarity-text-legendary" };
+            return map[rarityKey] || "rarity-text-common";
+        }
+
+        let inventory = [];
+        let isSpinning = false;
+        let currentGlow = null;
+        let stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+        let isResultScreen = false;
+
+        let extendedStats = {
+            totalRollsEver: 0,
+            spinTimeMs: 0,
+            firstItemName: "Нет предметов",
+            maxDryStreak: 0,
+            currentDryStreak: 0,
+            heavyItemName: "Нет предметов",
+            heavyItemRarity: "common",
+            heavyItemRolls: 0,
+            mostRollsInDayDate: "--",
+            mostRollsInDayCount: 0,
+            dailyCalendar: {},
+            itemClicks: {},
+            itemRollCounters: {}
+        };
+
+        // ==================== ОБЛАЧНЫЕ ФУНКЦИИ СОХРАНЕНИЯ С ЛОГИРОВАНИЕМ ====================
+        function saveAllDataToCloud() {
+            if (!currentUserUid) {
+                console.warn("⚠️ Нет авторизованного пользователя. Данные не сохранены.");
+                return;
+            }
+            
+            console.log("🔄 Попытка сохранить данные в облако Firebase...");
+            
+            set(ref(db, `users/${currentUserUid}`), {
+                inventory: inventory,
+                stats: stats,
+                extendedStats: extendedStats
+            })
+            .then(() => {
+                console.log("🟢 Данные успешно сохранены в облако Firebase для UID:", currentUserUid);
+            })
+            .catch((error) => {
+                console.error("🔴 ОШИБКА СОХРАНЕНИЯ В ОБЛАКО:", error);
+                console.error("🔴 Код ошибки:", error.code);
+                console.error("🔴 Сообщение:", error.message);
+                
+                // При ошибке сохранения показываем предупреждение и перезагружаем страницу
+                alert("Ошибка синхронизации! Проверьте сетевое подключение, иначе прогресс будет утерян.");
+                window.location.reload();
+            });
+        }
+
+        function saveData() { saveAllDataToCloud(); }
+        function saveStats() { saveAllDataToCloud(); }
+        function saveExtendedStats() { saveAllDataToCloud(); }
+
+        // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ С ТАЙМАУТОМ ====================
+        async function loadData() {
+            if (!currentUserUid) {
+                console.warn("⚠️ Нет авторизованного пользователя для загрузки данных.");
+                return;
+            }
+            
+            console.log("🔄 Попытка загрузить данные пользователя из облака Firebase...");
+            const dbRef = ref(db);
+            
+            try {
+                // Таймаут на 2.5 секунды для проверки сети
+                const timeoutPromise = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error("TIMEOUT")), 2500);
+                });
+                
+                // Гонка между запросом к БД и таймаутом
+                const snapshot = await Promise.race([
+                    get(child(dbRef, `users/${currentUserUid}`)),
+                    timeoutPromise
+                ]);
+                
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    inventory = data.inventory || [];
+                    stats = data.stats || { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+                    extendedStats = data.extendedStats || {
+                        totalRollsEver: 0, spinTimeMs: 0, firstItemName: "Нет предметов",
+                        maxDryStreak: 0, currentDryStreak: 0, heavyItemName: "Нет предметов",
+                        heavyItemRarity: "common", heavyItemRolls: 0, mostRollsInDayDate: "--",
+                        mostRollsInDayCount: 0, dailyCalendar: {}, itemClicks: {}, itemRollCounters: {}
+                    };
+                    console.log("🟢 Данные пользователя успешно загружены из облака Firebase.");
+                    console.log("📊 Загружено предметов в инвентаре:", inventory.length);
+                } else {
+                    inventory = [];
+                    stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
+                    extendedStats = {
+                        totalRollsEver: 0, spinTimeMs: 0, firstItemName: "Нет предметов",
+                        maxDryStreak: 0, currentDryStreak: 0, heavyItemName: "Нет предметов",
+                        heavyItemRarity: "common", heavyItemRolls: 0, mostRollsInDayDate: "--",
+                        mostRollsInDayCount: 0, dailyCalendar: {}, itemClicks: {}, itemRollCounters: {}
+                    };
+                    console.log("🟡 Аккаунт новый, в облаке нет старых данных. Инициализированы дефолтные значения.");
+                }
+                // Принудительно обновляем UI только при успешной загрузке
+                updateUI();
+                updateStatsDisplay();
+            } catch (error) {
+                console.error("🔴 КРИТИЧЕСКАЯ ОШИБКА ЗАГРУЗКИ:", error);
+                console.error("🔴 Код ошибки:", error.code);
+                console.error("🔴 Сообщение:", error.message);
+                
+                // Жёсткая блокировка: если не удалось загрузить данные, выкидываем пользователя
+                console.log("🔴 Выполняется принудительный выход из-за ошибки сети...");
+                
+                // Сбрасываем пользователя
+                currentUserUid = null;
+                
+                // Принудительный логаут из Firebase
+                try {
+                    await auth.signOut();
+                    console.log("🟢 Пользователь принудительно разлогинен.");
+                } catch (signOutError) {
+                    console.error("⚠️ Ошибка при принудительном выходе:", signOutError);
+                }
+                
+                // Скрываем приложение и показываем форму входа
+                document.querySelector(".app").style.display = "none";
+                const authOverlay = document.getElementById("authOverlay");
+                const errorDiv = document.getElementById("authError");
+                
+                authOverlay.style.display = "flex";
+                errorDiv.innerText = "Ошибка сети: Не удалось синхронизировать данные с сервером. Проверьте интернет-соединение.";
+                errorDiv.style.display = "block";
+                
+                // НЕ вызываем updateUI() и updateStatsDisplay() при ошибке
+            }
+        }
+
+        // ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
+        function hasItem(id) { 
+            return inventory.some(i => i.id === id); 
+        }
+        
+        function addItem(item) {
+            if (!hasItem(item.id)) {
+                const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+                const dateStr = `${formatter.format(new Date())}`;
+                const personalRolls = extendedStats.itemRollCounters[item.id] || 1;
+                inventory.push({ 
+                    id: item.id, 
+                    date: dateStr,
+                    rollsToDrop: personalRolls
+                });
+                saveData();
+                return true;
+            }
+            return false;
+        }
+        
+        function getCollected() { 
+            return ITEMS.filter(item => hasItem(item.id)).map(item => {
+                const invRecord = inventory.find(record => record.id === item.id);
+                return { ...item, collectedDate: invRecord ? invRecord.date : "" };
+            });
+        }
+        
+        function getMissing() { 
+            return ITEMS.filter(i => !hasItem(i.id)); 
+        }
+        
+        function isComplete() { 
+            return getMissing().length === 0; 
+        }
+        
+        function escapeHtml(str) { 
+            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); 
+        }
+        
+        function removeGlow() { 
+            if (currentGlow) { 
+                currentGlow.remove(); 
+                currentGlow = null; 
+            } 
+        }
+        
+        function hexToRgba(hex, alpha) {
+            let r = parseInt(hex.slice(1,3), 16);
+            let g = parseInt(hex.slice(3,5), 16);
+            let b = parseInt(hex.slice(5,7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        function addEternalGlow(item) {
+            removeGlow();
+            let win = document.getElementById("slotWindow");
+            if (!win) return;
+            let color = getRarityByKey(item.rarityKey).color;
+            let glow = document.createElement('div');
+            glow.style.position = 'absolute';
+            glow.style.top = '50%';
+            glow.style.left = '50%';
+            glow.style.transform = 'translate(-50%, -50%)';
+            glow.style.width = '450%';
+            glow.style.height = '450%';
+            glow.style.borderRadius = '50%';
+            glow.style.pointerEvents = 'none';
+            glow.style.zIndex = '1';
+            glow.style.filter = 'blur(20px)';
+            glow.style.opacity = '0.75';
+            glow.style.background = `radial-gradient(circle, ${hexToRgba(color, 0.8)} 0%, transparent 85%)`;
+            glow.style.animation = 'eternalPulse 4s ease-in-out infinite';
+            win.appendChild(glow);
+            currentGlow = glow;
+        }
+
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = `
+            @keyframes eternalPulse { 0% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); filter: blur(20px); } 50% { opacity: 0.85; transform: translate(-50%, -50%) scale(1.02); filter: blur(22px); } 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); filter: blur(20px); } }
+            @keyframes flashAnim { 0% { opacity: 0; width: 0%; height: 0%; } 15% { opacity: 1; width: 100%; height: 100%; } 100% { opacity: 0; width: 180%; height: 180%; } }
+        `;
+        document.head.appendChild(styleSheet);
+        
+        function stopArrowsAnimation() {
+            const arrowTop = document.getElementById('arrowTop');
+            const arrowBottom = document.getElementById('arrowBottom');
+            if (arrowTop) arrowTop.classList.remove('animate');
+            if (arrowBottom) arrowBottom.classList.remove('animate');
+        }
+        
+        function startArrowsAnimation() {
+            const arrowTop = document.getElementById('arrowTop');
+            const arrowBottom = document.getElementById('arrowBottom');
+            if (arrowTop) arrowTop.classList.add('animate');
+            if (arrowBottom) arrowBottom.classList.add('animate');
+        }
+        
+        function setArrowsSpinning() {
+            const arrowTop = document.getElementById('arrowTop');
+            const arrowBottom = document.getElementById('arrowBottom');
+            if (arrowTop) arrowTop.classList.add('spinning');
+            if (arrowBottom) arrowBottom.classList.add('spinning');
+        }
+        
+        function removeArrowsSpinning() {
+            const arrowTop = document.getElementById('arrowTop');
+            const arrowBottom = document.getElementById('arrowBottom');
+            if (arrowTop) arrowTop.classList.remove('spinning');
+            if (arrowBottom) arrowBottom.classList.remove('spinning');
+        }
+        
+        function hideArrows() {
+            const arrowTop = document.getElementById('arrowTop');
+            const arrowBottom = document.getElementById('arrowBottom');
+            if (arrowTop) arrowTop.style.display = 'none';
+            if (arrowBottom) arrowBottom.style.display = 'none';
+        }
+        
+        function showArrows() {
+            const arrowTop = document.getElementById('arrowTop');
+            const arrowBottom = document.getElementById('arrowBottom');
+            if (arrowTop) arrowTop.style.display = 'block';
+            if (arrowBottom) arrowBottom.style.display = 'block';
+        }
+        
+        function hideCenterHighlight() {
+            const centerHighlight = document.getElementById('centerHighlight');
+            if (centerHighlight) centerHighlight.style.display = 'none';
+        }
+        
+        function showCenterHighlight() {
+            const centerHighlight = document.getElementById('centerHighlight');
+            if (centerHighlight) centerHighlight.style.display = 'flex';
+        }
+        
+        function resetToInitialState() {
+            const win = document.getElementById("slotWindow");
+            const btn = document.getElementById("openCaseBtn");
+            const resDiv = document.getElementById("rollResult");
+            
+            win.innerHTML = `
                 <div class="arrow-top animate" id="arrowTop"></div>
                 <div class="arrow-bottom animate" id="arrowBottom"></div>
                 <div class="center-indicator"></div>
                 <div class="center-highlight" id="centerHighlight">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
-            </div>
-            <button class="open-btn" id="openCaseBtn">🔓 ОТКРЫТЬ КЕЙС 🔓</button>
-            <div class="result-area" id="rollResult">✨ Готов к крутке? Жми на кнопку! ✨</div>
-        </div>
-        <div class="stats">
-            <span>💰 Уникальных предметов: <strong id="totalItemsCount">0</strong></span>
-            <span>⭐ Осталось выбить: <strong id="remainingCount">0</strong></span>
-            <button class="small-reset" id="resetProgressBtn">♻️ Сбросить прогресс</button>
-        </div>
-        <div class="test-admin-panel">
-            <button onclick="window.testOpenCaseWithRarity('common')" style="background: #dee3f2; color: #000;">⚪ Common</button>
-            <button onclick="window.testOpenCaseWithRarity('rare')" style="background: #184cff; color: #fff;">🔵 Rare</button>
-            <button onclick="window.testOpenCaseWithRarity('superRare')" style="background: #8e18ff; color: #fff;">🟣 SuperRare</button>
-            <button onclick="window.testOpenCaseWithRarity('epic')" style="background: #ff18ab; color: #fff;">🩷 Epic</button>
-            <button onclick="window.testOpenCaseWithRarity('mythic')" style="background: #ff1414; color: #fff;">🔴 Mythic</button>
-            <button onclick="window.testOpenCaseWithRarity('legendary')" style="background: #ffc800; color: #000;">🟡 Legendary</button>
-        </div>
-        <div class="stats-panel" id="statsPanel">
-            <div class="stat-item">📊 Открыто: 0</div>
-            <div class="stat-item">⚪ Обычных: 0 (0%)</div>
-            <div class="stat-item">🔵 Редких: 0 (0%)</div>
-            <div class="stat-item">🟣 Сверхредких: 0 (0%)</div>
-            <div class="stat-item">🩷 Эпических: 0 (0%)</div>
-            <div class="stat-item">🔴 Мифических: 0 (0%)</div>
-            <div class="stat-item">🟡 Легендарных: 0 (0%)</div>
-        </div>
-    </div>
-
-    <div id="inventoryTab" class="tab-content">
-        <div id="inventoryGrid"></div>
-    </div>
-
-    <div id="collectionTab" class="tab-content">
-        <div id="collectionContainer"></div>
-    </div>
-
-    <div id="statsTab" class="tab-content">
-        <div class="stats-panel-rows" id="globalStatsContainer" style="display: flex; flex-direction: column; gap: 20px; padding: 20px 10px; font-size: 1.15rem; color: #fff;"></div>
-    </div>
-    
-    <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
-</div>
-
-<div id="descModal" class="modal-overlay" onclick="window.closeItemDescription()">
-    <div class="modal-card" id="modalCard" onclick="event.stopPropagation()">
-        <img id="modalImg" src="" style="width: 100.15%; height: auto; object-fit: contain; margin-bottom: 20px;" alt="">
-        <h2 id="modalName"></h2>
-        <div id="modalBadge" class="badge"></div>
-        <div id="modalDesc" class="modal-desc"></div>
-        <button class="open-btn" onclick="window.closeItemDescription()" style="font-size: 1.2rem; padding: 10px 30px; margin: 10px 0 0 0;">ЗАКРЫТЬ</button>
-    </div>
-    <div class="modal-side-panel" id="modalSidePanel" onclick="event.stopPropagation()">
-        <div style="font-size: 1.1rem; font-weight: bold; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 4px;">Статистика предмета</div>
-        <div class="modal-side-row" id="infoDateRow">📅 Дата получения: <strong>--</strong></div>
-        <div class="modal-side-row" id="infoRollsRow">🎰 Круток потребовалось: <strong>--</strong></div>
-    </div>
-</div>
-
-<script type="module">
-    // ==================== ПОДКЛЮЧЕНИЕ FIREBASE ====================
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyAhFEJ1AZRntBc_Qyrhd-D3klK_kQawSt0",
-        authDomain: "case-simulator-e2e36.firebaseapp.com",
-        projectId: "case-simulator-e2e36",
-        storageBucket: "case-simulator-e2e36.firebasestorage.app",
-        messagingSenderId: "820284500611",
-        appId: "1:820284500611:web:1f7eb404a8296fd5a349b6"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-
-    let currentUserUid = null;
-
-    // ==================== ЗВУКОВОЙ ДВИЖОК ====================
-    const clickAudio = new Audio('click.mp3');
-    const winAudio = new Audio('win.mp3');
-    let isMuted = false;
-    let currentVolume = 0.5;
-    
-    clickAudio.volume = currentVolume;
-    winAudio.volume = currentVolume;
-
-    // ==================== СИСТЕМА РЕДКОСТЕЙ ====================
-    const RARITIES = {
-        common: { name: "Обычный", color: "#dee3f2", totalChance: 95.234 },
-        rare: { name: "Редкий", color: "#184cff", totalChance: 3.809 },
-        superRare: { name: "Сверхредкий", color: "#8e18ff", totalChance: 0.762 },
-        epic: { name: "Эпический", color: "#ff18ab", totalChance: 0.152 },
-        mythic: { name: "Мифический", color: "#ff1414", totalChance: 0.030 },
-        legendary: { name: "Легендарный", color: "#ffc800", totalChance: 0.012 }
-    };
-
-    const ITEMS = [
-        { id: 0, name: "★ Нож-бабочка", img: "images/item3.png", rarityKey: "legendary", description: "Редчайший нож с уникальной анимацией осмотра. Мечта любого коллекционера." },
-        { id: 1, name: "AWP | Dragon Lore", img: "images/item3.png", rarityKey: "mythic", description: "Легендарная снайперская винтовка, украшенная рисунком огнедышащего дракона." },
-        { id: 2, name: "AK-47 | Fire Serpent", img: "images/item3.png", rarityKey: "mythic", description: "Автомат с изображением огненного змея из мифологии майя." },
-        { id: 3, name: "M4A4 | Howl", img: "images/item3.png", rarityKey: "mythic", description: "Засекреченная штурмовая винтовка с изображением свирепого волка." },
-        { id: 4, name: "Desert Eagle | Blaze", img: "images/item3.png", rarityKey: "epic", description: "Мощный пистолет с языками пламени, нанесенными на хромированную поверхность." },
-        { id: 5, name: "SSG 08 | Blood in the Water", img: "images/item3.png", rarityKey: "epic", description: "Еп твою мать! Это что вообще такое? Ты думаешь я ради этого покупал ее? Еп твою мать! Это что вообще такое? Ты думаешь я ради этого покупал ее? Еп твою мать! Это что вообще такое? Ты думаешь я ради этого покупал ее??" },
-        { id: 6, name: "USP-S | Kill Confirmed", img: "images/item3.png", rarityKey: "superRare", description: "Бесшумный пистолет со стильным рисунком пробитого черепа." },
-        { id: 7, name: "Glock-18 | Fade", img: "images/item3.png", rarityKey: "superRare", description: "Стандартный пистолет террористов с хромированным градиентным напылением." },
-        { id: 8, name: "P250 | Splash", img: "images/item3.png", rarityKey: "rare", description: "Простой и надежный пистолет с яркими брызгами краски на корпусе." },
-        { id: 9, name: "MP7 | Nemesis", img: "images/item3.png", rarityKey: "rare", description: "Пистолет-пулемет с геометрическим футуристическим паттерном монстра." },
-        { id: 10, name: "Galil AR | Chatterbox", img: "images/item3.png", rarityKey: "rare", description: "Грубо раскрашенный автомат с имитацией клацающей пасти на затворе." },
-        { id: 11, name: "Tec-9 | Ice Cap", img: "images/item3.png", rarityKey: "common", description: "Пистолет для ведения огня на ходу, покрытый узором арктического льда." },
-        { id: 12, name: "MAG-7 | Hazard", img: "images/item3.png", rarityKey: "common", description: "Дробовик в яркой промышленной окраске, предупреждающей об опасности." },
-        { id: 13, name: "Negev | Lionfish", img: "images/item3.png", rarityKey: "common", description: "Тяжелый пулемет с камуфляжем в стиле ядовитой рыбы-льва." },
-        { id: 14, name: "★ Перчатки (Crimson Web)", img: "images/item3.png", rarityKey: "legendary", description: "Стильные кожаные перчатки, покрытые узором из кровавой паутины." }
-    ];
-
-    const itemsCountByRarity = {};
-    for (const item of ITEMS) itemsCountByRarity[item.rarityKey] = (itemsCountByRarity[item.rarityKey] || 0) + 1;
-
-    const cumulativeItems = [];
-    let cumulativeSum = 0;
-    for (const item of ITEMS) {
-        const itemChance = RARITIES[item.rarityKey].totalChance / itemsCountByRarity[item.rarityKey];
-        cumulativeSum += itemChance;
-        cumulativeItems.push({ item, cumulative: cumulativeSum });
-    }
-
-    function getRandomItem() {
-        const rand = Math.random() * 100;
-        for (const entry of cumulativeItems) {
-            if (rand <= entry.cumulative) return entry.item;
-        }
-        return ITEMS[0];
-    }
-
-    function getRandomItemByRarity() {
-        const rand = Math.random() * 100;
-        if (rand < 79.6) {
-            const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'common');
-            if (itemsOfThisRarity.length === 0) return ITEMS[0];
-            return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
-        } else if (rand < 94.6) {
-            const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'rare');
-            if (itemsOfThisRarity.length === 0) return ITEMS[0];
-            return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
-        } else if (rand < 97.6) {
-            const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'superRare');
-            if (itemsOfThisRarity.length === 0) return ITEMS[0];
-            return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
-        } else if (rand < 99.4) {
-            const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'epic');
-            if (itemsOfThisRarity.length === 0) return ITEMS[0];
-            return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
-        } else if (rand < 99.7) {
-            const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'mythic');
-            if (itemsOfThisRarity.length === 0) return ITEMS[0];
-            return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
-        } else {
-            const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'legendary');
-            if (itemsOfThisRarity.length === 0) return ITEMS[0];
-            return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
-        }
-    }
-
-    function getItemChance(item) {
-        return (RARITIES[item.rarityKey].totalChance / itemsCountByRarity[item.rarityKey]).toFixed(4);
-    }
-
-    function getRarityByKey(key) { return RARITIES[key] || RARITIES.common; }
-    function getItemRarity(item) { return getRarityByKey(item.rarityKey); }
-    function getRarityName(rarityKey) { return RARITIES[rarityKey]?.name || "Обычный"; }
-    function getRarityClass(rarityKey) {
-        const map = { common: "rarity-common", rare: "rarity-rare", superRare: "rarity-superRare", epic: "rarity-epic", mythic: "rarity-mythic", legendary: "rarity-legendary" };
-        return map[rarityKey] || "rarity-common";
-    }
-    function getRarityTextClass(rarityKey) {
-        const map = { common: "rarity-text-common", rare: "rarity-text-rare", superRare: "rarity-text-superRare", epic: "rarity-text-epic", mythic: "rarity-text-mythic", legendary: "rarity-text-legendary" };
-        return map[rarityKey] || "rarity-text-common";
-    }
-
-    let inventory = [];
-    let isSpinning = false;
-    let currentGlow = null;
-    let stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
-    let isResultScreen = false;
-
-    let extendedStats = {
-        totalRollsEver: 0,
-        spinTimeMs: 0,
-        firstItemName: "Нет предметов",
-        maxDryStreak: 0,
-        currentDryStreak: 0,
-        heavyItemName: "Нет предметов",
-        heavyItemRarity: "common",
-        heavyItemRolls: 0,
-        mostRollsInDayDate: "--",
-        mostRollsInDayCount: 0,
-        dailyCalendar: {},
-        itemClicks: {},
-        itemRollCounters: {}
-    };
-
-    // ==================== ОБЛАЧНЫЕ ФУНКЦИИ СОХРАНЕНИЯ С ЛОГИРОВАНИЕМ ====================
-    function saveAllDataToCloud() {
-        if (!currentUserUid) {
-            console.warn("⚠️ Нет авторизованного пользователя. Данные не сохранены.");
-            return;
-        }
-        
-        console.log("🔄 Попытка сохранить данные в облако Firebase...");
-        
-        set(ref(db, `users/${currentUserUid}`), {
-            inventory: inventory,
-            stats: stats,
-            extendedStats: extendedStats
-        })
-        .then(() => {
-            console.log("🟢 Данные успешно сохранены в облако Firebase для UID:", currentUserUid);
-        })
-        .catch((error) => {
-            console.error("🔴 ОШИБКА СОХРАНЕНИЯ В ОБЛАКО:", error);
-            console.error("🔴 Код ошибки:", error.code);
-            console.error("🔴 Сообщение:", error.message);
+            `;
             
-            // При ошибке сохранения показываем предупреждение и перезагружаем страницу
-            alert("Ошибка синхронизации! Проверьте сетевое подключение, иначе прогресс будет утерян.");
-            window.location.reload();
-        });
-    }
-
-    function saveData() { saveAllDataToCloud(); }
-    function saveStats() { saveAllDataToCloud(); }
-    function saveExtendedStats() { saveAllDataToCloud(); }
-
-    // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ С ЖЁСТКОЙ БЛОКИРОВКОЙ ====================
-    async function loadData() {
-        if (!currentUserUid) {
-            console.warn("⚠️ Нет авторизованного пользователя для загрузки данных.");
-            return;
+            btn.textContent = "🔓 ОТКРЫТЬ КЕЙС 🔓";
+            btn.disabled = false;
+            resDiv.innerHTML = "✨ Готов к крутке? Жми на кнопку! ✨";
+            resDiv.style.background = "#00000099";
+            isResultScreen = false;
+            isSpinning = false;
+            removeGlow();
+            
+            startArrowsAnimation();
+            removeArrowsSpinning();
+            showCenterHighlight();
         }
-        
-        console.log("🔄 Попытка загрузить данные пользователя из облака Firebase...");
-        const dbRef = ref(db);
-        try {
-            const snapshot = await get(child(dbRef, `users/${currentUserUid}`));
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                inventory = data.inventory || [];
-                stats = data.stats || { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
-                extendedStats = data.extendedStats || {
-                    totalRollsEver: 0, spinTimeMs: 0, firstItemName: "Нет предметов",
-                    maxDryStreak: 0, currentDryStreak: 0, heavyItemName: "Нет предметов",
-                    heavyItemRarity: "common", heavyItemRolls: 0, mostRollsInDayDate: "--",
-                    mostRollsInDayCount: 0, dailyCalendar: {}, itemClicks: {}, itemRollCounters: {}
-                };
-                console.log("🟢 Данные пользователя успешно загружены из облака Firebase.");
-                console.log("📊 Загружено предметов в инвентаре:", inventory.length);
+
+        function showResult(item, isNew) {
+            let win = document.getElementById("slotWindow");
+            let rarity = getItemRarity(item);
+            let rarityClass = getRarityClass(item.rarityKey);
+            let textClass = getRarityTextClass(item.rarityKey);
+            let color = item.rarityKey === 'common' ? '#333333' : rarity.color;
+            
+            hideArrows();
+            hideCenterHighlight();
+            
+            let rarityName = getRarityName(item.rarityKey).toUpperCase();
+            
+            let content = `
+                <div class="center-indicator"></div>
+                <div class="final-container">
+                    <div class="final-item ${isNew ? 'rarity-common' : rarityClass}">
+                        ${isNew ? `<div class="new-rarity-title" style="--rarity-color: ${color};">${rarityName}!</div>` : ''}
+                        <img src="${item.img}" class="final-img" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
+                        <div class="name">${escapeHtml(item.name)}</div>
+                        <div class="rarity-badge ${textClass}">${rarity.name}</div>
+                    </div>
+                </div>
+            `;
+            
+            win.innerHTML = content;
+            
+            let flash = document.createElement('div');
+            flash.style.position = 'absolute';
+            flash.style.top = '50%';
+            flash.style.left = '50%';
+            flash.style.transform = 'translate(-50%, -50%)';
+            flash.style.width = '100%';
+            flash.style.height = '100%';
+            flash.style.borderRadius = '32px';
+            flash.style.background = `radial-gradient(circle, ${hexToRgba(color, 0.7)} 0%, transparent 70%)`;
+            flash.style.opacity = '0';
+            flash.style.pointerEvents = 'none';
+            flash.style.zIndex = '100';
+            flash.style.animation = 'flashAnim 1.5s ease-out forwards';
+            win.appendChild(flash);
+            setTimeout(() => flash.remove(), 1500);
+            
+            if (isNew) addEternalGlow(item);
+            
+            isResultScreen = true;
+        }
+
+        async function startSpin(finalItem) {
+            let win = document.getElementById("slotWindow");
+            const SLOTS_COUNT = 7;
+            const TOTAL_STEPS = 200;
+            
+            let fullSequence = [];
+            for (let i = 0; i < 10000; i++) {
+                fullSequence.push(getRandomItemByRarity());
+            }
+            
+            const targetQueuePosition = 3 + TOTAL_STEPS;
+            const insertIndex = targetQueuePosition % fullSequence.length;
+            fullSequence[insertIndex] = finalItem;
+            
+            let currentItems = [];
+            for (let i = 0; i < SLOTS_COUNT; i++) {
+                currentItems.push(fullSequence[i % fullSequence.length]);
+            }
+            
+            let currentStep = 0;
+            let queueIndex = SLOTS_COUNT;
+            
+            function renderSlots() {
+                let html = `<div class="slots-container">`;
+                for (let i = 0; i < SLOTS_COUNT; i++) {
+                    let item = currentItems[i];
+                    if (!item) continue;
+                    let rarity = getItemRarity(item);
+                    let rarityClass = getRarityClass(item.rarityKey);
+                    let textClass = getRarityTextClass(item.rarityKey);
+                    html += `
+                        <div class="slot-cell">
+                            <div class="slot-item ${rarityClass}">
+                                <img src="${item.img}" class="slot-img" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
+                                <div class="name">${escapeHtml(item.name.substring(0, 18))}</div>
+                                <div class="rarity-badge ${textClass}">${rarity.name}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                html += `</div>`;
+                win.innerHTML = `<div class="arrow-top spinning" id="arrowTop"></div><div class="arrow-bottom spinning" id="arrowBottom"></div><div class="center-indicator"></div>${html}`;
+            }
+            
+            renderSlots();
+            
+            return new Promise((resolve) => {
+                function step() {
+                    if (currentStep >= TOTAL_STEPS) {
+                        renderSlots();
+                        setTimeout(() => {
+                            resolve(finalItem);
+                        }, 1000);
+                        return;
+                    }
+                    
+                    const progress = currentStep / TOTAL_STEPS;
+                    let delay;
+                    if (progress < 0.5) {
+                        delay = 12;
+                    } else if (progress < 0.75) {
+                        delay = 35;
+                    } else if (progress < 0.88) {
+                        delay = 90;
+                    } else if (progress < 0.95) {
+                        delay = 220;
+                    } else {
+                        delay = 500;
+                    }
+                    
+                    for (let i = 0; i < SLOTS_COUNT - 1; i++) {
+                        currentItems[i] = currentItems[i + 1];
+                    }
+                    currentItems[SLOTS_COUNT - 1] = fullSequence[queueIndex % fullSequence.length];
+                    queueIndex++;
+                    
+                    renderSlots();
+                    
+                    if (!isMuted) {
+                        let clone = clickAudio.cloneNode();
+                        clone.volume = currentVolume;
+                        clone.play().catch(() => {});
+                    }
+                    
+                    currentStep++;
+                    setTimeout(step, delay);
+                }
+                
+                step();
+            });
+        }
+
+        // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ openCase ====================
+        async function openCase() {
+            let btn = document.getElementById("openCaseBtn");
+            if (isSpinning || btn.disabled) return;
+            
+            extendedStats.totalRollsEver++;
+            extendedStats.spinTimeMs += 14500;
+            
+            const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+            const todayStr = formatter.format(new Date());
+            // Очищаем строку от запрещённых символов для Firebase (точки, $, #, [, ])
+            const safeDateKey = todayStr.replace(/[\.\$\#\[\]]/g, "");
+            extendedStats.dailyCalendar[safeDateKey] = (extendedStats.dailyCalendar[safeDateKey] || 0) + 1;
+            
+            if (extendedStats.dailyCalendar[safeDateKey] > extendedStats.mostRollsInDayCount) {
+                extendedStats.mostRollsInDayCount = extendedStats.dailyCalendar[safeDateKey];
+                extendedStats.mostRollsInDayDate = todayStr; // оставляем красивую дату для отображения
+            }
+            
+            ITEMS.forEach(i => {
+                if (!hasItem(i.id)) {
+                    extendedStats.itemRollCounters[i.id] = (extendedStats.itemRollCounters[i.id] || 0) + 1;
+                }
+            });
+            saveExtendedStats();
+            
+            isSpinning = true;
+            btn.disabled = true;
+            removeGlow();
+            stopArrowsAnimation();
+            setArrowsSpinning();
+            hideCenterHighlight();
+            
+            let won = getRandomItem();
+            let isNew = !hasItem(won.id);
+            
+            await startSpin(won);
+            
+            if (!isMuted) {
+                winAudio.currentTime = 0;
+                winAudio.play().catch(() => {});
+            }
+            
+            showResult(won, isNew);
+            addItem(won);
+            
+            if (isNew) {
+                if (inventory.length === 1) {
+                    extendedStats.firstItemName = won.name;
+                }
+                
+                const currentRollsToDrop = extendedStats.itemRollCounters[won.id] || 1;
+                if (currentRollsToDrop > extendedStats.heavyItemRolls) {
+                    extendedStats.heavyItemRolls = currentRollsToDrop;
+                    extendedStats.heavyItemName = won.name;
+                    extendedStats.heavyItemRarity = won.rarityKey;
+                }
+                
+                extendedStats.currentDryStreak = 0;
             } else {
+                extendedStats.currentDryStreak++;
+                if (extendedStats.currentDryStreak > extendedStats.maxDryStreak) {
+                    extendedStats.maxDryStreak = extendedStats.currentDryStreak;
+                }
+            }
+            saveExtendedStats();
+            
+            if (isNew) {
+                const dot = document.getElementById("invDot");
+                if (dot) dot.style.display = "inline-block";
+            }
+            
+            stats.total++;
+            if (won.rarityKey === 'common') stats.common++;
+            else if (won.rarityKey === 'rare') stats.rare++;
+            else if (won.rarityKey === 'superRare') stats.superRare++;
+            else if (won.rarityKey === 'epic') stats.epic++;
+            else if (won.rarityKey === 'mythic') stats.mythic++;
+            else if (won.rarityKey === 'legendary') stats.legendary++;
+            saveStats();
+            updateStatsDisplay();
+            
+            let resDiv = document.getElementById("rollResult");
+            let color = getItemRarity(won).color;
+            resDiv.style.background = hexToRgba(color, 0.2);
+            
+            if (isNew) {
+                resDiv.innerHTML = `✨ НОВЫЙ ПРЕДМЕТ! ✨<br>🎉 ${won.name} [${getRarityName(won.rarityKey)}] 🎉<br>📊 Шанс: ${getItemChance(won)}%`;
+            } else {
+                resDiv.innerHTML = `🔄 ПОВТОР 🔄<br>📦 ${won.name} [${getRarityName(won.rarityKey)}]<br>📊 Шанс: ${getItemChance(won)}%`;
+            }
+            
+            updateUI();
+            
+            btn.textContent = "🔙 НАЗАД 🔙";
+            btn.disabled = false;
+            isSpinning = false;
+        }
+
+        function updateStatsDisplay() {
+            const panel = document.getElementById('statsPanel');
+            if (panel && stats.total > 0) {
+                const commonPercent = (stats.common / stats.total * 100).toFixed(1);
+                const rarePercent = (stats.rare / stats.total * 100).toFixed(1);
+                const superRarePercent = (stats.superRare / stats.total * 100).toFixed(1);
+                const epicPercent = (stats.epic / stats.total * 100).toFixed(1);
+                const mythicPercent = (stats.mythic / stats.total * 100).toFixed(1);
+                const legendaryPercent = (stats.legendary / stats.total * 100).toFixed(1);
+                panel.innerHTML = `
+                    <div class="stat-item">📊 Открыто: ${stats.total}</div>
+                    <div class="stat-item">⚪ Обычных: ${stats.common} (${commonPercent}%)</div>
+                    <div class="stat-item">🔵 Редких: ${stats.rare} (${rarePercent}%)</div>
+                    <div class="stat-item">🟣 Сверхредких: ${stats.superRare} (${superRarePercent}%)</div>
+                    <div class="stat-item">🩷 Эпических: ${stats.epic} (${epicPercent}%)</div>
+                    <div class="stat-item">🔴 Мифических: ${stats.mythic} (${mythicPercent}%)</div>
+                    <div class="stat-item">🟡 Легендарных: ${stats.legendary} (${legendaryPercent}%)</div>
+                `;
+            } else if (panel && stats.total === 0) {
+                panel.innerHTML = `
+                    <div class="stat-item">📊 Открыто: 0</div>
+                    <div class="stat-item">⚪ Обычных: 0 (0%)</div>
+                    <div class="stat-item">🔵 Редких: 0 (0%)</div>
+                    <div class="stat-item">🟣 Сверхредких: 0 (0%)</div>
+                    <div class="stat-item">🩷 Эпических: 0 (0%)</div>
+                    <div class="stat-item">🔴 Мифических: 0 (0%)</div>
+                    <div class="stat-item">🟡 Легендарных: 0 (0%)</div>
+                `;
+            }
+        }
+
+        function updateUI() {
+            const rarityOrder = ['common', 'rare', 'superRare', 'epic', 'mythic', 'legendary'];
+            
+            const pluralRarityNames = {
+                common: "Обычные",
+                rare: "Редкие",
+                superRare: "Сверхредкие",
+                epic: "Эпические",
+                mythic: "Мифические",
+                legendary: "Легендарные"
+            };
+            
+            // ===== ИНВЕНТАРЬ (через DOM-элементы с addEventListener) =====
+            let invDiv = document.getElementById("inventoryGrid");
+            let collected = getCollected();
+            
+            // Очищаем контейнер
+            invDiv.innerHTML = "";
+            
+            if (collected.length === 0) {
+                invDiv.innerHTML = '<div style="text-align:center;padding:40px;width:100%;">🧸 Инвентарь пуст...</div>';
+            } else {
+                let isFirstInv = true;
+                
+                rarityOrder.forEach(key => {
+                    let itemsInRarity = collected.filter(i => i.rarityKey === key);
+                    if (itemsInRarity.length > 0) {
+                        let rarityName = pluralRarityNames[key];
+                        
+                        // Разделитель между группами редкостей
+                        if (!isFirstInv) {
+                            let hr = document.createElement('hr');
+                            hr.style.cssText = 'border: none; height: 1px; background: rgba(255,255,255,0.15); margin: 40px 10px 20px 10px; width: 100%;';
+                            invDiv.appendChild(hr);
+                        }
+                        isFirstInv = false;
+                        
+                        // Заголовок группы
+                        let headerDiv = document.createElement('div');
+                        headerDiv.style.cssText = 'width:100%; margin-top:10px; margin-bottom:10px;';
+                        headerDiv.innerHTML = `<h3 style="font-size:1.5rem; margin:0; padding-left:10px; color:${getRarityByKey(key).color}; text-shadow: 0 0 10px ${hexToRgba(getRarityByKey(key).color, 0.3)};">${rarityName}</h3>`;
+                        invDiv.appendChild(headerDiv);
+                        
+                        // Сетка карточек
+                        let grid = document.createElement('div');
+                        grid.className = 'items-grid';
+                        grid.style.cssText = 'width:100%;';
+                        
+                        itemsInRarity.forEach(item => {
+                            let rarity = getItemRarity(item);
+                            let rarityClass = getRarityClass(item.rarityKey);
+                            let textClass = getRarityTextClass(item.rarityKey);
+                            
+                            let card = document.createElement('div');
+                            card.className = `item-card ${rarityClass}`;
+                            card.innerHTML = `
+                                <img src="${item.img}" class="grid-img" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
+                                <div class="item-name">${escapeHtml(item.name)}</div>
+                                <div class="badge ${textClass}">${rarity.name}</div>
+                            `;
+                            
+                            // Намертво привязываем клик через addEventListener
+                            card.addEventListener('click', function() {
+                                window.openItemDescription(item.id);
+                            });
+                            
+                            grid.appendChild(card);
+                        });
+                        
+                        invDiv.appendChild(grid);
+                    }
+                });
+            }
+            
+            // ===== КОЛЛЕКЦИЯ =====
+            let collDiv = document.getElementById("collectionContainer");
+            let missing = getMissing();
+            collDiv.innerHTML = "";
+            
+            if (missing.length === 0) {
+                collDiv.innerHTML = `<div class="celebration"><h1>🏆 ВСЕ СОБРАНО! 🏆</h1><p style="font-size:1.5rem; font-weight:bold; margin-top:10px;">Все предметы собраны! Ур-рааааа!</p></div>`;
+            } else {
+                let isFirstColl = true;
+                
+                rarityOrder.forEach(key => {
+                    let missingInRarity = missing.filter(i => i.rarityKey === key);
+                    if (missingInRarity.length > 0) {
+                        let rarityName = pluralRarityNames[key];
+                        
+                        if (!isFirstColl) {
+                            let hr = document.createElement('hr');
+                            hr.style.cssText = 'border: none; height: 1px; background: rgba(255,255,255,0.15); margin: 40px 10px 20px 10px; width: 100%;';
+                            collDiv.appendChild(hr);
+                        }
+                        isFirstColl = false;
+                        
+                        let headerDiv = document.createElement('div');
+                        headerDiv.style.cssText = 'width:100%; margin-top:10px; margin-bottom:10px;';
+                        headerDiv.innerHTML = `<h3 style="font-size:1.5rem; margin:0; padding-left:10px; color:#aaa;">${rarityName}</h3>`;
+                        collDiv.appendChild(headerDiv);
+                        
+                        let grid = document.createElement('div');
+                        grid.className = 'items-grid';
+                        grid.style.cssText = 'width:100%;';
+                        
+                        missingInRarity.forEach(item => {
+                            let rarity = getItemRarity(item);
+                            let rarityClass = getRarityClass(item.rarityKey);
+                            let textClass = getRarityTextClass(item.rarityKey);
+                            
+                            let card = document.createElement('div');
+                            card.className = `item-card ${rarityClass}`;
+                            card.style.cssText = 'filter: grayscale(1); opacity: 0.4;';
+                            card.innerHTML = `
+                                <img src="${item.img}" class="grid-img" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
+                                <div class="item-name">${escapeHtml(item.name)}</div>
+                                <div class="badge ${textClass}">${rarity.name}</div>
+                            `;
+                            
+                            grid.appendChild(card);
+                        });
+                        
+                        collDiv.appendChild(grid);
+                    }
+                });
+            }
+            
+            // ===== СТАТИСТИКА =====
+            let statsContainer = document.getElementById("globalStatsContainer");
+            if (statsContainer) {
+                let totalSeconds = Math.floor(extendedStats.spinTimeMs / 1000);
+                let hours = Math.floor(totalSeconds / 3600);
+                let minutes = Math.floor((totalSeconds % 3600) / 60);
+                
+                let favoriteItemStyled = "–";
+                let maxClicks = 0;
+                let favoriteItemObj = null;
+
+                if (extendedStats.totalRollsEver > 0) {
+                    for (let id in extendedStats.itemClicks) {
+                        if (extendedStats.itemClicks[id] > maxClicks) {
+                            maxClicks = extendedStats.itemClicks[id];
+                            favoriteItemObj = ITEMS.find(item => item.id == id);
+                        }
+                    }
+                    if (favoriteItemObj && maxClicks > 0) {
+                        let favColor = getRarityByKey(favoriteItemObj.rarityKey).color;
+                        favoriteItemStyled = `<span style="color: ${favColor}; font-weight: bold;">${favoriteItemObj.name}</span>`;
+                    } else {
+                        favoriteItemStyled = "–";
+                    }
+                }
+
+                let uniqueCollected = collected.length;
+                let totalPossible = ITEMS.length;
+                let percentRaw = totalPossible > 0 ? (uniqueCollected / totalPossible) * 100 : 0;
+                let percentFloor = Math.floor(percentRaw);
+                
+                let percentLineHtml = "";
+                if (percentFloor === 100) {
+                    percentLineHtml = `<div style="border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 8px; color: #00ff66; font-weight: bold;">Вся коллекция полностью собрана!</div>`;
+                } else {
+                    percentLineHtml = `<div style="border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 8px;">(Собрано <span style="color: #fff; font-weight: bold;">${percentFloor}%</span> от всей коллекции)</div>`;
+                }
+                
+                let countColor = uniqueCollected === totalPossible ? "#00ff66" : "#ffffff";
+                let itemsCountSpan = `<span style="color: ${countColor}; font-weight: bold;">${uniqueCollected}/${totalPossible}</span>`;
+                
+                let treasureCount = collected.filter(i => i.rarityKey === 'mythic' || i.rarityKey === 'legendary').length;
+
+                let heavyItemStyled = "–";
+                if (extendedStats.totalRollsEver > 0) {
+                    heavyItemStyled = "–";
+                    if (extendedStats.heavyItemRolls > 0) {
+                        let heavyColor = getRarityByKey(extendedStats.heavyItemRarity).color;
+                        heavyItemStyled = `<span style="color: ${heavyColor}; font-weight: bold;">${extendedStats.heavyItemName}</span> (Круток потребовалось: <span style="color: #ff1414; font-weight: bold;">${extendedStats.heavyItemRolls}</span>)`;
+                    }
+                }
+
+                let firstItemStyled = "–";
+                if (extendedStats.totalRollsEver > 0 && extendedStats.firstItemName !== "Нет предметов") {
+                    let firstItemObj = ITEMS.find(item => item.name === extendedStats.firstItemName);
+                    if (firstItemObj) {
+                        let firstColor = getRarityByKey(firstItemObj.rarityKey).color;
+                        firstItemStyled = `<span style="color: ${firstColor}; font-weight: bold;">${extendedStats.firstItemName}</span>`;
+                    } else {
+                        firstItemStyled = `<span style="color: #fff; font-weight: bold;">${extendedStats.firstItemName}</span>`;
+                    }
+                }
+
+                statsContainer.innerHTML = `
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 16px 20px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 12px; box-shadow: inset 0 0 15px rgba(0,0,0,0.2);">
+                        <div style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: -4px; font-weight: bold;">ОСНОВНОЙ ПРОГРЕСС</div>
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 8px;">Всего предметов собрано: ${itemsCountSpan}</div>
+                        ${percentLineHtml}
+                        <div style="font-size: 1.15rem; color: #fff;">
+                            <span style="font-weight: normal;">Из них сокровищ:</span> <span style="color: #ffc800; font-size: 1.3rem; font-weight: bold;">${treasureCount}</span> <span style="font-size: 0.95rem; font-weight: normal; color: #aaa; margin-left: 4px;">(Сокровищами считаются предметы <span style="color: ${RARITIES.mythic.color}; font-weight: bold;">мифической</span> и <span style="color: ${RARITIES.legendary.color}; font-weight: bold;">легендарной</span> редкости)</span>
+                        </div>
+                    </div>
+                    
+                    <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px; margin-top: 10px;">🔄 Всего вращений совершено: <span style="color: #fff; font-weight: bold;">${extendedStats.totalRollsEver}</span></div>
+                    <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">⏱️ Барабан вращался: ${hours} часов ${minutes} минут</div>
+                    <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">📈 Больше всего вращений совершено: <span style="color: #fff; font-weight: bold;">${extendedStats.mostRollsInDayDate} (${extendedStats.mostRollsInDayCount})</span></div>
+                    <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">1️⃣ Первый выпавший предмет: ${firstItemStyled}</div>
+                    <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">🧱 Тяжелее всего дался: ${heavyItemStyled}</div>
+                    <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">❤️ Любимый предмет: ${favoriteItemStyled}</div>
+                    <div style="padding-top: 5px;">⏩ Рекордная серия повторов: <span style="color: #fff; font-weight: bold;">${extendedStats.maxDryStreak}</span></div>
+                `;
+            }
+            
+            document.getElementById("totalItemsCount").innerText = inventory.length;
+            document.getElementById("remainingCount").innerText = missing.length;
+        }
+
+        function initTabs() {
+            let btns = document.querySelectorAll(".tab-btn");
+            btns.forEach(btn => {
+                btn.onclick = () => {
+                    let id = btn.getAttribute("data-tab");
+                    btns.forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    document.getElementById("caseTab").classList.remove("active");
+                    document.getElementById("inventoryTab").classList.remove("active");
+                    document.getElementById("collectionTab").classList.remove("active");
+                    document.getElementById("statsTab").classList.remove("active");
+                    document.getElementById(id + "Tab").classList.add("active");
+                    
+                    if (id === "inventory") {
+                        const dot = document.getElementById("invDot");
+                        if (dot) dot.style.display = "none";
+                    }
+                    
+                    updateUI();
+                };
+            });
+        }
+
+        function initAudioControls() {
+            const muteBtn = document.getElementById('muteBtn');
+            const volumeSlider = document.getElementById('volumeSlider');
+            
+            volumeSlider.addEventListener('input', (e) => {
+                currentVolume = parseFloat(e.target.value);
+                clickAudio.volume = currentVolume;
+                winAudio.volume = currentVolume;
+            });
+            
+            muteBtn.addEventListener('click', () => {
+                isMuted = !isMuted;
+                muteBtn.textContent = isMuted ? '🔇' : '🔊';
+            });
+        }
+
+        // ==================== МОДАЛЬНОЕ ОКНО (ИСПРАВЛЕННАЯ ФУНКЦИЯ) ====================
+        function openItemDescription(id) {
+            console.log("Клик по предмету с ID:", id);
+            const item = ITEMS.find(i => i.id === id);
+            if (!item) {
+                console.error("Предмет с ID", id, "не найден!");
+                return;
+            }
+            
+            extendedStats.itemClicks[id] = (extendedStats.itemClicks[id] || 0) + 1;
+            saveExtendedStats();
+            
+            const invRecord = inventory.find(record => record.id === id);
+            
+            const modal = document.getElementById("descModal");
+            const card = document.getElementById("modalCard");
+            const img = document.getElementById("modalImg");
+            const name = document.getElementById("modalName");
+            const badge = document.getElementById("modalBadge");
+            const desc = document.getElementById("modalDesc");
+            
+            const sidePanel = document.getElementById("modalSidePanel");
+            const infoDate = document.getElementById("infoDateRow");
+            const infoRolls = document.getElementById("infoRollsRow");
+            
+            let rarity = getItemRarity(item);
+            let rarityClass = getRarityClass(item.rarityKey);
+            let textClass = getRarityTextClass(item.rarityKey);
+            
+            img.src = item.img;
+            name.innerText = item.name;
+            badge.innerText = rarity.name;
+            desc.innerText = item.description || "У этого предмета пока нет описания.";
+            card.className = "modal-card " + rarityClass;
+            badge.className = "badge " + textClass;
+            
+            if (invRecord) {
+                let cleanDate = invRecord.date ? invRecord.date.replace("Дата получения: ", "") : "--";
+                infoDate.innerHTML = `📅 Дата получения: <strong>${cleanDate}</strong>`;
+                infoRolls.innerHTML = `🎰 Круток потребовалось: <strong>${invRecord.rollsToDrop || "Неизвестно"}</strong>`;
+            }
+            
+            sidePanel.style.borderColor = rarity.color;
+            modal.style.display = "flex";
+        }
+
+        function closeItemDescription() {
+            document.getElementById("descModal").style.display = "none";
+        }
+
+        // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ testOpenCaseWithRarity ====================
+        async function testOpenCaseWithRarity(rarityKey) {
+            let btn = document.getElementById("openCaseBtn");
+            if (isSpinning || btn.disabled) return;
+            
+            extendedStats.totalRollsEver++;
+            extendedStats.spinTimeMs += 14500;
+            
+            const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+            const todayStr = formatter.format(new Date());
+            // Очищаем строку от запрещённых символов для Firebase (точки, $, #, [, ])
+            const safeDateKey = todayStr.replace(/[\.\$\#\[\]]/g, "");
+            extendedStats.dailyCalendar[safeDateKey] = (extendedStats.dailyCalendar[safeDateKey] || 0) + 1;
+            
+            if (extendedStats.dailyCalendar[safeDateKey] > extendedStats.mostRollsInDayCount) {
+                extendedStats.mostRollsInDayCount = extendedStats.dailyCalendar[safeDateKey];
+                extendedStats.mostRollsInDayDate = todayStr; // оставляем красивую дату для отображения
+            }
+            
+            ITEMS.forEach(i => {
+                if (!hasItem(i.id)) {
+                    extendedStats.itemRollCounters[i.id] = (extendedStats.itemRollCounters[i.id] || 0) + 1;
+                }
+            });
+            saveExtendedStats();
+            
+            const filteredItems = ITEMS.filter(i => i.rarityKey === rarityKey);
+            if (filteredItems.length === 0) {
+                alert("В массиве ITEMS нет предметов с редкостью: " + rarityKey);
+                return;
+            }
+            
+            let won = filteredItems[Math.floor(Math.random() * filteredItems.length)];
+            
+            isSpinning = true;
+            btn.disabled = true;
+            removeGlow();
+            stopArrowsAnimation();
+            setArrowsSpinning();
+            hideCenterHighlight();
+            
+            let isNew = !hasItem(won.id);
+            
+            await startSpin(won);
+            
+            if (!isMuted) {
+                winAudio.currentTime = 0;
+                winAudio.play().catch(() => {});
+            }
+            
+            showResult(won, isNew);
+            addItem(won);
+            
+            if (isNew) {
+                if (inventory.length === 1) {
+                    extendedStats.firstItemName = won.name;
+                }
+                
+                const currentRollsToDrop = extendedStats.itemRollCounters[won.id] || 1;
+                if (currentRollsToDrop > extendedStats.heavyItemRolls) {
+                    extendedStats.heavyItemRolls = currentRollsToDrop;
+                    extendedStats.heavyItemName = won.name;
+                    extendedStats.heavyItemRarity = won.rarityKey;
+                }
+                
+                extendedStats.currentDryStreak = 0;
+            } else {
+                extendedStats.currentDryStreak++;
+                if (extendedStats.currentDryStreak > extendedStats.maxDryStreak) {
+                    extendedStats.maxDryStreak = extendedStats.currentDryStreak;
+                }
+            }
+            saveExtendedStats();
+            
+            if (isNew) {
+                const dot = document.getElementById("invDot");
+                if (dot) dot.style.display = "inline-block";
+            }
+            
+            stats.total++;
+            stats[won.rarityKey]++;
+            saveStats();
+            updateStatsDisplay();
+            
+            let resDiv = document.getElementById("rollResult");
+            let color = getItemRarity(won).color;
+            resDiv.style.background = hexToRgba(color, 0.2);
+            
+            if (isNew) {
+                resDiv.innerHTML = `✨ ТЕСТ: НОВЫЙ ПРЕДМЕТ! ✨<br>🎉 ${won.name} [${getRarityName(won.rarityKey)}] 🎉<br>📊 Шанс: ${getItemChance(won)}%`;
+            } else {
+                resDiv.innerHTML = `🔄 ТЕСТ: ПОВТОР 🔄<br>📦 ${won.name} [${getRarityName(won.rarityKey)}]<br>📊 Шанс: ${getItemChance(won)}%`;
+            }
+            
+            updateUI();
+            
+            btn.textContent = "🔙 НАЗАД 🔙";
+            btn.disabled = false;
+            isSpinning = false;
+        }
+
+        async function resetGame() {
+            if (confirm("Сбросить прогресс?")) {
                 inventory = [];
                 stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
                 extendedStats = {
@@ -1170,1006 +2044,164 @@
                     heavyItemRarity: "common", heavyItemRolls: 0, mostRollsInDayDate: "--",
                     mostRollsInDayCount: 0, dailyCalendar: {}, itemClicks: {}, itemRollCounters: {}
                 };
-                console.log("🟡 Аккаунт новый, в облаке нет старых данных. Инициализированы дефолтные значения.");
+                
+                if (currentUserUid) {
+                    await set(ref(db, `users/${currentUserUid}`), {
+                        inventory: inventory,
+                        stats: stats,
+                        extendedStats: extendedStats
+                    });
+                }
+                resetToInitialState();
+                updateUI();
+                updateStatsDisplay();
             }
-            // Принудительно обновляем UI только при успешной загрузке
-            updateUI();
-            updateStatsDisplay();
-        } catch (error) {
-            console.error("🔴 КРИТИЧЕСКАЯ ОШИБКА ЗАГРУЗКИ:", error);
-            console.error("🔴 Код ошибки:", error.code);
-            console.error("🔴 Сообщение:", error.message);
+        }
+
+        // ==================== ЭКСПОРТ В ГЛОБАЛЬНЫЙ ОБЪЕКТ WINDOW ====================
+        window.testOpenCaseWithRarity = testOpenCaseWithRarity;
+        window.openItemDescription = openItemDescription;
+        window.closeItemDescription = closeItemDescription;
+        window.resetGame = resetGame;
+
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+        document.addEventListener("DOMContentLoaded", () => {
+            initTabs();
+            initAudioControls();
             
-            // Жёсткая блокировка: если не удалось загрузить данные, выкидываем пользователя
-            console.log("🔴 Выполняется принудительный выход из-за ошибки сети...");
-            
-            // Сбрасываем пользователя
-            currentUserUid = null;
-            
-            // Принудительный логаут из Firebase
-            try {
-                await auth.signOut();
-                console.log("🟢 Пользователь принудительно разлогинен.");
-            } catch (signOutError) {
-                console.error("⚠️ Ошибка при принудительном выходе:", signOutError);
-            }
-            
-            // Скрываем приложение и показываем форму входа
-            document.querySelector(".app").style.display = "none";
             const authOverlay = document.getElementById("authOverlay");
+            const emailInput = document.getElementById("authEmail");
+            const passwordInput = document.getElementById("authPassword");
             const errorDiv = document.getElementById("authError");
+            const videoBg = document.getElementById("globalVideoBg");
             
-            authOverlay.style.display = "flex";
-            errorDiv.innerText = "Ошибка сети: Не удалось синхронизировать данные с сервером. Проверьте интернет-соединение.";
-            errorDiv.style.display = "block";
-            
-            // НЕ вызываем updateUI() и updateStatsDisplay() при ошибке
-            // Это предотвращает частичную инициализацию интерфейса
-        }
-    }
-
-    // ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
-    function hasItem(id) { 
-        return inventory.some(i => i.id === id); 
-    }
-    
-    function addItem(item) {
-        if (!hasItem(item.id)) {
-            const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-            const dateStr = `${formatter.format(new Date())}`;
-            const personalRolls = extendedStats.itemRollCounters[item.id] || 1;
-            inventory.push({ 
-                id: item.id, 
-                date: dateStr,
-                rollsToDrop: personalRolls
+            // Отслеживание состояния аккаунта
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    currentUserUid = user.uid;
+                    console.log("✅ Пользователь авторизован, UID:", currentUserUid);
+                    
+                    // Показываем приложение, скрываем окно авторизации и выключаем видео
+                    document.querySelector(".app").style.display = "block";
+                    document.getElementById("authOverlay").style.display = "none";
+                    if (videoBg) videoBg.style.display = "none";
+                    
+                    loadData();
+                } else {
+                    currentUserUid = null;
+                    console.log("👤 Пользователь не авторизован");
+                    
+                    // Скрываем приложение, показываем окно авторизации и включаем видео
+                    document.querySelector(".app").style.display = "none";
+                    document.getElementById("authOverlay").style.display = "flex";
+                    if (videoBg) videoBg.style.display = "block";
+                }
             });
-            saveData();
-            return true;
-        }
-        return false;
-    }
-    
-    function getCollected() { 
-        return ITEMS.filter(item => hasItem(item.id)).map(item => {
-            const invRecord = inventory.find(record => record.id === item.id);
-            return { ...item, collectedDate: invRecord ? invRecord.date : "" };
-        });
-    }
-    
-    function getMissing() { 
-        return ITEMS.filter(i => !hasItem(i.id)); 
-    }
-    
-    function isComplete() { 
-        return getMissing().length === 0; 
-    }
-    
-    function escapeHtml(str) { 
-        return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); 
-    }
-    
-    function removeGlow() { 
-        if (currentGlow) { 
-            currentGlow.remove(); 
-            currentGlow = null; 
-        } 
-    }
-    
-    function hexToRgba(hex, alpha) {
-        let r = parseInt(hex.slice(1,3), 16);
-        let g = parseInt(hex.slice(3,5), 16);
-        let b = parseInt(hex.slice(5,7), 16);
-        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-    }
 
-    function addEternalGlow(item) {
-        removeGlow();
-        let win = document.getElementById("slotWindow");
-        if (!win) return;
-        let color = getRarityByKey(item.rarityKey).color;
-        let glow = document.createElement('div');
-        glow.style.position = 'absolute';
-        glow.style.top = '50%';
-        glow.style.left = '50%';
-        glow.style.transform = 'translate(-50%, -50%)';
-        glow.style.width = '450%';
-        glow.style.height = '450%';
-        glow.style.borderRadius = '50%';
-        glow.style.pointerEvents = 'none';
-        glow.style.zIndex = '1';
-        glow.style.filter = 'blur(20px)';
-        glow.style.opacity = '0.75';
-        glow.style.background = `radial-gradient(circle, ${hexToRgba(color, 0.8)} 0%, transparent 85%)`;
-        glow.style.animation = 'eternalPulse 4s ease-in-out infinite';
-        win.appendChild(glow);
-        currentGlow = glow;
-    }
-
-    const styleSheet = document.createElement('style');
-    styleSheet.textContent = `
-        @keyframes eternalPulse { 0% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); filter: blur(20px); } 50% { opacity: 0.85; transform: translate(-50%, -50%) scale(1.02); filter: blur(22px); } 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); filter: blur(20px); } }
-        @keyframes flashAnim { 0% { opacity: 0; width: 0%; height: 0%; } 15% { opacity: 1; width: 100%; height: 100%; } 100% { opacity: 0; width: 180%; height: 180%; } }
-    `;
-    document.head.appendChild(styleSheet);
-    
-    function stopArrowsAnimation() {
-        const arrowTop = document.getElementById('arrowTop');
-        const arrowBottom = document.getElementById('arrowBottom');
-        if (arrowTop) arrowTop.classList.remove('animate');
-        if (arrowBottom) arrowBottom.classList.remove('animate');
-    }
-    
-    function startArrowsAnimation() {
-        const arrowTop = document.getElementById('arrowTop');
-        const arrowBottom = document.getElementById('arrowBottom');
-        if (arrowTop) arrowTop.classList.add('animate');
-        if (arrowBottom) arrowBottom.classList.add('animate');
-    }
-    
-    function setArrowsSpinning() {
-        const arrowTop = document.getElementById('arrowTop');
-        const arrowBottom = document.getElementById('arrowBottom');
-        if (arrowTop) arrowTop.classList.add('spinning');
-        if (arrowBottom) arrowBottom.classList.add('spinning');
-    }
-    
-    function removeArrowsSpinning() {
-        const arrowTop = document.getElementById('arrowTop');
-        const arrowBottom = document.getElementById('arrowBottom');
-        if (arrowTop) arrowTop.classList.remove('spinning');
-        if (arrowBottom) arrowBottom.classList.remove('spinning');
-    }
-    
-    function hideArrows() {
-        const arrowTop = document.getElementById('arrowTop');
-        const arrowBottom = document.getElementById('arrowBottom');
-        if (arrowTop) arrowTop.style.display = 'none';
-        if (arrowBottom) arrowBottom.style.display = 'none';
-    }
-    
-    function showArrows() {
-        const arrowTop = document.getElementById('arrowTop');
-        const arrowBottom = document.getElementById('arrowBottom');
-        if (arrowTop) arrowTop.style.display = 'block';
-        if (arrowBottom) arrowBottom.style.display = 'block';
-    }
-    
-    function hideCenterHighlight() {
-        const centerHighlight = document.getElementById('centerHighlight');
-        if (centerHighlight) centerHighlight.style.display = 'none';
-    }
-    
-    function showCenterHighlight() {
-        const centerHighlight = document.getElementById('centerHighlight');
-        if (centerHighlight) centerHighlight.style.display = 'flex';
-    }
-    
-    function resetToInitialState() {
-        const win = document.getElementById("slotWindow");
-        const btn = document.getElementById("openCaseBtn");
-        const resDiv = document.getElementById("rollResult");
-        
-        win.innerHTML = `
-            <div class="arrow-top animate" id="arrowTop"></div>
-            <div class="arrow-bottom animate" id="arrowBottom"></div>
-            <div class="center-indicator"></div>
-            <div class="center-highlight" id="centerHighlight">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
-        `;
-        
-        btn.textContent = "🔓 ОТКРЫТЬ КЕЙС 🔓";
-        btn.disabled = false;
-        resDiv.innerHTML = "✨ Готов к крутке? Жми на кнопку! ✨";
-        resDiv.style.background = "#00000099";
-        isResultScreen = false;
-        isSpinning = false;
-        removeGlow();
-        
-        startArrowsAnimation();
-        removeArrowsSpinning();
-        showCenterHighlight();
-    }
-
-    function showResult(item, isNew) {
-        let win = document.getElementById("slotWindow");
-        let rarity = getItemRarity(item);
-        let rarityClass = getRarityClass(item.rarityKey);
-        let textClass = getRarityTextClass(item.rarityKey);
-        let color = item.rarityKey === 'common' ? '#333333' : rarity.color;
-        
-        hideArrows();
-        hideCenterHighlight();
-        
-        let rarityName = getRarityName(item.rarityKey).toUpperCase();
-        
-        let content = `
-            <div class="center-indicator"></div>
-            <div class="final-container">
-                <div class="final-item ${isNew ? 'rarity-common' : rarityClass}">
-                    ${isNew ? `<div class="new-rarity-title" style="--rarity-color: ${color};">${rarityName}!</div>` : ''}
-                    <img src="${item.img}" class="final-img" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
-                    <div class="name">${escapeHtml(item.name)}</div>
-                    <div class="rarity-badge ${textClass}">${rarity.name}</div>
-                </div>
-            </div>
-        `;
-        
-        win.innerHTML = content;
-        
-        let flash = document.createElement('div');
-        flash.style.position = 'absolute';
-        flash.style.top = '50%';
-        flash.style.left = '50%';
-        flash.style.transform = 'translate(-50%, -50%)';
-        flash.style.width = '100%';
-        flash.style.height = '100%';
-        flash.style.borderRadius = '32px';
-        flash.style.background = `radial-gradient(circle, ${hexToRgba(color, 0.7)} 0%, transparent 70%)`;
-        flash.style.opacity = '0';
-        flash.style.pointerEvents = 'none';
-        flash.style.zIndex = '100';
-        flash.style.animation = 'flashAnim 1.5s ease-out forwards';
-        win.appendChild(flash);
-        setTimeout(() => flash.remove(), 1500);
-        
-        if (isNew) addEternalGlow(item);
-        
-        isResultScreen = true;
-    }
-
-    async function startSpin(finalItem) {
-        let win = document.getElementById("slotWindow");
-        const SLOTS_COUNT = 7;
-        const TOTAL_STEPS = 200;
-        
-        let fullSequence = [];
-        for (let i = 0; i < 10000; i++) {
-            fullSequence.push(getRandomItemByRarity());
-        }
-        
-        const targetQueuePosition = 3 + TOTAL_STEPS;
-        const insertIndex = targetQueuePosition % fullSequence.length;
-        fullSequence[insertIndex] = finalItem;
-        
-        let currentItems = [];
-        for (let i = 0; i < SLOTS_COUNT; i++) {
-            currentItems.push(fullSequence[i % fullSequence.length]);
-        }
-        
-        let currentStep = 0;
-        let queueIndex = SLOTS_COUNT;
-        
-        function renderSlots() {
-            let html = `<div class="slots-container">`;
-            for (let i = 0; i < SLOTS_COUNT; i++) {
-                let item = currentItems[i];
-                if (!item) continue;
-                let rarity = getItemRarity(item);
-                let rarityClass = getRarityClass(item.rarityKey);
-                let textClass = getRarityTextClass(item.rarityKey);
-                html += `
-                    <div class="slot-cell">
-                        <div class="slot-item ${rarityClass}">
-                            <img src="${item.img}" class="slot-img" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
-                            <div class="name">${escapeHtml(item.name.substring(0, 18))}</div>
-                            <div class="rarity-badge ${textClass}">${rarity.name}</div>
-                        </div>
-                    </div>
-                `;
-            }
-            html += `</div>`;
-            win.innerHTML = `<div class="arrow-top spinning" id="arrowTop"></div><div class="arrow-bottom spinning" id="arrowBottom"></div><div class="center-indicator"></div>${html}`;
-        }
-        
-        renderSlots();
-        
-        return new Promise((resolve) => {
-            function step() {
-                if (currentStep >= TOTAL_STEPS) {
-                    renderSlots();
-                    setTimeout(() => {
-                        resolve(finalItem);
-                    }, 1000);
+            // Кнопка ВОЙТИ (с принудительной загрузкой данных после успешного входа)
+            document.getElementById("signInBtn").onclick = () => {
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+                errorDiv.style.display = "none";
+                
+                if (!email || !password) {
+                    errorDiv.innerText = "Заполните все поля.";
+                    errorDiv.style.display = "block";
                     return;
                 }
                 
-                const progress = currentStep / TOTAL_STEPS;
-                let delay;
-                if (progress < 0.5) {
-                    delay = 12;
-                } else if (progress < 0.75) {
-                    delay = 35;
-                } else if (progress < 0.88) {
-                    delay = 90;
-                } else if (progress < 0.95) {
-                    delay = 220;
-                } else {
-                    delay = 500;
-                }
+                console.log("🔄 Попытка входа для:", email);
                 
-                for (let i = 0; i < SLOTS_COUNT - 1; i++) {
-                    currentItems[i] = currentItems[i + 1];
-                }
-                currentItems[SLOTS_COUNT - 1] = fullSequence[queueIndex % fullSequence.length];
-                queueIndex++;
-                
-                renderSlots();
-                
-                if (!isMuted) {
-                    let clone = clickAudio.cloneNode();
-                    clone.volume = currentVolume;
-                    clone.play().catch(() => {});
-                }
-                
-                currentStep++;
-                setTimeout(step, delay);
-            }
-            
-            step();
-        });
-    }
-
-    // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ openCase ====================
-    async function openCase() {
-        let btn = document.getElementById("openCaseBtn");
-        if (isSpinning || btn.disabled) return;
-        
-        extendedStats.totalRollsEver++;
-        extendedStats.spinTimeMs += 14500;
-        
-        const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-        const todayStr = formatter.format(new Date());
-        // Очищаем строку от запрещённых символов для Firebase (точки, $, #, [, ])
-        const safeDateKey = todayStr.replace(/[\.\$\#\[\]]/g, "");
-        extendedStats.dailyCalendar[safeDateKey] = (extendedStats.dailyCalendar[safeDateKey] || 0) + 1;
-        
-        if (extendedStats.dailyCalendar[safeDateKey] > extendedStats.mostRollsInDayCount) {
-            extendedStats.mostRollsInDayCount = extendedStats.dailyCalendar[safeDateKey];
-            extendedStats.mostRollsInDayDate = todayStr; // оставляем красивую дату для отображения
-        }
-        
-        ITEMS.forEach(i => {
-            if (!hasItem(i.id)) {
-                extendedStats.itemRollCounters[i.id] = (extendedStats.itemRollCounters[i.id] || 0) + 1;
-            }
-        });
-        saveExtendedStats();
-        
-        isSpinning = true;
-        btn.disabled = true;
-        removeGlow();
-        stopArrowsAnimation();
-        setArrowsSpinning();
-        hideCenterHighlight();
-        
-        let won = getRandomItem();
-        let isNew = !hasItem(won.id);
-        
-        await startSpin(won);
-        
-        if (!isMuted) {
-            winAudio.currentTime = 0;
-            winAudio.play().catch(() => {});
-        }
-        
-        showResult(won, isNew);
-        addItem(won);
-        
-        if (isNew) {
-            if (inventory.length === 1) {
-                extendedStats.firstItemName = won.name;
-            }
-            
-            const currentRollsToDrop = extendedStats.itemRollCounters[won.id] || 1;
-            if (currentRollsToDrop > extendedStats.heavyItemRolls) {
-                extendedStats.heavyItemRolls = currentRollsToDrop;
-                extendedStats.heavyItemName = won.name;
-                extendedStats.heavyItemRarity = won.rarityKey;
-            }
-            
-            extendedStats.currentDryStreak = 0;
-        } else {
-            extendedStats.currentDryStreak++;
-            if (extendedStats.currentDryStreak > extendedStats.maxDryStreak) {
-                extendedStats.maxDryStreak = extendedStats.currentDryStreak;
-            }
-        }
-        saveExtendedStats();
-        
-        if (isNew) {
-            const dot = document.getElementById("invDot");
-            if (dot) dot.style.display = "inline-block";
-        }
-        
-        stats.total++;
-        if (won.rarityKey === 'common') stats.common++;
-        else if (won.rarityKey === 'rare') stats.rare++;
-        else if (won.rarityKey === 'superRare') stats.superRare++;
-        else if (won.rarityKey === 'epic') stats.epic++;
-        else if (won.rarityKey === 'mythic') stats.mythic++;
-        else if (won.rarityKey === 'legendary') stats.legendary++;
-        saveStats();
-        updateStatsDisplay();
-        
-        let resDiv = document.getElementById("rollResult");
-        let color = getItemRarity(won).color;
-        resDiv.style.background = hexToRgba(color, 0.2);
-        
-        if (isNew) {
-            resDiv.innerHTML = `✨ НОВЫЙ ПРЕДМЕТ! ✨<br>🎉 ${won.name} [${getRarityName(won.rarityKey)}] 🎉<br>📊 Шанс: ${getItemChance(won)}%`;
-        } else {
-            resDiv.innerHTML = `🔄 ПОВТОР 🔄<br>📦 ${won.name} [${getRarityName(won.rarityKey)}]<br>📊 Шанс: ${getItemChance(won)}%`;
-        }
-        
-        updateUI();
-        
-        btn.textContent = "🔙 НАЗАД 🔙";
-        btn.disabled = false;
-        isSpinning = false;
-    }
-
-    function updateStatsDisplay() {
-        const panel = document.getElementById('statsPanel');
-        if (panel && stats.total > 0) {
-            const commonPercent = (stats.common / stats.total * 100).toFixed(1);
-            const rarePercent = (stats.rare / stats.total * 100).toFixed(1);
-            const superRarePercent = (stats.superRare / stats.total * 100).toFixed(1);
-            const epicPercent = (stats.epic / stats.total * 100).toFixed(1);
-            const mythicPercent = (stats.mythic / stats.total * 100).toFixed(1);
-            const legendaryPercent = (stats.legendary / stats.total * 100).toFixed(1);
-            panel.innerHTML = `
-                <div class="stat-item">📊 Открыто: ${stats.total}</div>
-                <div class="stat-item">⚪ Обычных: ${stats.common} (${commonPercent}%)</div>
-                <div class="stat-item">🔵 Редких: ${stats.rare} (${rarePercent}%)</div>
-                <div class="stat-item">🟣 Сверхредких: ${stats.superRare} (${superRarePercent}%)</div>
-                <div class="stat-item">🩷 Эпических: ${stats.epic} (${epicPercent}%)</div>
-                <div class="stat-item">🔴 Мифических: ${stats.mythic} (${mythicPercent}%)</div>
-                <div class="stat-item">🟡 Легендарных: ${stats.legendary} (${legendaryPercent}%)</div>
-            `;
-        } else if (panel && stats.total === 0) {
-            panel.innerHTML = `
-                <div class="stat-item">📊 Открыто: 0</div>
-                <div class="stat-item">⚪ Обычных: 0 (0%)</div>
-                <div class="stat-item">🔵 Редких: 0 (0%)</div>
-                <div class="stat-item">🟣 Сверхредких: 0 (0%)</div>
-                <div class="stat-item">🩷 Эпических: 0 (0%)</div>
-                <div class="stat-item">🔴 Мифических: 0 (0%)</div>
-                <div class="stat-item">🟡 Легендарных: 0 (0%)</div>
-            `;
-        }
-    }
-
-    function updateUI() {
-        const rarityOrder = ['common', 'rare', 'superRare', 'epic', 'mythic', 'legendary'];
-        
-        const pluralRarityNames = {
-            common: "Обычные",
-            rare: "Редкие",
-            superRare: "Сверхредкие",
-            epic: "Эпические",
-            mythic: "Мифические",
-            legendary: "Легендарные"
-        };
-        
-        let invDiv = document.getElementById("inventoryGrid");
-        let collected = getCollected();
-        
-        if (collected.length === 0) {
-            invDiv.innerHTML = '<div style="text-align:center;padding:40px;width:100%;">🧸 Инвентарь пуст...</div>';
-        } else {
-            let invHtml = "";
-            let isFirstInv = true;
-            
-            rarityOrder.forEach(key => {
-                let itemsInRarity = collected.filter(i => i.rarityKey === key);
-                if (itemsInRarity.length > 0) {
-                    let rarityName = pluralRarityNames[key];
-                    let hrLine = !isFirstInv ? `<hr style="border: none; height: 1px; background: rgba(255,255,255,0.15); margin: 40px 10px 20px 10px; width: 100%;">` : '';
-                    isFirstInv = false;
-                    
-                    invHtml += `
-                        ${hrLine}
-                        <div style="width:100%; margin-top:10px; margin-bottom:10px;">
-                            <h3 style="font-size:1.5rem; margin:0; padding-left:10px; color:${getRarityByKey(key).color}; text-shadow: 0 0 10px ${hexToRgba(getRarityByKey(key).color, 0.3)};">${rarityName}</h3>
-                        </div>
-                        <div class="items-grid" style="width:100%;">
-                    `;
-                    invHtml += itemsInRarity.map(i => {
-                        let rarity = getItemRarity(i);
-                        let rarityClass = getRarityClass(i.rarityKey);
-                        let textClass = getRarityTextClass(i.rarityKey);
-                        return `<div class="item-card ${rarityClass}" onclick="window.openItemDescription(${i.id})">
-                                    <img src="${i.img}" class="grid-img" alt="${escapeHtml(i.name)}" onerror="this.style.display='none'">
-                                    <div class="item-name">${escapeHtml(i.name)}</div>
-                                    <div class="badge ${textClass}">${rarity.name}</div>
-                                </div>`;
-                    }).join('');
-                    invHtml += `</div>`;
-                }
-            });
-            invDiv.innerHTML = invHtml;
-        }
-        
-        let collDiv = document.getElementById("collectionContainer");
-        let missing = getMissing();
-        
-        if (missing.length === 0) {
-            collDiv.innerHTML = `<div class="celebration"><h1>🏆 ВСЕ СОБРАНО! 🏆</h1><p style="font-size:1.5rem; font-weight:bold; margin-top:10px;">Все предметы собраны! Ур-рааааа!</p></div>`;
-        } else {
-            let collHtml = "";
-            let isFirstColl = true;
-            
-            rarityOrder.forEach(key => {
-                let missingInRarity = missing.filter(i => i.rarityKey === key);
-                
-                if (missingInRarity.length > 0) {
-                    let rarityName = pluralRarityNames[key];
-                    let hrLine = !isFirstColl ? `<hr style="border: none; height: 1px; background: rgba(255,255,255,0.15); margin: 40px 10px 20px 10px; width: 100%;">` : '';
-                    isFirstColl = false;
-                    
-                    collHtml += `
-                        ${hrLine}
-                        <div style="width:100%; margin-top:10px; margin-bottom:10px;">
-                            <h3 style="font-size:1.5rem; margin:0; padding-left:10px; color:#aaa;">${rarityName}</h3>
-                        </div>
-                        <div class="items-grid" style="width:100%;">
-                    `;
-                    collHtml += missingInRarity.map(i => {
-                        let rarity = getItemRarity(i);
-                        let rarityClass = getRarityClass(i.rarityKey);
-                        let textClass = getRarityTextClass(i.rarityKey);
-                        return `<div class="item-card ${rarityClass}" style="filter: grayscale(1); opacity: 0.4;">
-                                    <img src="${i.img}" class="grid-img" alt="${escapeHtml(i.name)}" onerror="this.style.display='none'">
-                                    <div class="item-name">${escapeHtml(i.name)}</div>
-                                    <div class="badge ${textClass}">${rarity.name}</div>
-                                </div>`;
-                    }).join('');
-                    collHtml += `</div>`;
-                }
-            });
-            collDiv.innerHTML = collHtml;
-        }
-        
-        let statsContainer = document.getElementById("globalStatsContainer");
-        if (statsContainer) {
-            let totalSeconds = Math.floor(extendedStats.spinTimeMs / 1000);
-            let hours = Math.floor(totalSeconds / 3600);
-            let minutes = Math.floor((totalSeconds % 3600) / 60);
-            
-            let favoriteItemStyled = "–";
-            let maxClicks = 0;
-            let favoriteItemObj = null;
-
-            if (extendedStats.totalRollsEver > 0) {
-                for (let id in extendedStats.itemClicks) {
-                    if (extendedStats.itemClicks[id] > maxClicks) {
-                        maxClicks = extendedStats.itemClicks[id];
-                        favoriteItemObj = ITEMS.find(item => item.id == id);
-                    }
-                }
-                if (favoriteItemObj && maxClicks > 0) {
-                    let favColor = getRarityByKey(favoriteItemObj.rarityKey).color;
-                    favoriteItemStyled = `<span style="color: ${favColor}; font-weight: bold;">${favoriteItemObj.name}</span>`;
-                } else {
-                    favoriteItemStyled = "–";
-                }
-            }
-
-            let uniqueCollected = collected.length;
-            let totalPossible = ITEMS.length;
-            let percentRaw = totalPossible > 0 ? (uniqueCollected / totalPossible) * 100 : 0;
-            let percentFloor = Math.floor(percentRaw);
-            
-            let percentLineHtml = "";
-            if (percentFloor === 100) {
-                percentLineHtml = `<div style="border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 8px; color: #00ff66; font-weight: bold;">Вся коллекция полностью собрана!</div>`;
-            } else {
-                percentLineHtml = `<div style="border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 8px;">(Собрано <span style="color: #fff; font-weight: bold;">${percentFloor}%</span> от всей коллекции)</div>`;
-            }
-            
-            let countColor = uniqueCollected === totalPossible ? "#00ff66" : "#ffffff";
-            let itemsCountSpan = `<span style="color: ${countColor}; font-weight: bold;">${uniqueCollected}/${totalPossible}</span>`;
-            
-            let treasureCount = collected.filter(i => i.rarityKey === 'mythic' || i.rarityKey === 'legendary').length;
-
-            let heavyItemStyled = "–";
-            if (extendedStats.totalRollsEver > 0) {
-                heavyItemStyled = "–";
-                if (extendedStats.heavyItemRolls > 0) {
-                    let heavyColor = getRarityByKey(extendedStats.heavyItemRarity).color;
-                    heavyItemStyled = `<span style="color: ${heavyColor}; font-weight: bold;">${extendedStats.heavyItemName}</span> (Круток потребовалось: <span style="color: #ff1414; font-weight: bold;">${extendedStats.heavyItemRolls}</span>)`;
-                }
-            }
-
-            let firstItemStyled = "–";
-            if (extendedStats.totalRollsEver > 0 && extendedStats.firstItemName !== "Нет предметов") {
-                let firstItemObj = ITEMS.find(item => item.name === extendedStats.firstItemName);
-                if (firstItemObj) {
-                    let firstColor = getRarityByKey(firstItemObj.rarityKey).color;
-                    firstItemStyled = `<span style="color: ${firstColor}; font-weight: bold;">${extendedStats.firstItemName}</span>`;
-                } else {
-                    firstItemStyled = `<span style="color: #fff; font-weight: bold;">${extendedStats.firstItemName}</span>`;
-                }
-            }
-
-            statsContainer.innerHTML = `
-                <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 16px 20px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 12px; box-shadow: inset 0 0 15px rgba(0,0,0,0.2);">
-                    <div style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: -4px; font-weight: bold;">ОСНОВНОЙ ПРОГРЕСС</div>
-                    <div style="border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 8px;">Всего предметов собрано: ${itemsCountSpan}</div>
-                    ${percentLineHtml}
-                    <div style="font-size: 1.15rem; color: #fff;">
-                        <span style="font-weight: normal;">Из них сокровищ:</span> <span style="color: #ffc800; font-size: 1.3rem; font-weight: bold;">${treasureCount}</span> <span style="font-size: 0.95rem; font-weight: normal; color: #aaa; margin-left: 4px;">(Сокровищами считаются предметы <span style="color: ${RARITIES.mythic.color}; font-weight: bold;">мифической</span> и <span style="color: ${RARITIES.legendary.color}; font-weight: bold;">легендарной</span> редкости)</span>
-                    </div>
-                </div>
-                
-                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px; margin-top: 10px;">🔄 Всего вращений совершено: <span style="color: #fff; font-weight: bold;">${extendedStats.totalRollsEver}</span></div>
-                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">⏱️ Барабан вращался: ${hours} часов ${minutes} минут</div>
-                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">📈 Больше всего вращений совершено: <span style="color: #fff; font-weight: bold;">${extendedStats.mostRollsInDayDate} (${extendedStats.mostRollsInDayCount})</span></div>
-                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">1️⃣ Первый выпавший предмет: ${firstItemStyled}</div>
-                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">🧱 Тяжелее всего дался: ${heavyItemStyled}</div>
-                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">❤️ Любимый предмет: ${favoriteItemStyled}</div>
-                <div style="padding-top: 5px;">⏩ Рекордная серия повторов: <span style="color: #fff; font-weight: bold;">${extendedStats.maxDryStreak}</span></div>
-            `;
-        }
-        
-        document.getElementById("totalItemsCount").innerText = inventory.length;
-        document.getElementById("remainingCount").innerText = missing.length;
-    }
-
-    function initTabs() {
-        let btns = document.querySelectorAll(".tab-btn");
-        btns.forEach(btn => {
-            btn.onclick = () => {
-                let id = btn.getAttribute("data-tab");
-                btns.forEach(b => b.classList.remove("active"));
-                btn.classList.add("active");
-                document.getElementById("caseTab").classList.remove("active");
-                document.getElementById("inventoryTab").classList.remove("active");
-                document.getElementById("collectionTab").classList.remove("active");
-                document.getElementById("statsTab").classList.remove("active");
-                document.getElementById(id + "Tab").classList.add("active");
-                
-                if (id === "inventory") {
-                    const dot = document.getElementById("invDot");
-                    if (dot) dot.style.display = "none";
-                }
-                
-                updateUI();
+                signInWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        console.log("✅ Вход выполнен успешно!");
+                        // Принудительно вызываем loadData() после успешного входа
+                        // Это гарантирует проверку соединения с базой данных
+                        currentUserUid = userCredential.user.uid;
+                        loadData();
+                    })
+                    .catch(error => {
+                        console.error("🔴 Детали ошибки входа:", error);
+                        console.error("🔴 Код ошибки:", error.code);
+                        console.error("🔴 Сообщение:", error.message);
+                        
+                        // Проверяем на сетевую ошибку
+                        if (error.code === 'auth/network-request-failed') {
+                            errorDiv.innerText = "Ошибка сети: Сервер недоступен. Проверьте интернет-соединение.";
+                        } else if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
+                            errorDiv.innerText = "Ошибка входа: Неверный email или пароль.";
+                        } else if (error.code === "auth/operation-not-allowed") {
+                            errorDiv.innerText = "Ошибка: В консоли Firebase не включен способ входа по Email/Паролю!";
+                        } else {
+                            errorDiv.innerText = "Ошибка входа: " + error.message;
+                        }
+                        errorDiv.style.display = "block";
+                    });
             };
-        });
-    }
 
-    function initAudioControls() {
-        const muteBtn = document.getElementById('muteBtn');
-        const volumeSlider = document.getElementById('volumeSlider');
-        
-        volumeSlider.addEventListener('input', (e) => {
-            currentVolume = parseFloat(e.target.value);
-            clickAudio.volume = currentVolume;
-            winAudio.volume = currentVolume;
-        });
-        
-        muteBtn.addEventListener('click', () => {
-            isMuted = !isMuted;
-            muteBtn.textContent = isMuted ? '🔇' : '🔊';
-        });
-    }
-
-    // ==================== МОДАЛЬНОЕ ОКНО (ИСПРАВЛЕННАЯ ФУНКЦИЯ) ====================
-    function openItemDescription(id) {
-        console.log("Клик по предмету с ID:", id);
-        const item = ITEMS.find(i => i.id === id);
-        if (!item) {
-            console.error("Предмет с ID", id, "не найден!");
-            return;
-        }
-        
-        extendedStats.itemClicks[id] = (extendedStats.itemClicks[id] || 0) + 1;
-        saveExtendedStats();
-        
-        const invRecord = inventory.find(record => record.id === id);
-        
-        const modal = document.getElementById("descModal");
-        const card = document.getElementById("modalCard");
-        const img = document.getElementById("modalImg");
-        const name = document.getElementById("modalName");
-        const badge = document.getElementById("modalBadge");
-        const desc = document.getElementById("modalDesc");
-        
-        const sidePanel = document.getElementById("modalSidePanel");
-        const infoDate = document.getElementById("infoDateRow");
-        const infoRolls = document.getElementById("infoRollsRow");
-        
-        let rarity = getItemRarity(item);
-        let rarityClass = getRarityClass(item.rarityKey);
-        let textClass = getRarityTextClass(item.rarityKey);
-        
-        img.src = item.img;
-        name.innerText = item.name;
-        badge.innerText = rarity.name;
-        desc.innerText = item.description || "У этого предмета пока нет описания.";
-        card.className = "modal-card " + rarityClass;
-        badge.className = "badge " + textClass;
-        
-        if (invRecord) {
-            let cleanDate = invRecord.date ? invRecord.date.replace("Дата получения: ", "") : "--";
-            infoDate.innerHTML = `📅 Дата получения: <strong>${cleanDate}</strong>`;
-            infoRolls.innerHTML = `🎰 Круток потребовалось: <strong>${invRecord.rollsToDrop || "Неизвестно"}</strong>`;
-        }
-        
-        sidePanel.style.borderColor = rarity.color;
-        modal.style.display = "flex";
-    }
-
-    function closeItemDescription() {
-        document.getElementById("descModal").style.display = "none";
-    }
-
-    // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ testOpenCaseWithRarity ====================
-    async function testOpenCaseWithRarity(rarityKey) {
-        let btn = document.getElementById("openCaseBtn");
-        if (isSpinning || btn.disabled) return;
-        
-        extendedStats.totalRollsEver++;
-        extendedStats.spinTimeMs += 14500;
-        
-        const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-        const todayStr = formatter.format(new Date());
-        // Очищаем строку от запрещённых символов для Firebase (точки, $, #, [, ])
-        const safeDateKey = todayStr.replace(/[\.\$\#\[\]]/g, "");
-        extendedStats.dailyCalendar[safeDateKey] = (extendedStats.dailyCalendar[safeDateKey] || 0) + 1;
-        
-        if (extendedStats.dailyCalendar[safeDateKey] > extendedStats.mostRollsInDayCount) {
-            extendedStats.mostRollsInDayCount = extendedStats.dailyCalendar[safeDateKey];
-            extendedStats.mostRollsInDayDate = todayStr; // оставляем красивую дату для отображения
-        }
-        
-        ITEMS.forEach(i => {
-            if (!hasItem(i.id)) {
-                extendedStats.itemRollCounters[i.id] = (extendedStats.itemRollCounters[i.id] || 0) + 1;
-            }
-        });
-        saveExtendedStats();
-        
-        const filteredItems = ITEMS.filter(i => i.rarityKey === rarityKey);
-        if (filteredItems.length === 0) {
-            alert("В массиве ITEMS нет предметов с редкостью: " + rarityKey);
-            return;
-        }
-        
-        let won = filteredItems[Math.floor(Math.random() * filteredItems.length)];
-        
-        isSpinning = true;
-        btn.disabled = true;
-        removeGlow();
-        stopArrowsAnimation();
-        setArrowsSpinning();
-        hideCenterHighlight();
-        
-        let isNew = !hasItem(won.id);
-        
-        await startSpin(won);
-        
-        if (!isMuted) {
-            winAudio.currentTime = 0;
-            winAudio.play().catch(() => {});
-        }
-        
-        showResult(won, isNew);
-        addItem(won);
-        
-        if (isNew) {
-            if (inventory.length === 1) {
-                extendedStats.firstItemName = won.name;
-            }
-            
-            const currentRollsToDrop = extendedStats.itemRollCounters[won.id] || 1;
-            if (currentRollsToDrop > extendedStats.heavyItemRolls) {
-                extendedStats.heavyItemRolls = currentRollsToDrop;
-                extendedStats.heavyItemName = won.name;
-                extendedStats.heavyItemRarity = won.rarityKey;
-            }
-            
-            extendedStats.currentDryStreak = 0;
-        } else {
-            extendedStats.currentDryStreak++;
-            if (extendedStats.currentDryStreak > extendedStats.maxDryStreak) {
-                extendedStats.maxDryStreak = extendedStats.currentDryStreak;
-            }
-        }
-        saveExtendedStats();
-        
-        if (isNew) {
-            const dot = document.getElementById("invDot");
-            if (dot) dot.style.display = "inline-block";
-        }
-        
-        stats.total++;
-        stats[won.rarityKey]++;
-        saveStats();
-        updateStatsDisplay();
-        
-        let resDiv = document.getElementById("rollResult");
-        let color = getItemRarity(won).color;
-        resDiv.style.background = hexToRgba(color, 0.2);
-        
-        if (isNew) {
-            resDiv.innerHTML = `✨ ТЕСТ: НОВЫЙ ПРЕДМЕТ! ✨<br>🎉 ${won.name} [${getRarityName(won.rarityKey)}] 🎉<br>📊 Шанс: ${getItemChance(won)}%`;
-        } else {
-            resDiv.innerHTML = `🔄 ТЕСТ: ПОВТОР 🔄<br>📦 ${won.name} [${getRarityName(won.rarityKey)}]<br>📊 Шанс: ${getItemChance(won)}%`;
-        }
-        
-        updateUI();
-        
-        btn.textContent = "🔙 НАЗАД 🔙";
-        btn.disabled = false;
-        isSpinning = false;
-    }
-
-    async function resetGame() {
-        if (confirm("Сбросить прогресс?")) {
-            inventory = [];
-            stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
-            extendedStats = {
-                totalRollsEver: 0, spinTimeMs: 0, firstItemName: "Нет предметов",
-                maxDryStreak: 0, currentDryStreak: 0, heavyItemName: "Нет предметов",
-                heavyItemRarity: "common", heavyItemRolls: 0, mostRollsInDayDate: "--",
-                mostRollsInDayCount: 0, dailyCalendar: {}, itemClicks: {}, itemRollCounters: {}
+            // Кнопка Зарегистрироваться (с принудительной загрузкой данных после успешной регистрации)
+            document.getElementById("signUpBtn").onclick = () => {
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+                errorDiv.style.display = "none";
+                
+                if (!email || !password) {
+                    errorDiv.innerText = "Заполните все поля для регистрации.";
+                    errorDiv.style.display = "block";
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    errorDiv.innerText = "Пароль должен быть не менее 6 символов.";
+                    errorDiv.style.display = "block";
+                    return;
+                }
+                
+                console.log("🔄 Попытка регистрации для:", email);
+                
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        console.log("✅ Регистрация выполнена успешно!");
+                        // Принудительно вызываем loadData() после успешной регистрации
+                        // Это гарантирует проверку соединения с базой данных
+                        currentUserUid = userCredential.user.uid;
+                        loadData();
+                    })
+                    .catch(error => {
+                        console.error("🔴 Детали ошибки регистрации:", error);
+                        console.error("🔴 Код ошибки:", error.code);
+                        console.error("🔴 Сообщение:", error.message);
+                        
+                        // Проверяем на сетевую ошибку
+                        if (error.code === 'auth/network-request-failed') {
+                            errorDiv.innerText = "Ошибка сети: Сервер недоступен. Проверьте интернет-соединение.";
+                        } else if (error.code === "auth/email-already-in-use") {
+                            errorDiv.innerText = "Этот Email уже зарегистрирован.";
+                        } else if (error.code === "auth/invalid-email") {
+                            errorDiv.innerText = "Неверный формат Email. Пример: user@mail.ru";
+                        } else if (error.code === "auth/operation-not-allowed") {
+                            errorDiv.innerText = "Ошибка: В консоли Firebase не включен способ входа по Email/Паролю!";
+                        } else {
+                            errorDiv.innerText = "Ошибка регистрации: " + error.message;
+                        }
+                        errorDiv.style.display = "block";
+                    });
             };
-            
-            if (currentUserUid) {
-                await set(ref(db, `users/${currentUserUid}`), {
-                    inventory: inventory,
-                    stats: stats,
-                    extendedStats: extendedStats
-                });
-            }
-            resetToInitialState();
-            updateUI();
-            updateStatsDisplay();
-        }
-    }
 
-    // ==================== ЭКСПОРТ В ГЛОБАЛЬНЫЙ ОБЪЕКТ WINDOW ====================
-    window.testOpenCaseWithRarity = testOpenCaseWithRarity;
-    window.openItemDescription = openItemDescription;
-    window.closeItemDescription = closeItemDescription;
-    window.resetGame = resetGame;
+            // Кнопка открытия кейса (с логгированием для отладки)
+            const openBtn = document.getElementById("openCaseBtn");
+            openBtn.onclick = async () => {
+                console.log("🎯 Клик по кнопке зафиксирован, isSpinning =", isSpinning);
+                if (isResultScreen) {
+                    resetToInitialState();
+                } else {
+                    await openCase();
+                }
+            };
 
-    // ==================== ИНИЦИАЛИЗАЦИЯ ====================
-    document.addEventListener("DOMContentLoaded", () => {
-        initTabs();
-        initAudioControls();
-        
-        const authOverlay = document.getElementById("authOverlay");
-        const emailInput = document.getElementById("authEmail");
-        const passwordInput = document.getElementById("authPassword");
-        const errorDiv = document.getElementById("authError");
-        
-        // Отслеживание состояния аккаунта
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUserUid = user.uid;
-                console.log("✅ Пользователь авторизован, UID:", currentUserUid);
-                
-                // Показываем приложение и скрываем окно авторизации
-                document.querySelector(".app").style.display = "block";
-                document.getElementById("authOverlay").style.display = "none";
-                
-                loadData();
-            } else {
-                currentUserUid = null;
-                console.log("👤 Пользователь не авторизован");
-                
-                // Скрываем приложение и показываем окно авторизации
-                document.querySelector(".app").style.display = "none";
-                document.getElementById("authOverlay").style.display = "flex";
-            }
+            // Кнопка сброса прогресса
+            document.getElementById("resetProgressBtn").onclick = resetGame;
         });
-
-        // Кнопка ВОЙТИ (с принудительной загрузкой данных после успешного входа)
-        document.getElementById("signInBtn").onclick = () => {
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-            errorDiv.style.display = "none";
-            
-            if (!email || !password) {
-                errorDiv.innerText = "Заполните все поля.";
-                errorDiv.style.display = "block";
-                return;
-            }
-            
-            console.log("🔄 Попытка входа для:", email);
-            
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    console.log("✅ Вход выполнен успешно!");
-                    // Принудительно вызываем loadData() после успешного входа
-                    // Это гарантирует проверку соединения с базой данных
-                    currentUserUid = userCredential.user.uid;
-                    loadData();
-                })
-                .catch(error => {
-                    console.error("🔴 Детали ошибки входа:", error);
-                    console.error("🔴 Код ошибки:", error.code);
-                    console.error("🔴 Сообщение:", error.message);
-                    
-                    // Проверяем на сетевую ошибку
-                    if (error.code === 'auth/network-request-failed') {
-                        errorDiv.innerText = "Ошибка сети: Сервер недоступен. Проверьте интернет-соединение.";
-                    } else if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
-                        errorDiv.innerText = "Ошибка входа: Неверный email или пароль.";
-                    } else if (error.code === "auth/operation-not-allowed") {
-                        errorDiv.innerText = "Ошибка: В консоли Firebase не включен способ входа по Email/Паролю!";
-                    } else {
-                        errorDiv.innerText = "Ошибка входа: " + error.message;
-                    }
-                    errorDiv.style.display = "block";
-                });
-        };
-
-        // Кнопка Зарегистрироваться (с принудительной загрузкой данных после успешной регистрации)
-        document.getElementById("signUpBtn").onclick = () => {
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-            errorDiv.style.display = "none";
-            
-            if (!email || !password) {
-                errorDiv.innerText = "Заполните все поля для регистрации.";
-                errorDiv.style.display = "block";
-                return;
-            }
-            
-            if (password.length < 6) {
-                errorDiv.innerText = "Пароль должен быть не менее 6 символов.";
-                errorDiv.style.display = "block";
-                return;
-            }
-            
-            console.log("🔄 Попытка регистрации для:", email);
-            
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    console.log("✅ Регистрация выполнена успешно!");
-                    // Принудительно вызываем loadData() после успешной регистрации
-                    // Это гарантирует проверку соединения с базой данных
-                    currentUserUid = userCredential.user.uid;
-                    loadData();
-                })
-                .catch(error => {
-                    console.error("🔴 Детали ошибки регистрации:", error);
-                    console.error("🔴 Код ошибки:", error.code);
-                    console.error("🔴 Сообщение:", error.message);
-                    
-                    // Проверяем на сетевую ошибку
-                    if (error.code === 'auth/network-request-failed') {
-                        errorDiv.innerText = "Ошибка сети: Сервер недоступен. Проверьте интернет-соединение.";
-                    } else if (error.code === "auth/email-already-in-use") {
-                        errorDiv.innerText = "Этот Email уже зарегистрирован.";
-                    } else if (error.code === "auth/invalid-email") {
-                        errorDiv.innerText = "Неверный формат Email. Пример: user@mail.ru";
-                    } else if (error.code === "auth/operation-not-allowed") {
-                        errorDiv.innerText = "Ошибка: В консоли Firebase не включен способ входа по Email/Паролю!";
-                    } else {
-                        errorDiv.innerText = "Ошибка регистрации: " + error.message;
-                    }
-                    errorDiv.style.display = "block";
-                });
-        };
-
-        // Кнопка открытия кейса (с логгированием для отладки)
-        const openBtn = document.getElementById("openCaseBtn");
-        openBtn.onclick = async () => {
-            console.log("🎯 Клик по кнопке зафиксирован, isSpinning =", isSpinning);
-            if (isResultScreen) {
-                resetToInitialState();
-            } else {
-                await openCase();
-            }
-        };
-
-        // Кнопка сброса прогресса
-        document.getElementById("resetProgressBtn").onclick = resetGame;
-    });
-</script>
+    </script>
 </body>
 </html>
