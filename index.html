@@ -774,9 +774,19 @@
             box-sizing: border-box;
         }
         
+        /* ===== ИСПРАВЛЕННЫЙ МЕДИА-ЗАПРОС (без display: none) ===== */
         @media (max-width: 1180px) {
-            .modal-overlay { display: none; flex-direction: column; gap: 16px; justify-content: flex-start; overflow-y: auto; }
-            .modal-side-panel { position: static; max-width: 580px; margin-top: 10px; }
+            .modal-overlay { 
+                flex-direction: column; 
+                gap: 16px; 
+                justify-content: flex-start; 
+                overflow-y: auto; 
+            }
+            .modal-side-panel { 
+                position: static; 
+                max-width: 580px; 
+                margin-top: 10px; 
+            }
         }
         
         .modal-side-row {
@@ -929,6 +939,7 @@
         <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
     </div>
 
+    <!-- ===== ИСПРАВЛЕННАЯ МОДАЛКА ===== -->
     <div id="descModal" class="modal-overlay" onclick="window.closeItemDescription()">
         <div class="modal-card" id="modalCard" onclick="event.stopPropagation()">
             <img id="modalImg" src="" style="width: 100.15%; height: auto; object-fit: contain; margin-bottom: 20px;" alt="">
@@ -2230,9 +2241,7 @@
             // Кнопка сброса прогресса
             document.getElementById("resetProgressBtn").onclick = resetGame;
             
-            // ================================================
             // === АВТОСОХРАНЕНИЕ КАЖДЫЕ 10 СЕКУНД ===
-            // ================================================
             setInterval(() => {
                 if (currentUserUid && !isSpinning) {
                     console.log("⏱️ Таймер автосохранения: Запуск плановой синхронизации...");
@@ -2240,7 +2249,7 @@
                 } else if (currentUserUid && isSpinning) {
                     console.log("⏱️ Таймер автосохранения: Пропуск, идёт крутка барабана...");
                 }
-            }, 10000); // 10000 миллисекунд = 10 секунд
+            }, 10000);
             
             console.log("🚀 Инициализация завершена");
             console.log("⏱️ Автосохранение запущено (интервал: 10 секунд)");
