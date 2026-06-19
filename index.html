@@ -131,6 +131,7 @@
             padding: 20px 24px 32px;
             box-shadow: 0 25px 45px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.1);
+            display: none;
         }
 
         .audio-controls {
@@ -909,12 +910,12 @@
             <button class="small-reset" id="resetProgressBtn">♻️ Сбросить прогресс</button>
         </div>
         <div class="test-admin-panel">
-            <button onclick="testOpenCaseWithRarity('common')" style="background: #dee3f2; color: #000;">⚪ Common</button>
-            <button onclick="testOpenCaseWithRarity('rare')" style="background: #184cff; color: #fff;">🔵 Rare</button>
-            <button onclick="testOpenCaseWithRarity('superRare')" style="background: #8e18ff; color: #fff;">🟣 SuperRare</button>
-            <button onclick="testOpenCaseWithRarity('epic')" style="background: #ff18ab; color: #fff;">🩷 Epic</button>
-            <button onclick="testOpenCaseWithRarity('mythic')" style="background: #ff1414; color: #fff;">🔴 Mythic</button>
-            <button onclick="testOpenCaseWithRarity('legendary')" style="background: #ffc800; color: #000;">🟡 Legendary</button>
+            <button onclick="window.testOpenCaseWithRarity('common')" style="background: #dee3f2; color: #000;">⚪ Common</button>
+            <button onclick="window.testOpenCaseWithRarity('rare')" style="background: #184cff; color: #fff;">🔵 Rare</button>
+            <button onclick="window.testOpenCaseWithRarity('superRare')" style="background: #8e18ff; color: #fff;">🟣 SuperRare</button>
+            <button onclick="window.testOpenCaseWithRarity('epic')" style="background: #ff18ab; color: #fff;">🩷 Epic</button>
+            <button onclick="window.testOpenCaseWithRarity('mythic')" style="background: #ff1414; color: #fff;">🔴 Mythic</button>
+            <button onclick="window.testOpenCaseWithRarity('legendary')" style="background: #ffc800; color: #000;">🟡 Legendary</button>
         </div>
         <div class="stats-panel" id="statsPanel">
             <div class="stat-item">📊 Открыто: 0</div>
@@ -942,13 +943,13 @@
     <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
 </div>
 
-<div id="descModal" class="modal-overlay" onclick="closeItemDescription()">
+<div id="descModal" class="modal-overlay" onclick="window.closeItemDescription()">
     <div class="modal-card" id="modalCard" onclick="event.stopPropagation()">
         <img id="modalImg" src="" style="width: 100.15%; height: auto; object-fit: contain; margin-bottom: 20px;" alt="">
         <h2 id="modalName"></h2>
         <div id="modalBadge" class="badge"></div>
         <div id="modalDesc" class="modal-desc"></div>
-        <button class="open-btn" onclick="closeItemDescription()" style="font-size: 1.2rem; padding: 10px 30px; margin: 10px 0 0 0;">ЗАКРЫТЬ</button>
+        <button class="open-btn" onclick="window.closeItemDescription()" style="font-size: 1.2rem; padding: 10px 30px; margin: 10px 0 0 0;">ЗАКРЫТЬ</button>
     </div>
     <div class="modal-side-panel" id="modalSidePanel" onclick="event.stopPropagation()">
         <div style="font-size: 1.1rem; font-weight: bold; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 4px;">Статистика предмета</div>
@@ -1133,7 +1134,7 @@
     function saveStats() { saveAllDataToCloud(); }
     function saveExtendedStats() { saveAllDataToCloud(); }
 
-    // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ С ЖЁСТКОЙ ПРИВЯЗКОЙ К ОБЛАКУ ====================
+    // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ С ЖЁСТКОЙ БЛОКИРОВКОЙ ====================
     async function loadData() {
         if (!currentUserUid) {
             console.warn("⚠️ Нет авторизованного пользователя для загрузки данных.");
@@ -1167,7 +1168,7 @@
                 };
                 console.log("🟡 Аккаунт новый, в облаке нет старых данных. Инициализированы дефолтные значения.");
             }
-            // Принудительно обновляем UI
+            // Принудительно обновляем UI только при успешной загрузке
             updateUI();
             updateStatsDisplay();
         } catch (error) {
@@ -1175,29 +1176,31 @@
             console.error("🔴 Код ошибки:", error.code);
             console.error("🔴 Сообщение:", error.message);
             
-            // Жёсткая привязка к облаку: показываем окно авторизации при ошибке сети
+            // Жёсткая блокировка: если не удалось загрузить данные, выкидываем пользователя
+            console.log("🔴 Выполняется принудительный выход из-за ошибки сети...");
+            
+            // Сбрасываем пользователя
+            currentUserUid = null;
+            
+            // Принудительный логаут из Firebase
+            try {
+                await auth.signOut();
+                console.log("🟢 Пользователь принудительно разлогинен.");
+            } catch (signOutError) {
+                console.error("⚠️ Ошибка при принудительном выходе:", signOutError);
+            }
+            
+            // Скрываем приложение и показываем форму входа
+            document.querySelector(".app").style.display = "none";
             const authOverlay = document.getElementById("authOverlay");
             const errorDiv = document.getElementById("authError");
             
             authOverlay.style.display = "flex";
-            errorDiv.innerText = "Ошибка подключения: Не удалось синхронизировать данные с сервером. Повторите попытку позже.";
+            errorDiv.innerText = "Ошибка сети: Не удалось синхронизировать данные с сервером. Проверьте интернет-соединение.";
             errorDiv.style.display = "block";
             
-            // Сбрасываем пользователя, чтобы заблокировать доступ к игре
-            currentUserUid = null;
-            
-            // Инициализируем дефолтные значения
-            inventory = [];
-            stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
-            extendedStats = {
-                totalRollsEver: 0, spinTimeMs: 0, firstItemName: "Нет предметов",
-                maxDryStreak: 0, currentDryStreak: 0, heavyItemName: "Нет предметов",
-                heavyItemRarity: "common", heavyItemRolls: 0, mostRollsInDayDate: "--",
-                mostRollsInDayCount: 0, dailyCalendar: {}, itemClicks: {}, itemRollCounters: {}
-            };
-            
-            updateUI();
-            updateStatsDisplay();
+            // НЕ вызываем updateUI() и updateStatsDisplay() при ошибке
+            // Это предотвращает частичную инициализацию интерфейса
         }
     }
 
@@ -1670,7 +1673,7 @@
                         let rarity = getItemRarity(i);
                         let rarityClass = getRarityClass(i.rarityKey);
                         let textClass = getRarityTextClass(i.rarityKey);
-                        return `<div class="item-card ${rarityClass}" onclick="openItemDescription(${i.id})">
+                        return `<div class="item-card ${rarityClass}" onclick="window.openItemDescription(${i.id})">
                                     <img src="${i.img}" class="grid-img" alt="${escapeHtml(i.name)}" onerror="this.style.display='none'">
                                     <div class="item-name">${escapeHtml(i.name)}</div>
                                     <div class="badge ${textClass}">${rarity.name}</div>
@@ -2040,16 +2043,23 @@
             if (user) {
                 currentUserUid = user.uid;
                 console.log("✅ Пользователь авторизован, UID:", currentUserUid);
-                authOverlay.style.display = "none";
+                
+                // Показываем приложение и скрываем окно авторизации
+                document.querySelector(".app").style.display = "block";
+                document.getElementById("authOverlay").style.display = "none";
+                
                 loadData();
             } else {
                 currentUserUid = null;
                 console.log("👤 Пользователь не авторизован");
-                authOverlay.style.display = "flex";
+                
+                // Скрываем приложение и показываем окно авторизации
+                document.querySelector(".app").style.display = "none";
+                document.getElementById("authOverlay").style.display = "flex";
             }
         });
 
-        // Кнопка ВОЙТИ (с нейтральным сообщением о сетевой ошибке)
+        // Кнопка ВОЙТИ (с принудительной загрузкой данных после успешного входа)
         document.getElementById("signInBtn").onclick = () => {
             const email = emailInput.value.trim();
             const password = passwordInput.value;
@@ -2064,6 +2074,13 @@
             console.log("🔄 Попытка входа для:", email);
             
             signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    console.log("✅ Вход выполнен успешно!");
+                    // Принудительно вызываем loadData() после успешного входа
+                    // Это гарантирует проверку соединения с базой данных
+                    currentUserUid = userCredential.user.uid;
+                    loadData();
+                })
                 .catch(error => {
                     console.error("🔴 Детали ошибки входа:", error);
                     console.error("🔴 Код ошибки:", error.code);
@@ -2083,7 +2100,7 @@
                 });
         };
 
-        // Кнопка Зарегистрироваться (с нейтральным сообщением о сетевой ошибке)
+        // Кнопка Зарегистрироваться (с принудительной загрузкой данных после успешной регистрации)
         document.getElementById("signUpBtn").onclick = () => {
             const email = emailInput.value.trim();
             const password = passwordInput.value;
@@ -2104,6 +2121,13 @@
             console.log("🔄 Попытка регистрации для:", email);
             
             createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    console.log("✅ Регистрация выполнена успешно!");
+                    // Принудительно вызываем loadData() после успешной регистрации
+                    // Это гарантирует проверку соединения с базой данных
+                    currentUserUid = userCredential.user.uid;
+                    loadData();
+                })
                 .catch(error => {
                     console.error("🔴 Детали ошибки регистрации:", error);
                     console.error("🔴 Код ошибки:", error.code);
