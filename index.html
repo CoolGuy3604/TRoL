@@ -1088,7 +1088,7 @@
             itemRollCounters: {}
         };
 
-        // ==================== ОБЛАЧНЫЕ ФУНКЦИИ СОХРАНЕНИЯ С ЛОГИРОВАНИЕМ ====================
+        // ==================== ОБЛАЧНЫЕ ФУНКЦИИ СОХРАНЕНИЯ С ТОЧНЫМ ЛОГИРОВАНИЕМ ====================
         function saveAllDataToCloud() {
             if (!currentUserUid) {
                 console.warn("⚠️ Нет авторизованного пользователя. Данные не сохранены.");
@@ -1103,16 +1103,12 @@
                 extendedStats: extendedStats
             })
             .then(() => {
-                console.log("🟢 Данные успешно сохранены в облако Firebase для UID:", currentUserUid);
+                console.log("☁️ СИНХРОНИЗАЦИЯ: Все последние данные успешно записаны в облако Firebase!");
             })
             .catch((error) => {
-                console.error("🔴 ОШИБКА СОХРАНЕНИЯ В ОБЛАКО:", error);
-                console.error("🔴 Код ошибки:", error.code);
-                console.error("🔴 Сообщение:", error.message);
-                
-                // При ошибке сохранения показываем предупреждение и перезагружаем страницу
-                alert("Ошибка синхронизации! Проверьте сетевое подключение, иначе прогресс будет утерян.");
-                window.location.reload();
+                console.error("❌ ОШИБКА ОБЛАКА: Данные не записались на сервер!", error);
+                console.error("❌ Код ошибки:", error.code);
+                console.error("❌ Сообщение:", error.message);
             });
         }
 
