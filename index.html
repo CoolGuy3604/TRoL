@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1366, initial-scale=1.0, minimum-scale=0.2, maximum-scale=1.0, user-scalable=yes, shrink-to-fit=no">
+    <meta name="viewport" content="width=1366, initial-scale=0.3, minimum-scale=0.1, maximum-scale=1.0, user-scalable=yes">
     <title>Симулятор кейсов | ЭЛИТНЫЙ ДИЗАЙН</title>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
     <style>
@@ -12,9 +12,7 @@
         }
 
         body {
-            background: #0a0f1e !important;
-            width: 100% !important;
-            min-height: 100vh !important;
+            background: linear-gradient(145deg, #0a0f1e 0%, #0c1222 100%);
             font-family: 'Segoe UI', Roboto, Arial, sans-serif;
             margin: 0;
             padding: 20px;
@@ -23,28 +21,6 @@
             justify-content: center;
             align-items: center;
             color: #eee;
-        }
-
-        .orientation-warning {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #0a0f1e;
-            z-index: 9999999;
-            color: #fff;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            font-family: sans-serif;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        @media (max-width: 1024px) and (orientation: portrait) {
-            .orientation-warning {
-                display: flex !important;
-            }
         }
 
         /* Стили окна входа/регистрации (ПРОЗРАЧНЫЙ ФОН) */
@@ -357,8 +333,6 @@
             width: 100%;
             z-index: 10;
             margin-left: -12px;
-            will-change: transform;
-            transform: translate3d(0,0,0);
         }
         
         .slot-cell {
@@ -879,15 +853,23 @@
             cursor: pointer;
             font-weight: bold;
         }
+
+        /* ЖЕСТКИЙ ПОСТОЯННЫЙ ПОВОРОТ ДЛЯ МОБИЛЬНЫХ (без проверки ориентации) */
+        @media (max-width: 1024px) {
+            body {
+                width: 100vh !important;
+                height: 100vw !important;
+                position: fixed !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) rotate(90deg) !important;
+                transform-origin: center center !important;
+                overflow: hidden !important;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="orientation-warning">
-        <div style="font-size: 5rem; margin-bottom: 20px;">🔄</div>
-        <div style="font-size: 2rem; font-weight: bold;">Пожалуйста, переверните телефон боком</div>
-        <div style="font-size: 1.2rem; color: #666; margin-top: 10px;">Для идеального отображения игры необходим горизонтальный режим.</div>
-    </div>
-
     <!-- ГЛОБАЛЬНЫЙ ВИДЕО-ФОН С ОТЛАДКОЙ -->
     <video autoplay muted loop playsinline id="globalVideoBg" style="position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: -100 !important; object-fit: cover !important; pointer-events: none !important;" oncanplay="console.log('🟢 Видео-фон готов к воспроизведению')" onerror="console.error('🔴 Ошибка загрузки видео-файла! Проверьте путь images/auth-bg.mp4')">
         <source src="images/auth-bg.mp4" type="video/mp4">
@@ -1445,7 +1427,6 @@
             isResultScreen = true;
         }
 
-        // ==================== ОРИГИНАЛЬНАЯ ФУНКЦИЯ startSpin (setTimeout) ====================
         async function startSpin(finalItem) {
             let win = document.getElementById("slotWindow");
             const SLOTS_COUNT = 7;
@@ -1971,6 +1952,7 @@
             
             sidePanel.style.borderColor = rarity.color;
             
+            // Жёсткое принудительное отображение модалки через setProperty с important
             modal.style.setProperty("display", "flex", "important");
             modal.style.setProperty("visibility", "visible", "important");
             modal.style.setProperty("opacity", "1", "important");
