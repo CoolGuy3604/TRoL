@@ -979,6 +979,7 @@
         const db = getDatabase(app);
 
         let currentUserUid = null;
+        let isDataLoaded = false; // Становится true только после успешного скачивания данных из Firebase
 
         // ==================== ЗВУКОВОЙ ДВИЖОК ====================
         const clickAudio = new Audio('click.mp3');
@@ -1109,6 +1110,11 @@
                 console.warn("⚠️ Нет авторизованного пользователя. Данные не сохранены.");
                 return;
             }
+            // ЗАЩИТА: Если данные из облака ещё не скачались в текущей сессии — запрещаем затирать базу нулями!
+            if (!isDataLoaded) {
+                console.warn("⚠️ Автосохранение заблокировано: данные профиля ещё не прогрузились из облака.");
+                return;
+            }
             
             console.log("🔄 Попытка сохранить данные в облако Firebase...");
             
@@ -1180,6 +1186,7 @@
                     };
                     console.log("🟡 Аккаунт новый, в облаке нет старых данных. Инициализированы дефолтные значения.");
                 }
+                isDataLoaded = true; // <--- ВЗВОДИМ ФЛАГ: теперь сохранять в базу разрешено!
                 updateUI();
                 updateStatsDisplay();
             } catch (error) {
@@ -1190,6 +1197,7 @@
                 console.log("🔴 Выполняется принудительный выход из-за ошибки сети...");
                 
                 currentUserUid = null;
+                isDataLoaded = false;
                 
                 try {
                     await auth.signOut();
@@ -2160,6 +2168,7 @@
                     loadData();
                 } else {
                     currentUserUid = null;
+                    isDataLoaded = false; // Сбрасываем флаг при выходе из аккаунта
                     console.log("👤 Пользователь не авторизован");
                     
                     document.querySelector(".app").style.display = "none";
@@ -2185,7 +2194,7 @@
                     .then((userCredential) => {
                         console.log("✅ Вход выполнен успешно!");
                         currentUserUid = userCredential.user.uid;
-                        loadData();
+                        // loadData() удалён отсюда — теперь загрузка происходит только в onAuthStateChanged
                     })
                     .catch(error => {
                         console.error("🔴 Детали ошибки входа:", error);
@@ -2228,7 +2237,7 @@
                     .then((userCredential) => {
                         console.log("✅ Регистрация выполнена успешно!");
                         currentUserUid = userCredential.user.uid;
-                        loadData();
+                        // loadData() удалён отсюда — теперь загрузка происходит только в onAuthStateChanged
                     })
                     .catch(error => {
                         console.error("🔴 Детали ошибки регистрации:", error);
