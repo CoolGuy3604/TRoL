@@ -286,23 +286,15 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 245px;
-            height: 245px;
+            width: 960px !important;
+            height: 720px !important;
             border: 3px solid #00ff66;
             border-radius: 28px;
             box-shadow: 0 0 30px rgba(0, 255, 102, 0.5);
+            z-index: 10 !important;
+            background: transparent !important;
             pointer-events: none;
-            z-index: 18;
-            background: rgba(0, 255, 102, 0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #00ff66;
-            text-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
-            backdrop-filter: blur(2px);
+            overflow: hidden;
         }
         
         .center-indicator {
@@ -846,6 +838,9 @@
     </style>
 </head>
 <body>
+    <!-- ЭКСКЛЮЗИВНЫЙ ФОН ДЛЯ СТРАНИЦЫ АВТОРИЗАЦИИ -->
+    <div id="authCustomBg" style="position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: url('images/сифон') no-repeat center center !important; background-size: cover !important; z-index: -50 !important; display: block;"></div>
+    
     <div id="mobileBlocker" style="display: none; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: #0a0f1e !important; z-index: 999999999 !important; justify-content: center !important; align-items: center !important; box-sizing: border-box !important;">
         <div id="blockerSmile" style="font-size: min(35vw, 35vh) !important; line-height: 1 !important; user-select: none !important;"></div>
     </div>
@@ -900,9 +895,18 @@
                     <div class="arrow-top animate" id="arrowTop"></div>
                     <div class="arrow-bottom animate" id="arrowBottom"></div>
                     <div class="center-indicator"></div>
-                    <div class="center-highlight" id="centerHighlight">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
+                    <div class="center-highlight" id="centerHighlight"></div>
+                    
+                    <!-- Два скрытых предзагруженных видео под рамку -->
+                    <video id="videoA" muted loop playsinline preload="auto" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: none;">
+                        <source src="images/video1.mp4" type="video/mp4">
+                    </video>
+                    <video id="videoB" muted loop playsinline preload="auto" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: none;">
+                        <source src="images/video2.mp4" type="video/mp4">
+                    </video>
                 </div>
                 <button class="open-btn" id="openCaseBtn">ВРАЩАТЬ БАРАБАН</button>
+                <div id="rollVerdictBlock" style="display: none; width: 100% !important; border-radius: 80px !important; padding: 16px 42px !important; font-size: 1.6rem !important; font-weight: bold !important; text-align: center !important; margin: 20px 0 !important; box-sizing: border-box !important;"></div>
             </div>
             <div class="test-admin-panel">
                 <button onclick="window.testOpenCaseWithRarity('common')" style="background: #dee3f2; color: #000;">⚪ Common</button>
@@ -911,15 +915,6 @@
                 <button onclick="window.testOpenCaseWithRarity('epic')" style="background: #ff18ab; color: #fff;">🩷 Epic</button>
                 <button onclick="window.testOpenCaseWithRarity('mythic')" style="background: #ff1414; color: #fff;">🔴 Mythic</button>
                 <button onclick="window.testOpenCaseWithRarity('legendary')" style="background: #ffc800; color: #000;">🟡 Legendary</button>
-            </div>
-            <div class="stats-panel" id="statsPanel">
-                <div class="stat-item">📊 Открыто: 0</div>
-                <div class="stat-item">⚪ Обычных: 0 (0%)</div>
-                <div class="stat-item">🔵 Редких: 0 (0%)</div>
-                <div class="stat-item">🟣 Сверхредких: 0 (0%)</div>
-                <div class="stat-item">🩷 Эпических: 0 (0%)</div>
-                <div class="stat-item">🔴 Мифических: 0 (0%)</div>
-                <div class="stat-item">🟡 Легендарных: 0 (0%)</div>
             </div>
         </div>
 
@@ -949,6 +944,7 @@
             <div style="font-size: 1.1rem; font-weight: bold; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 4px;">Статистика предмета</div>
             <div class="modal-side-row" id="infoDateRow">📅 Дата получения: <strong>--</strong></div>
             <div class="modal-side-row" id="infoRollsRow">🎰 Круток потребовалось: <strong>--</strong></div>
+            <div class="modal-side-row" id="infoDuplicatesRow" style="font-size: 1rem; color: #eee; white-space: nowrap; display: none;">♻️ Количество повторов: <strong style="color: #ffffff !important;">--</strong></div>
         </div>
     </div>
 
@@ -975,7 +971,8 @@
         const db = getDatabase(app);
 
         let currentUserUid = null;
-        let isDataLoaded = false; // Становится true только после успешного скачивания данных из Firebase
+        let isDataLoaded = false;
+        let spinTextInterval = null;
 
         // ==================== ЗВУКОВОЙ ДВИЖОК ====================
         const clickAudio = new Audio('click.mp3');
@@ -1106,7 +1103,6 @@
                 console.warn("⚠️ Нет авторизованного пользователя. Данные не сохранены.");
                 return;
             }
-            // ЗАЩИТА: Если данные из облака ещё не скачались в текущей сессии — запрещаем затирать базу нулями!
             if (!isDataLoaded) {
                 console.warn("⚠️ Автосохранение заблокировано: данные профиля ещё не прогрузились из облака.");
                 return;
@@ -1182,9 +1178,8 @@
                     };
                     console.log("🟡 Аккаунт новый, в облаке нет старых данных. Инициализированы дефолтные значения.");
                 }
-                isDataLoaded = true; // <--- ВЗВОДИМ ФЛАГ: теперь сохранять в базу разрешено!
+                isDataLoaded = true;
                 updateUI();
-                updateStatsDisplay();
             } catch (error) {
                 console.error("🔴 КРИТИЧЕСКАЯ ОШИБКА ЗАГРУЗКИ:", error);
                 console.error("🔴 Код ошибки:", error.code);
@@ -1218,19 +1213,23 @@
         }
         
         function addItem(item) {
-            if (!hasItem(item.id)) {
+            const invRecord = inventory.find(i => i.id === item.id);
+            if (!invRecord) {
                 const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
                 const dateStr = `${formatter.format(new Date())}`;
-                const personalRolls = extendedStats.itemRollCounters[item.id] || 1;
                 inventory.push({ 
                     id: item.id, 
                     date: dateStr,
-                    rollsToDrop: personalRolls
+                    rollsToDrop: extendedStats.itemRollCounters[item.id] || 1,
+                    duplicatesCount: 0
                 });
                 saveData();
                 return true;
+            } else {
+                invRecord.duplicatesCount = (invRecord.duplicatesCount || 0) + 1;
+                saveData();
+                return false;
             }
-            return false;
         }
         
         function getCollected() { 
@@ -1345,7 +1344,7 @@
         
         function showCenterHighlight() {
             const centerHighlight = document.getElementById('centerHighlight');
-            if (centerHighlight) centerHighlight.style.display = 'flex';
+            if (centerHighlight) centerHighlight.style.display = 'block';
         }
         
         function resetToInitialState() {
@@ -1356,7 +1355,13 @@
                 <div class="arrow-top animate" id="arrowTop"></div>
                 <div class="arrow-bottom animate" id="arrowBottom"></div>
                 <div class="center-indicator"></div>
-                <div class="center-highlight" id="centerHighlight">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
+                <div class="center-highlight" id="centerHighlight"></div>
+                <video id="videoA" muted loop playsinline preload="auto" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: none;">
+                    <source src="images/video1.mp4" type="video/mp4">
+                </video>
+                <video id="videoB" muted loop playsinline preload="auto" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: none;">
+                    <source src="images/video2.mp4" type="video/mp4">
+                </video>
             `;
             
             refreshOpenButtonText();
@@ -1368,6 +1373,11 @@
             startArrowsAnimation();
             removeArrowsSpinning();
             showCenterHighlight();
+            
+            document.getElementById("rollVerdictBlock").style.display = "none";
+            
+            // Перезапускаем видео-движок
+            restartVideoEngine();
         }
 
         function showResult(item, isNew) {
@@ -1378,12 +1388,12 @@
             let color = item.rarityKey === 'common' ? '#333333' : rarity.color;
             
             hideArrows();
-            hideCenterHighlight();
             
             let rarityName = getRarityName(item.rarityKey).toUpperCase();
             
             let content = `
                 <div class="center-indicator"></div>
+                <div class="center-highlight" id="centerHighlight"></div>
                 <div class="final-container">
                     <div class="final-item ${isNew ? 'rarity-common' : rarityClass}">
                         ${isNew ? `<div class="new-rarity-title" style="--rarity-color: ${color};">${rarityName}!</div>` : ''}
@@ -1392,9 +1402,18 @@
                         <div class="rarity-badge ${textClass}">${rarity.name}</div>
                     </div>
                 </div>
+                <video id="videoA" muted loop playsinline preload="auto" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: none;">
+                    <source src="images/video1.mp4" type="video/mp4">
+                </video>
+                <video id="videoB" muted loop playsinline preload="auto" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: none;">
+                    <source src="images/video2.mp4" type="video/mp4">
+                </video>
             `;
             
             win.innerHTML = content;
+            
+            // Перезапускаем видео-движок после обновления DOM
+            setTimeout(() => restartVideoEngine(), 100);
             
             let flash = document.createElement('div');
             flash.style.position = 'absolute';
@@ -1458,8 +1477,22 @@
                     `;
                 }
                 html += `</div>`;
-                win.innerHTML = `<div class="arrow-top spinning" id="arrowTop"></div><div class="arrow-bottom spinning" id="arrowBottom"></div><div class="center-indicator"></div>${html}`;
-                hideCenterHighlight();
+                win.innerHTML = `
+                    <div class="arrow-top spinning" id="arrowTop"></div>
+                    <div class="arrow-bottom spinning" id="arrowBottom"></div>
+                    <div class="center-indicator"></div>
+                    <div class="center-highlight" id="centerHighlight"></div>
+                    ${html}
+                    <video id="videoA" muted loop playsinline preload="auto" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: none;">
+                        <source src="images/video1.mp4" type="video/mp4">
+                    </video>
+                    <video id="videoB" muted loop playsinline preload="auto" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: none;">
+                        <source src="images/video2.mp4" type="video/mp4">
+                    </video>
+                `;
+                
+                // Перезапускаем видео-движок после обновления DOM
+                setTimeout(() => restartVideoEngine(), 50);
             }
             
             renderSlots();
@@ -1510,7 +1543,7 @@
             });
         }
 
-        // ==================== ФУНКЦИЯ openCase С ЗАЩИТОЙ ОТ UNDEFINED ====================
+        // ==================== ФУНКЦИЯ openCase ====================
         async function openCase() {
             let btn = document.getElementById("openCaseBtn");
             if (isSpinning || btn.disabled) return;
@@ -1546,7 +1579,14 @@
             removeGlow();
             stopArrowsAnimation();
             setArrowsSpinning();
-            hideCenterHighlight();
+            
+            // Анимация точек на кнопке
+            let dotCount = 0;
+            clearInterval(spinTextInterval);
+            spinTextInterval = setInterval(() => {
+                dotCount = (dotCount + 1) % 4;
+                btn.textContent = "БАРАБАН ВРАЩАЕТСЯ" + ".".repeat(dotCount);
+            }, 300);
             
             let won = getRandomItem();
             let isNew = !hasItem(won.id);
@@ -1599,47 +1639,29 @@
             else if (won.rarityKey === 'mythic') stats.mythic++;
             else if (won.rarityKey === 'legendary') stats.legendary++;
             saveStats();
-            updateStatsDisplay();
             
             updateUI();
             
-            if (isNew) {
-                btn.textContent = "🎉 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🎉";
-            } else {
-                btn.textContent = "💤 ПОВТОР 💤";
-            }
+            clearInterval(spinTextInterval);
+            btn.textContent = "ВЕРНУТЬСЯ НАЗАД";
             btn.disabled = false;
             isSpinning = false;
-        }
-
-        function updateStatsDisplay() {
-            const panel = document.getElementById('statsPanel');
-            if (panel && stats.total > 0) {
-                const commonPercent = (stats.common / stats.total * 100).toFixed(1);
-                const rarePercent = (stats.rare / stats.total * 100).toFixed(1);
-                const superRarePercent = (stats.superRare / stats.total * 100).toFixed(1);
-                const epicPercent = (stats.epic / stats.total * 100).toFixed(1);
-                const mythicPercent = (stats.mythic / stats.total * 100).toFixed(1);
-                const legendaryPercent = (stats.legendary / stats.total * 100).toFixed(1);
-                panel.innerHTML = `
-                    <div class="stat-item">📊 Открыто: ${stats.total}</div>
-                    <div class="stat-item">⚪ Обычных: ${stats.common} (${commonPercent}%)</div>
-                    <div class="stat-item">🔵 Редких: ${stats.rare} (${rarePercent}%)</div>
-                    <div class="stat-item">🟣 Сверхредких: ${stats.superRare} (${superRarePercent}%)</div>
-                    <div class="stat-item">🩷 Эпических: ${stats.epic} (${epicPercent}%)</div>
-                    <div class="stat-item">🔴 Мифических: ${stats.mythic} (${mythicPercent}%)</div>
-                    <div class="stat-item">🟡 Легендарных: ${stats.legendary} (${legendaryPercent}%)</div>
-                `;
-            } else if (panel && stats.total === 0) {
-                panel.innerHTML = `
-                    <div class="stat-item">📊 Открыто: 0</div>
-                    <div class="stat-item">⚪ Обычных: 0 (0%)</div>
-                    <div class="stat-item">🔵 Редких: 0 (0%)</div>
-                    <div class="stat-item">🟣 Сверхредких: 0 (0%)</div>
-                    <div class="stat-item">🩷 Эпических: 0 (0%)</div>
-                    <div class="stat-item">🔴 Мифических: 0 (0%)</div>
-                    <div class="stat-item">🟡 Легендарных: 0 (0%)</div>
-                `;
+            
+            // Вывод плашки вердикта
+            const verdictBlock = document.getElementById("rollVerdictBlock");
+            if (verdictBlock) {
+                if (!isNew) {
+                    const arr = verdictTexts.duplicate;
+                    verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
+                    verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: monospace !important; letter-spacing: 3px !important; box-shadow: 0 8px 0 #009933 !important; text-transform: uppercase !important;";
+                } else {
+                    const arr = verdictTexts[won.rarityKey] || verdictTexts.common;
+                    const rarityColor = getItemRarity(won).color;
+                    const textColor = won.rarityKey === "common" ? "#000000" : "#ffffff";
+                    
+                    verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
+                    verdictBlock.style.cssText = `display: block !important; background: ${rarityColor} !important; color: ${textColor} !important; font-family: inherit !important; letter-spacing: 1px !important; box-shadow: 0 8px 0 ${hexToRgba(rarityColor, 0.5)} !important;`;
+                }
             }
         }
 
@@ -1667,7 +1689,6 @@
                 let isFirstInv = true;
                 
                 rarityOrder.forEach(key => {
-                    // Сортируем предметы по порядку их реального добавления в массив inventory (от старых к новым)
                     let itemsInRarity = collected.filter(i => i.rarityKey === key).sort((a, b) => {
                         const indexA = inventory.findIndex(inv => inv.id === a.id);
                         const indexB = inventory.findIndex(inv => inv.id === b.id);
@@ -1732,7 +1753,6 @@
                 let isFirstColl = true;
                 
                 rarityOrder.forEach(key => {
-                    // Сортируем отсутствующие предметы строго по алфавиту от А до Я
                     let missingInRarity = missing.filter(i => i.rarityKey === key).sort((a, b) => a.name.localeCompare(b.name));
                     
                     if (missingInRarity.length > 0) {
@@ -1768,7 +1788,6 @@
                                 <div class="badge ${textClass}">${rarity.name}</div>
                             `;
                             
-                            // Защита от перетаскивания и правого клика
                             card.addEventListener('contextmenu', e => e.preventDefault());
                             card.addEventListener('dragstart', e => e.preventDefault());
                             
@@ -1931,6 +1950,7 @@
             const sidePanel = document.getElementById("modalSidePanel");
             const infoDate = document.getElementById("infoDateRow");
             const infoRolls = document.getElementById("infoRollsRow");
+            const infoDup = document.getElementById("infoDuplicatesRow");
             
             let rarity = getItemRarity(item);
             let rarityClass = getRarityClass(item.rarityKey);
@@ -1947,11 +1967,17 @@
                 let cleanDate = invRecord.date ? invRecord.date.replace("Дата получения: ", "") : "--";
                 infoDate.innerHTML = `📅 Дата получения: <strong>${cleanDate}</strong>`;
                 infoRolls.innerHTML = `🎰 Круток потребовалось: <strong>${invRecord.rollsToDrop || "Неизвестно"}</strong>`;
+                
+                if (invRecord.duplicatesCount && invRecord.duplicatesCount > 0) {
+                    infoDup.innerHTML = `♻️ Количество повторов: <strong style="color: #ffffff !important;">${invRecord.duplicatesCount}</strong>`;
+                    infoDup.style.display = "block";
+                } else {
+                    infoDup.style.display = "none";
+                }
             }
             
             sidePanel.style.borderColor = rarity.color;
             
-            // Жёсткое принудительное отображение модалки через setProperty с important
             modal.style.setProperty("display", "flex", "important");
             modal.style.setProperty("visibility", "visible", "important");
             modal.style.setProperty("opacity", "1", "important");
@@ -2009,7 +2035,14 @@
             removeGlow();
             stopArrowsAnimation();
             setArrowsSpinning();
-            hideCenterHighlight();
+            
+            // Анимация точек на кнопке
+            let dotCount = 0;
+            clearInterval(spinTextInterval);
+            spinTextInterval = setInterval(() => {
+                dotCount = (dotCount + 1) % 4;
+                btn.textContent = "БАРАБАН ВРАЩАЕТСЯ" + ".".repeat(dotCount);
+            }, 300);
             
             let isNew = !hasItem(won.id);
             
@@ -2056,17 +2089,30 @@
             stats.total++;
             stats[won.rarityKey]++;
             saveStats();
-            updateStatsDisplay();
             
             updateUI();
             
-            if (isNew) {
-                btn.textContent = "🎉 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🎉";
-            } else {
-                btn.textContent = "💤 ПОВТОР 💤";
-            }
+            clearInterval(spinTextInterval);
+            btn.textContent = "ВЕРНУТЬСЯ НАЗАД";
             btn.disabled = false;
             isSpinning = false;
+            
+            // Вывод плашки вердикта
+            const verdictBlock = document.getElementById("rollVerdictBlock");
+            if (verdictBlock) {
+                if (!isNew) {
+                    const arr = verdictTexts.duplicate;
+                    verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
+                    verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: monospace !important; letter-spacing: 3px !important; box-shadow: 0 8px 0 #009933 !important; text-transform: uppercase !important;";
+                } else {
+                    const arr = verdictTexts[won.rarityKey] || verdictTexts.common;
+                    const rarityColor = getItemRarity(won).color;
+                    const textColor = won.rarityKey === "common" ? "#000000" : "#ffffff";
+                    
+                    verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
+                    verdictBlock.style.cssText = `display: block !important; background: ${rarityColor} !important; color: ${textColor} !important; font-family: inherit !important; letter-spacing: 1px !important; box-shadow: 0 8px 0 ${hexToRgba(rarityColor, 0.5)} !important;`;
+                }
+            }
         }
 
         async function resetGame() {
@@ -2089,7 +2135,6 @@
                 }
                 resetToInitialState();
                 updateUI();
-                updateStatsDisplay();
             }
         }
 
@@ -2099,7 +2144,7 @@
         function refreshOpenButtonText() {
             const btn = document.getElementById("openCaseBtn");
             if (!btn) return;
-            if (Math.random() < 0.01) { // Теперь шанс строго 1%! Кастомная фраза станет редкой пасхалкой
+            if (Math.random() < 0.01) {
                 const randomPhrase = randomBtnTexts[Math.floor(Math.random() * randomBtnTexts.length)];
                 btn.textContent = randomPhrase;
             } else {
@@ -2107,6 +2152,79 @@
             }
         }
         window.refreshOpenButtonText = refreshOpenButtonText;
+
+        // ==================== МАССИВЫ ВЕРДИКТОВ ====================
+        const verdictTexts = {
+            common: ["🙂 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🙂", "🙃 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🙃", "😉 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😉", "😙 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😙", "☺️ НОВЫЙ ПРЕДМЕТ! УР-РАА!! ☺️", "😌 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😌", "😊 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😊", "😁 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😁", "😜 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😜"],
+            rare: ["👍 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 👍", "🤘 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤘", "🤞 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤞", "💪 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💪", "🦾 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🦾", "🤜 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤛"],
+            superRare: ["❤️ НОВЫЙ ПРЕДМЕТ! УР-РАА!! ❤️", "🧡 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🧡", "💛 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💛", "💚 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💚", "💙 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💙", "🤎 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤎", "🖤 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🖤", "🤍 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤍"],
+            epic: ["🤩 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤩", "😍 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😍", "😻 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😻", "🤑 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤑"],
+            mythic: ["😱 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😱", "😲 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😲", "🙀 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🙀", "🤯 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤯", "😨 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😨"],
+            legendary: ["🥵 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🥵", "😵 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😵", "🔥 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🔥", "🙊 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🙊", "⚰️ НОВЫЙ ПРЕДМЕТ! УР-РАА!! ⚰️", "💀 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💀", "🎷 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🎷", "💕 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💕", "🐠 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🐠", "👑 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 👑", "🧿 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🧿"],
+            duplicate: ["😔 ПОВТОР 😔", "😂 ПОВТОР 😂", "🤣 ПОВТОР 🤣", "😒 ПОВТОР 😒", "🙄 ПОВТОР 🙄", "😴 ПОВТОР 😴", "😕 ПОВТОР 😕", "🙁 ПОВТОР 🙁", "☹️ ПОВТОР ☹️", "😢 ПОВТОР 😢", "😞 ПОВТОР 😞", "😩 ПОВТОР 😩", "🥱 ПОВТОР 🥱", "😤 ПОВТОР 😤", "😡 ПОВТОР 😡", "😠 ПОВТОР 😠", "🤬 ПОВТОР 🤬", "😣 ПОВТОР 😣", "💩 ПОВТОР 💩", "😹 ПОВТОР 😹", "💢 ПОВТОР 💢", "🗿 ПОВТОР 🗿", "😾 ПОВТОР 😾", "🗑️ ПОВТОР 🗑️", "🆒 ПОВТОР 🆒", "💤 ПОВТОР 💤", "👎 ПОВТОР 👎", "🤡 ПОВТОР 🤡", "🤔 ПОВТОР 🤔", "👏 ПОВТОР 👏", "😭 ПОВТОР 😭", "🤦‍♂️ ПОВТОР 🤦‍♂️", "🤦‍♀️ ПОВТОР 🤦‍♀️", "😪 ПОВТОР 😪", "😛 ПОВТОР 😛", "💅 ПОВТОР 💅", "💔 ПОВТОР 💔", "🕯️ ПОВТОР 🕯️"]
+        };
+
+        // ==================== ВИДЕО-ДВИЖОК ====================
+        function restartVideoEngine() {
+            const vA = document.getElementById("videoA");
+            const vB = document.getElementById("videoB");
+            if (vA && vB) {
+                // Останавливаем все текущие воспроизведения
+                vA.pause();
+                vB.pause();
+                vA.style.display = "none";
+                vB.style.display = "none";
+                
+                // Запускаем случайный порядок
+                if (Math.random() < 0.5) {
+                    console.log("🎬 Активирован кинематографический Порядок №1");
+                    runOrder1();
+                } else {
+                    console.log("🎬 Активирован кинематографический Порядок №2");
+                    runOrder2();
+                }
+            }
+        }
+
+        function runOrder1() {
+            const vA = document.getElementById("videoA");
+            const vB = document.getElementById("videoB");
+            if (!vA || !vB) return;
+            
+            vB.style.display = "none";
+            vB.pause();
+            vA.style.display = "block";
+            vA.currentTime = 0;
+            vA.play().catch(() => {});
+            vA.onended = () => {
+                vA.style.display = "none";
+                vA.pause();
+                vB.style.display = "block";
+                vB.currentTime = 0;
+                vB.play().catch(() => {});
+                vB.onended = runOrder1;
+            };
+        }
+
+        function runOrder2() {
+            const vA = document.getElementById("videoA");
+            const vB = document.getElementById("videoB");
+            if (!vA || !vB) return;
+            
+            vA.style.display = "none";
+            vA.pause();
+            vB.style.display = "block";
+            vB.currentTime = 0;
+            vB.play().catch(() => {});
+            vB.onended = () => {
+                vB.style.display = "none";
+                vB.pause();
+                vA.style.display = "block";
+                vA.currentTime = 0;
+                vA.play().catch(() => {});
+                vA.onended = runOrder2;
+            };
+        }
 
         // ==================== ЭКСПОРТ В ГЛОБАЛЬНЫЙ ОБЪЕКТ WINDOW ====================
         window.testOpenCaseWithRarity = testOpenCaseWithRarity;
@@ -2122,15 +2240,15 @@
             const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 1024);
 
             if (isMobileDevice) {
-                // Полностью скрываем и изолируем ПК-элементы интерфейса
                 const appEl = document.querySelector(".app");
                 const authEl = document.getElementById("authOverlay");
                 const videoEl = document.getElementById("globalVideoBg");
+                const customBg = document.getElementById("authCustomBg");
                 if (appEl) appEl.style.setProperty("display", "none", "important");
                 if (authEl) authEl.style.setProperty("display", "none", "important");
                 if (videoEl) videoEl.style.setProperty("display", "none", "important");
+                if (customBg) customBg.style.setProperty("display", "none", "important");
                 
-                // Выбираем случайный смайл и выводим заглушку на весь экран
                 const randomSmile = mobileSmiles[Math.floor(Math.random() * mobileSmiles.length)];
                 const blocker = document.getElementById("mobileBlocker");
                 const smileDiv = document.getElementById("blockerSmile");
@@ -2138,7 +2256,7 @@
                     smileDiv.innerText = randomSmile;
                     blocker.style.setProperty("display", "flex", "important");
                 }
-                return; // Полностью прерываем дальнейшую инициализацию JS на телефонах
+                return;
             }
             
             console.log("🚀 DOM полностью загружен, инициализация...");
@@ -2151,6 +2269,7 @@
             const passwordInput = document.getElementById("authPassword");
             const errorDiv = document.getElementById("authError");
             const videoBg = document.getElementById("globalVideoBg");
+            const customBg = document.getElementById("authCustomBg");
             
             const inventoryGrid = document.getElementById("inventoryGrid");
             if (inventoryGrid) {
@@ -2180,16 +2299,21 @@
                     document.querySelector(".app").style.display = "block";
                     document.getElementById("authOverlay").style.display = "none";
                     if (videoBg) videoBg.style.display = "none";
+                    if (customBg) customBg.style.display = "none";
                     
                     loadData();
+                    
+                    // Запускаем видео-движок после загрузки данных
+                    setTimeout(() => restartVideoEngine(), 500);
                 } else {
                     currentUserUid = null;
-                    isDataLoaded = false; // Сбрасываем флаг при выходе из аккаунта
+                    isDataLoaded = false;
                     console.log("👤 Пользователь не авторизован");
                     
                     document.querySelector(".app").style.display = "none";
                     document.getElementById("authOverlay").style.display = "flex";
                     if (videoBg) videoBg.style.display = "block";
+                    if (customBg) customBg.style.setProperty("display", "block", "important");
                 }
             });
 
@@ -2210,7 +2334,6 @@
                     .then((userCredential) => {
                         console.log("✅ Вход выполнен успешно!");
                         currentUserUid = userCredential.user.uid;
-                        // loadData() удалён отсюда — теперь загрузка происходит только в onAuthStateChanged
                     })
                     .catch(error => {
                         console.error("🔴 Детали ошибки входа:", error);
@@ -2253,7 +2376,6 @@
                     .then((userCredential) => {
                         console.log("✅ Регистрация выполнена успешно!");
                         currentUserUid = userCredential.user.uid;
-                        // loadData() удалён отсюда — теперь загрузка происходит только в onAuthStateChanged
                     })
                     .catch(error => {
                         console.error("🔴 Детали ошибки регистрации:", error);
@@ -2287,10 +2409,8 @@
 
             document.getElementById("resetProgressBtn").onclick = resetGame;
             
-            // Инициализация текста кнопки при старте
             refreshOpenButtonText();
             
-            // Кнопка прокрутки наверх
             const topBtn = document.getElementById("scrollToTopBtn");
             window.addEventListener("scroll", () => {
                 if (window.scrollY > 300) {
@@ -2303,7 +2423,6 @@
                 window.scrollTo({ top: 0, behavior: "smooth" });
             };
             
-            // Клавиатурный пробел для крутки
             window.addEventListener("keydown", (e) => {
                 if (e.code === "Space") {
                     const activeTabBtn = document.querySelector(".tab-btn.active");
@@ -2311,14 +2430,21 @@
                     const isUserTyping = document.activeElement.tagName === "INPUT";
                     
                     if (isCurrentlyInCaseTab && !isUserTyping) {
-                        e.preventDefault(); // Предотвращаем скролл страницы пробелом
+                        e.preventDefault();
                         const openBtn = document.getElementById("openCaseBtn");
                         if (openBtn && !openBtn.disabled) {
-                            openBtn.click(); // Симулируем клик по кнопке
+                            openBtn.click();
                         }
                     }
                 }
             });
+            
+            // Запускаем видео-движок при загрузке страницы (если уже авторизованы)
+            setTimeout(() => {
+                if (currentUserUid) {
+                    restartVideoEngine();
+                }
+            }, 1000);
             
             setInterval(() => {
                 if (currentUserUid && !isSpinning) {
