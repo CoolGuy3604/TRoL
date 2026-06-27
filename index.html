@@ -903,6 +903,8 @@
                     <div class="arrow-bottom animate" id="arrowBottom"></div>
                     <div class="center-indicator"></div>
                     <div class="center-highlight" id="centerHighlight">🐇🐈♾️</div>
+                    <!-- Изолированный контейнер для бегущей ленты скинов -->
+                    <div id="tapeContainer" style="width: 100%; display: flex; justify-content: center; z-index: 10;"></div>
                 </div>
                 <button class="open-btn" id="openCaseBtn">ВРАЩАТЬ БАРАБАН</button>
                 <div id="rollVerdictBlock" style="display: none; width: 100% !important; border-radius: 80px !important; padding: 16px 42px !important; font-size: 1.6rem !important; font-weight: bold !important; text-align: center !important; margin: 20px 0 !important; box-sizing: border-box !important;"></div>
@@ -1350,13 +1352,19 @@
             const win = document.getElementById("slotWindow");
             const btn = document.getElementById("openCaseBtn");
             const verdictBlock = document.getElementById("rollVerdictBlock");
+            const tape = document.getElementById("tapeContainer");
             
+            // Полностью очищаем ленту предметов после предыдущей крутки
+            if (tape) tape.innerHTML = "";
+            
+            // Восстанавливаем оригинальную разметку стрелок и индикаторов без пересоздания элементов
             if (win) {
                 win.innerHTML = `
                     <div class="arrow-top animate" id="arrowTop"></div>
                     <div class="arrow-bottom animate" id="arrowBottom"></div>
                     <div class="center-indicator"></div>
-                    <div class="center-highlight" id="centerHighlight">🐇🐈♾️</div>
+                    <div class="center-highlight" id="centerHighlight" style="display: flex !important;">🐇🐈♾️</div>
+                    <div id="tapeContainer" style="width: 100%; display: flex; justify-content: center; z-index: 10;"></div>
                 `;
             }
             
@@ -1394,6 +1402,7 @@
                         <div class="rarity-badge ${textClass}">${rarity.name}</div>
                     </div>
                 </div>
+                <div id="tapeContainer" style="width: 100%; display: flex; justify-content: center; z-index: 10;"></div>
             `;
             
             win.innerHTML = content;
@@ -1421,6 +1430,7 @@
 
         async function startSpin(finalItem) {
             let win = document.getElementById("slotWindow");
+            const tape = document.getElementById("tapeContainer");
             const SLOTS_COUNT = 7;
             const TOTAL_STEPS = 200;
             
@@ -1441,6 +1451,13 @@
             let currentStep = 0;
             let queueIndex = SLOTS_COUNT;
             
+            // При старте крутки гарантированно очищаем контейнер вердиктов и сбрасываем видимость элементов каркаса окна
+            const verdictBlock = document.getElementById("rollVerdictBlock");
+            if (verdictBlock) verdictBlock.style.setProperty("display", "none", "important");
+            
+            // Каркас окна НЕ перерисовывается, мы просто очищаем ленту перед стартом
+            if (tape) tape.innerHTML = "";
+            
             function renderSlots() {
                 let html = `<div class="slots-container">`;
                 for (let i = 0; i < SLOTS_COUNT; i++) {
@@ -1460,7 +1477,9 @@
                     `;
                 }
                 html += `</div>`;
-                win.innerHTML = `<div class="arrow-top spinning" id="arrowTop"></div><div class="arrow-bottom spinning" id="arrowBottom"></div><div class="center-indicator"></div>${html}`;
+                
+                // КРИТИЧЕСКИЙ ФИКС ЛАГОВ: обновляем ТОЛЬКО изолированную ленту! Стрелки и рамка не трогаются!
+                if (tape) tape.innerHTML = html;
             }
             
             renderSlots();
@@ -1477,17 +1496,11 @@
                     
                     const progress = currentStep / TOTAL_STEPS;
                     let delay;
-                    if (progress < 0.5) {
-                        delay = 12;
-                    } else if (progress < 0.75) {
-                        delay = 35;
-                    } else if (progress < 0.88) {
-                        delay = 90;
-                    } else if (progress < 0.95) {
-                        delay = 220;
-                    } else {
-                        delay = 500;
-                    }
+                    if (progress < 0.5) delay = 12;
+                    else if (progress < 0.75) delay = 35;
+                    else if (progress < 0.88) delay = 90;
+                    else if (progress < 0.95) delay = 220;
+                    else delay = 500;
                     
                     for (let i = 0; i < SLOTS_COUNT - 1; i++) {
                         currentItems[i] = currentItems[i + 1];
@@ -1506,7 +1519,6 @@
                     currentStep++;
                     setTimeout(step, delay);
                 }
-                
                 step();
             });
         }
