@@ -900,7 +900,6 @@
                     <div class="arrow-top animate" id="arrowTop"></div>
                     <div class="arrow-bottom animate" id="arrowBottom"></div>
                     <div class="center-indicator"></div>
-                    <div class="center-highlight" id="centerHighlight">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
                 </div>
                 <button class="open-btn" id="openCaseBtn">ВРАЩАТЬ БАРАБАН</button>
             </div>
@@ -1356,7 +1355,6 @@
                 <div class="arrow-top animate" id="arrowTop"></div>
                 <div class="arrow-bottom animate" id="arrowBottom"></div>
                 <div class="center-indicator"></div>
-                <div class="center-highlight" id="centerHighlight">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
             `;
             
             refreshOpenButtonText();
@@ -1367,7 +1365,6 @@
             
             startArrowsAnimation();
             removeArrowsSpinning();
-            showCenterHighlight();
         }
 
         function showResult(item, isNew) {
@@ -1378,7 +1375,6 @@
             let color = item.rarityKey === 'common' ? '#333333' : rarity.color;
             
             hideArrows();
-            hideCenterHighlight();
             
             let rarityName = getRarityName(item.rarityKey).toUpperCase();
             
@@ -1459,7 +1455,6 @@
                 }
                 html += `</div>`;
                 win.innerHTML = `<div class="arrow-top spinning" id="arrowTop"></div><div class="arrow-bottom spinning" id="arrowBottom"></div><div class="center-indicator"></div>${html}`;
-                hideCenterHighlight();
             }
             
             renderSlots();
@@ -1546,7 +1541,6 @@
             removeGlow();
             stopArrowsAnimation();
             setArrowsSpinning();
-            hideCenterHighlight();
             
             let won = getRandomItem();
             let isNew = !hasItem(won.id);
@@ -2009,7 +2003,6 @@
             removeGlow();
             stopArrowsAnimation();
             setArrowsSpinning();
-            hideCenterHighlight();
             
             let isNew = !hasItem(won.id);
             
@@ -2099,7 +2092,7 @@
         function refreshOpenButtonText() {
             const btn = document.getElementById("openCaseBtn");
             if (!btn) return;
-            if (Math.random() < 0.01) { // Теперь шанс строго 1%! Кастомная фраза станет редкой пасхалкой
+            if (Math.random() < 0.10) { // 10% шанс на кастомную фразу
                 const randomPhrase = randomBtnTexts[Math.floor(Math.random() * randomBtnTexts.length)];
                 btn.textContent = randomPhrase;
             } else {
