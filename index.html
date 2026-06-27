@@ -223,9 +223,7 @@
         
         .arrow-top {
             position: absolute;
-            top: 11px;
             left: 50%;
-            transform: translateX(-50%);
             width: 0;
             height: 0;
             border-left: 28px solid transparent;
@@ -234,6 +232,9 @@
             filter: drop-shadow(0 0 15px rgba(0, 255, 102, 0.9));
             z-index: 40;
             transition: all 0.3s ease;
+            /* ИГРОВОЙ ФИКС ЛАГОВ: Форсируем 3D рендеринг */
+            will-change: transform, opacity;
+            transform: translateX(-50%) translate3d(0,0,0) !important;
         }
         
         .arrow-top.animate {
@@ -247,9 +248,7 @@
         
         .arrow-bottom {
             position: absolute;
-            bottom: 11px;
             left: 50%;
-            transform: translateX(-50%);
             width: 0;
             height: 0;
             border-left: 28px solid transparent;
@@ -258,6 +257,9 @@
             filter: drop-shadow(0 0 15px rgba(0, 255, 102, 0.9));
             z-index: 40;
             transition: all 0.3s ease;
+            /* ИГРОВОЙ ФИКС ЛАГОВ: Форсируем 3D рендеринг */
+            will-change: transform, opacity;
+            transform: translateX(-50%) translate3d(0,0,0) !important;
         }
         
         .arrow-bottom.animate {
@@ -270,22 +272,21 @@
         }
         
         @keyframes arrowTopPulse {
-            0% { opacity: 0.8; transform: translateX(-50%) translateY(0px); }
-            50% { opacity: 1; transform: translateX(-50%) translateY(6px); }
-            100% { opacity: 0.8; transform: translateX(-50%) translateY(0px); }
+            0% { opacity: 0.8; transform: translateX(-50%) translateY(0px) translate3d(0,0,0); }
+            50% { opacity: 1; transform: translateX(-50%) translateY(6px) translate3d(0,0,0); }
+            100% { opacity: 0.8; transform: translateX(-50%) translateY(0px) translate3d(0,0,0); }
         }
         
         @keyframes arrowBottomPulse {
-            0% { opacity: 0.8; transform: translateX(-50%) translateY(0px); }
-            50% { opacity: 1; transform: translateX(-50%) translateY(-6px); }
-            100% { opacity: 0.8; transform: translateX(-50%) translateY(0px); }
+            0% { opacity: 0.8; transform: translateX(-50%) translateY(0px) translate3d(0,0,0); }
+            50% { opacity: 1; transform: translateX(-50%) translateY(-6px) translate3d(0,0,0); }
+            100% { opacity: 0.8; transform: translateX(-50%) translateY(0px) translate3d(0,0,0); }
         }
         
         .center-highlight {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
             width: 245px !important;
             height: 245px !important;
             border: 3px solid #00ff66;
@@ -302,6 +303,9 @@
             font-size: 3.2rem !important;
             line-height: 1 !important;
             box-sizing: border-box !important;
+            /* ИГРОВОЙ ФИКС ЛАГОВ */
+            will-change: transform;
+            transform: translate(-50%, -50%) translate3d(0,0,0) !important;
         }
         
         .center-indicator {
@@ -1343,31 +1347,32 @@
         
         function showCenterHighlight() {
             const centerHighlight = document.getElementById('centerHighlight');
-            if (centerHighlight) centerHighlight.style.display = 'block';
+            if (centerHighlight) centerHighlight.style.display = 'flex';
         }
         
         function resetToInitialState() {
             const win = document.getElementById("slotWindow");
             const btn = document.getElementById("openCaseBtn");
+            const verdictBlock = document.getElementById("rollVerdictBlock");
             
-            win.innerHTML = `
-                <div class="arrow-top animate" id="arrowTop"></div>
-                <div class="arrow-bottom animate" id="arrowBottom"></div>
-                <div class="center-indicator"></div>
-                <div class="center-highlight" id="centerHighlight">🐇🐈♾️</div>
-            `;
+            if (win) {
+                win.innerHTML = `
+                    <div class="arrow-top animate" id="arrowTop"></div>
+                    <div class="arrow-bottom animate" id="arrowBottom"></div>
+                    <div class="center-indicator"></div>
+                    <div class="center-highlight" id="centerHighlight" style="display: flex !important;">🐇🐈♾️</div>
+                `;
+            }
             
-            refreshOpenButtonText();
-            btn.disabled = false;
+            if (verdictBlock) verdictBlock.style.setProperty("display", "none", "important");
+            
             isResultScreen = false;
             isSpinning = false;
             removeGlow();
             
             startArrowsAnimation();
             removeArrowsSpinning();
-            showCenterHighlight();
-            
-            document.getElementById("rollVerdictBlock").style.display = "none";
+            refreshOpenButtonText();
         }
 
         function showResult(item, isNew) {
@@ -1458,13 +1463,7 @@
                     `;
                 }
                 html += `</div>`;
-                win.innerHTML = `
-                    <div class="arrow-top spinning" id="arrowTop"></div>
-                    <div class="arrow-bottom spinning" id="arrowBottom"></div>
-                    <div class="center-indicator"></div>
-                    <div class="center-highlight" id="centerHighlight">🐇🐈♾️</div>
-                    ${html}
-                `;
+                win.innerHTML = `<div class="arrow-top spinning" id="arrowTop"></div><div class="arrow-bottom spinning" id="arrowBottom"></div><div class="center-indicator"></div><div class="center-highlight" id="centerHighlight" style="display: none !important;">🐇🐈♾️</div>${html}`;
             }
             
             renderSlots();
@@ -1520,6 +1519,10 @@
             let btn = document.getElementById("openCaseBtn");
             if (isSpinning || btn.disabled) return;
             
+            // Скрываем рамку при старте
+            const targetHighlight = document.getElementById("centerHighlight");
+            if (targetHighlight) targetHighlight.style.setProperty("display", "none", "important");
+            
             if (!extendedStats) extendedStats = {};
             if (!extendedStats.dailyCalendar) extendedStats.dailyCalendar = {};
             if (!extendedStats.itemRollCounters) extendedStats.itemRollCounters = {};
@@ -1551,9 +1554,6 @@
             removeGlow();
             stopArrowsAnimation();
             setArrowsSpinning();
-            
-            // Скрываем рамку во время крутки
-            document.getElementById("centerHighlight").style.display = "none";
             
             // Анимация точек на кнопке
             let dotCount = 0;
@@ -1971,6 +1971,10 @@
             let btn = document.getElementById("openCaseBtn");
             if (isSpinning || btn.disabled) return;
             
+            // Скрываем рамку при старте
+            const targetHighlight = document.getElementById("centerHighlight");
+            if (targetHighlight) targetHighlight.style.setProperty("display", "none", "important");
+            
             if (!extendedStats) extendedStats = {};
             if (!extendedStats.dailyCalendar) extendedStats.dailyCalendar = {};
             if (!extendedStats.itemRollCounters) extendedStats.itemRollCounters = {};
@@ -2010,9 +2014,6 @@
             removeGlow();
             stopArrowsAnimation();
             setArrowsSpinning();
-            
-            // Скрываем рамку во время крутки
-            document.getElementById("centerHighlight").style.display = "none";
             
             // Анимация точек на кнопке
             let dotCount = 0;
