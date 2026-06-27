@@ -585,16 +585,6 @@
             transform: none;
         }
         
-        .result-area {
-            background: #00000099;
-            border-radius: 32px;
-            padding: 16px;
-            margin-top: 16px;
-            font-size: 1rem;
-            font-weight: bold;
-            text-align: center;
-        }
-
         .items-grid {
             display: flex;
             flex-wrap: wrap;
@@ -671,24 +661,14 @@
         .celebration {
             text-align: center;
             padding: 60px 20px;
-            background: linear-gradient(135deg, #00ff66, #00cc44);
             border-radius: 48px;
             color: #1e1e2a;
-            animation: party 1s infinite alternate;
-        }
-        @keyframes party {
-            from { transform: scale(1); background: #00ff66; }
-            to { transform: scale(1.02); background: #00cc44; }
+            background: #00cc44 !important;
+            animation: none !important;
         }
         .celebration h1 {
             font-size: 3rem;
             margin: 0;
-        }
-        footer {
-            font-size: 0.7rem;
-            text-align: center;
-            margin-top: 28px;
-            opacity: 0.5;
         }
         
         .stats-panel {
@@ -851,9 +831,24 @@
             cursor: pointer;
             font-weight: bold;
         }
+
+        /* Стиль для кнопки прокрутки */
+        #scrollToTopBtn {
+            transition: all 0.3s ease;
+        }
+        #scrollToTopBtn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(0,255,102,0.6) !important;
+        }
+        #scrollToTopBtn:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body>
+    <!-- ЭКСКЛЮЗИВНЫЙ ФОН ДЛЯ СТРАНИЦЫ АВТОРИЗАЦИИ -->
+    <div id="authCustomBg" style="position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: url('images/sifon.png') no-repeat center center !important; background-size: cover !important; z-index: -50 !important; display: block;"></div>
+
     <div id="mobileBlocker" style="display: none; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: #0a0f1e !important; z-index: 999999999 !important; justify-content: center !important; align-items: center !important; box-sizing: border-box !important;">
         <div id="blockerSmile" style="font-size: min(35vw, 35vh) !important; line-height: 1 !important; user-select: none !important;"></div>
     </div>
@@ -910,13 +905,9 @@
                     <div class="center-indicator"></div>
                     <div class="center-highlight" id="centerHighlight">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
                 </div>
-                <button class="open-btn" id="openCaseBtn">🔓 ОТКРЫТЬ КЕЙС 🔓</button>
-                <div class="result-area" id="rollResult">✨ Готов к крутке? Жми на кнопку! ✨</div>
-            </div>
-            <div class="stats">
-                <span>💰 Уникальных предметов: <strong id="totalItemsCount">0</strong></span>
-                <span>⭐ Осталось выбить: <strong id="remainingCount">0</strong></span>
-                <button class="small-reset" id="resetProgressBtn">♻️ Сбросить прогресс</button>
+                <button class="open-btn" id="openCaseBtn">ВРАЩАТЬ БАРАБАН</button>
+                <!-- ПЛАШКА ВЕРДИКТОВ (ПОД КНОПКОЙ) -->
+                <div id="rollVerdictBlock" style="display: none; width: 100% !important; border-radius: 80px !important; padding: 16px 42px !important; font-size: 1.6rem !important; font-weight: bold !important; text-align: center !important; margin: 20px 0 !important; box-sizing: border-box !important;"></div>
             </div>
             <div class="test-admin-panel">
                 <button onclick="window.testOpenCaseWithRarity('common')" style="background: #dee3f2; color: #000;">⚪ Common</button>
@@ -925,15 +916,6 @@
                 <button onclick="window.testOpenCaseWithRarity('epic')" style="background: #ff18ab; color: #fff;">🩷 Epic</button>
                 <button onclick="window.testOpenCaseWithRarity('mythic')" style="background: #ff1414; color: #fff;">🔴 Mythic</button>
                 <button onclick="window.testOpenCaseWithRarity('legendary')" style="background: #ffc800; color: #000;">🟡 Legendary</button>
-            </div>
-            <div class="stats-panel" id="statsPanel">
-                <div class="stat-item">📊 Открыто: 0</div>
-                <div class="stat-item">⚪ Обычных: 0 (0%)</div>
-                <div class="stat-item">🔵 Редких: 0 (0%)</div>
-                <div class="stat-item">🟣 Сверхредких: 0 (0%)</div>
-                <div class="stat-item">🩷 Эпических: 0 (0%)</div>
-                <div class="stat-item">🔴 Мифических: 0 (0%)</div>
-                <div class="stat-item">🟡 Легендарных: 0 (0%)</div>
             </div>
         </div>
 
@@ -946,10 +928,9 @@
         </div>
 
         <div id="statsTab" class="tab-content">
+            <button class="small-reset" id="resetProgressBtn" style="margin-bottom: 15px;">♻️ Сбросить прогресс</button>
             <div class="stats-panel-rows" id="globalStatsContainer" style="display: flex; flex-direction: column; gap: 20px; padding: 20px 10px; font-size: 1.15rem; color: #fff;"></div>
         </div>
-        
-        <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
     </div>
 
     <div id="descModal" class="modal-overlay" onclick="window.closeItemDescription()">
@@ -964,8 +945,12 @@
             <div style="font-size: 1.1rem; font-weight: bold; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 4px;">Статистика предмета</div>
             <div class="modal-side-row" id="infoDateRow">📅 Дата получения: <strong>--</strong></div>
             <div class="modal-side-row" id="infoRollsRow">🎰 Круток потребовалось: <strong>--</strong></div>
+            <div class="modal-side-row" id="infoDuplicatesRow" style="font-size: 1rem; color: #eee; white-space: nowrap; display: none;">♻️ Количество повторов: <strong style="color: #ffffff !important;">--</strong></div>
         </div>
     </div>
+
+    <!-- Кнопка прокрутки наверх -->
+    <button id="scrollToTopBtn" style="display: none; position: fixed !important; bottom: 30px !important; right: 30px !important; width: 60px !important; height: 60px !important; border-radius: 50% !important; background: radial-gradient(circle, #00ff66, #00cc44) !important; border: none !important; color: #1e1e2a !important; font-size: 2rem !important; font-weight: bold !important; cursor: pointer !important; z-index: 99999 !important; box-shadow: 0 4px 15px rgba(0,255,102,0.4) !important; justify-content: center !important; align-items: center !important;">↑</button>
 
     <script type="module">
         // ==================== ПОДКЛЮЧЕНИЕ FIREBASE ====================
@@ -987,7 +972,7 @@
         const db = getDatabase(app);
 
         let currentUserUid = null;
-        let isDataLoaded = false; // Становится true только после успешного скачивания данных из Firebase
+        let isDataLoaded = false;
 
         // ==================== ЗВУКОВОЙ ДВИЖОК ====================
         const clickAudio = new Audio('click.mp3');
@@ -1095,6 +1080,7 @@
         let currentGlow = null;
         let stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
         let isResultScreen = false;
+        let spinTextInterval = null;
 
         let extendedStats = {
             totalRollsEver: 0,
@@ -1112,13 +1098,23 @@
             itemRollCounters: {}
         };
 
+        // ==================== МАССИВЫ ТЕКСТОВ СО СМАЙЛИКАМИ ====================
+        const verdictTexts = {
+            common: ["🙂 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🙂", "🙃 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🙃", "😉 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😉", "😙 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😙", "☺️ НОВЫЙ ПРЕДМЕТ! УР-РАА!! ☺️", "😌 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😌", "😊 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😊", "😁 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😁", "😜 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😜"],
+            rare: ["👍 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 👍", "🤘 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤘", "🤞 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤞", "💪 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💪", "🦾 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🦾", "🤜 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤛"],
+            superRare: ["❤️ НОВЫЙ ПРЕДМЕТ! УР-РАА!! ❤️", "🧡 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🧡", "💛 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💛", "💚 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💚", "💙 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💙", "🤎 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤎", "🖤 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🖤", "🤍 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤍"],
+            epic: ["🤩 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤩", "😍 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😍", "😻 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😻", "🤑 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤑"],
+            mythic: ["😱 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😱", "😲 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😲", "🙀 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🙀", "🤯 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤯", "😨 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😨"],
+            legendary: ["🥵 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🥵", "😵 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😵", "🔥 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🔥", "🙊 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🙊", "⚰️ НОВЫЙ ПРЕДМЕТ! УР-РАА!! ⚰️", "💀 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💀", "🎷 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🎷", "💕 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💕", "🐠 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🐠", "👑 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 👑", "🧿 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🧿"],
+            duplicate: ["😔 ПОВТОР 😔", "😂 ПОВТОР 😂", "🤣 ПОВТОР 🤣", "😒 ПОВТОР 😒", "🙄 ПОВТОР 🙄", "😴 ПОВТОР 😴", "😕 ПОВТОР 😕", "🙁 ПОВТОР 🙁", "☹️ ПОВТОР ☹️", "😢 ПОВТОР 😢", "😞 ПОВТОР 😞", "😩 ПОВТОР 😩", "🥱 ПОВТОР 🥱", "😤 ПОВТОР 😤", "😡 ПОВТОР 😡", "😠 ПОВТОР 😠", "🤬 ПОВТОР 🤬", "😣 ПОВТОР 😣", "💩 ПОВТОР 💩", "😹 ПОВТОР 😹", "💢 ПОВТОР 💢", "🗿 ПОВТОР 🗿", "😾 ПОВТОР 😾", "🗑️ ПОВТОР 🗑️", "🆒 ПОВТОР 🆒", "💤 ПОВТОР 💤", "👎 ПОВТОР 👎", "🤡 ПОВТОР 🤡", "🤔 ПОВТОР 🤔", "👏 ПОВТОР 👏", "😭 ПОВТОР 😭", "🤦‍♂️ ПОВТОР 🤦‍♂️", "🤦‍♀️ ПОВТОР 🤦‍♀️", "😪 ПОВТОР 😪", "😛 ПОВТОР 😛", "💅 ПОВТОР 💅", "💔 ПОВТОР 💔", "🕯️ ПОВТОР 🕯️"]
+        };
+
         // ==================== ОБЛАЧНЫЕ ФУНКЦИИ СОХРАНЕНИЯ ====================
         function saveAllDataToCloud() {
             if (!currentUserUid) {
                 console.warn("⚠️ Нет авторизованного пользователя. Данные не сохранены.");
                 return;
             }
-            // ЗАЩИТА: Если данные из облака ещё не скачались в текущей сессии — запрещаем затирать базу нулями!
             if (!isDataLoaded) {
                 console.warn("⚠️ Автосохранение заблокировано: данные профиля ещё не прогрузились из облака.");
                 return;
@@ -1194,7 +1190,7 @@
                     };
                     console.log("🟡 Аккаунт новый, в облаке нет старых данных. Инициализированы дефолтные значения.");
                 }
-                isDataLoaded = true; // <--- ВЗВОДИМ ФЛАГ: теперь сохранять в базу разрешено!
+                isDataLoaded = true;
                 updateUI();
                 updateStatsDisplay();
             } catch (error) {
@@ -1230,19 +1226,23 @@
         }
         
         function addItem(item) {
-            if (!hasItem(item.id)) {
+            const invRecord = inventory.find(i => i.id === item.id);
+            if (!invRecord) {
                 const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
                 const dateStr = `${formatter.format(new Date())}`;
-                const personalRolls = extendedStats.itemRollCounters[item.id] || 1;
                 inventory.push({ 
                     id: item.id, 
                     date: dateStr,
-                    rollsToDrop: personalRolls
+                    rollsToDrop: extendedStats.itemRollCounters[item.id] || 1,
+                    duplicatesCount: 0
                 });
                 saveData();
                 return true;
+            } else {
+                invRecord.duplicatesCount = (invRecord.duplicatesCount || 0) + 1;
+                saveData();
+                return false;
             }
-            return false;
         }
         
         function getCollected() { 
@@ -1363,7 +1363,6 @@
         function resetToInitialState() {
             const win = document.getElementById("slotWindow");
             const btn = document.getElementById("openCaseBtn");
-            const resDiv = document.getElementById("rollResult");
             
             win.innerHTML = `
                 <div class="arrow-top animate" id="arrowTop"></div>
@@ -1372,10 +1371,8 @@
                 <div class="center-highlight" id="centerHighlight">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
             `;
             
-            btn.textContent = "🔓 ОТКРЫТЬ КЕЙС 🔓";
+            refreshOpenButtonText();
             btn.disabled = false;
-            resDiv.innerHTML = "✨ Готов к крутке? Жми на кнопку! ✨";
-            resDiv.style.background = "#00000099";
             isResultScreen = false;
             isSpinning = false;
             removeGlow();
@@ -1383,6 +1380,9 @@
             startArrowsAnimation();
             removeArrowsSpinning();
             showCenterHighlight();
+            
+            const verdictBlock = document.getElementById("rollVerdictBlock");
+            if (verdictBlock) verdictBlock.style.display = "none";
         }
 
         function showResult(item, isNew) {
@@ -1474,6 +1474,7 @@
                 }
                 html += `</div>`;
                 win.innerHTML = `<div class="arrow-top spinning" id="arrowTop"></div><div class="arrow-bottom spinning" id="arrowBottom"></div><div class="center-indicator"></div>${html}`;
+                hideCenterHighlight();
             }
             
             renderSlots();
@@ -1524,7 +1525,7 @@
             });
         }
 
-        // ==================== ФУНКЦИЯ openCase С ЗАЩИТОЙ ОТ UNDEFINED ====================
+        // ==================== ФУНКЦИЯ openCase ====================
         async function openCase() {
             let btn = document.getElementById("openCaseBtn");
             if (isSpinning || btn.disabled) return;
@@ -1562,6 +1563,13 @@
             setArrowsSpinning();
             hideCenterHighlight();
             
+            let dotCount = 0;
+            clearInterval(spinTextInterval);
+            spinTextInterval = setInterval(() => {
+                dotCount = (dotCount + 1) % 4;
+                btn.textContent = "БАРАБАН ВРАЩАЕТСЯ" + ".".repeat(dotCount);
+            }, 600);
+            
             let won = getRandomItem();
             let isNew = !hasItem(won.id);
             
@@ -1573,7 +1581,7 @@
             }
             
             showResult(won, isNew);
-            addItem(won);
+            const wasNew = addItem(won);
             
             if (isNew) {
                 if (inventory.length === 1) {
@@ -1597,8 +1605,12 @@
             saveExtendedStats();
             
             if (isNew) {
-                const dot = document.getElementById("invDot");
-                if (dot) dot.style.display = "inline-block";
+                const activeTabBtn = document.querySelector(".tab-btn.active");
+                const isCurrentlyInInventory = activeTabBtn && activeTabBtn.getAttribute("data-tab") === "inventory";
+                if (!isCurrentlyInInventory) {
+                    const dot = document.getElementById("invDot");
+                    if (dot) dot.style.display = "inline-block";
+                }
             }
             
             stats.total++;
@@ -1611,52 +1623,35 @@
             saveStats();
             updateStatsDisplay();
             
-            let resDiv = document.getElementById("rollResult");
-            let color = getItemRarity(won).color;
-            resDiv.style.background = hexToRgba(color, 0.2);
-            
-            if (isNew) {
-                resDiv.innerHTML = `✨ НОВЫЙ ПРЕДМЕТ! ✨<br>🎉 ${won.name} [${getRarityName(won.rarityKey)}] 🎉<br>📊 Шанс: ${getItemChance(won)}%`;
-            } else {
-                resDiv.innerHTML = `🔄 ПОВТОР 🔄<br>📦 ${won.name} [${getRarityName(won.rarityKey)}]<br>📊 Шанс: ${getItemChance(won)}%`;
-            }
-            
             updateUI();
             
-            btn.textContent = "🔙 НАЗАД 🔙";
+            clearInterval(spinTextInterval);
+            btn.textContent = "ВЕРНУТЬСЯ НАЗАД";
             btn.disabled = false;
             isSpinning = false;
+            
+            // ЗАДАНИЕ 1: Плоская плашка вердиктов без 3D-эффекта кнопки
+            const verdictBlock = document.getElementById("rollVerdictBlock");
+            if (verdictBlock) {
+                if (!isNew) {
+                    // ПОВТОР: Плоский стильный зеленый овал без 3D тени кнопки
+                    const arr = verdictTexts.duplicate;
+                    verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
+                    verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 3px !important; box-shadow: none !important; text-transform: uppercase !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; transform: none !important;";
+                } else {
+                    // НОВЫЙ предмет: Плоский овал в цвет редкости без 3D тени кнопки
+                    const arr = verdictTexts[won.rarityKey] || verdictTexts.common;
+                    const rarityColor = getItemRarity(won).color;
+                    const textColor = won.rarityKey === "common" ? "#000000" : "#ffffff";
+                    
+                    verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
+                    verdictBlock.style.cssText = `display: block !important; background: ${rarityColor} !important; color: ${textColor} !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 1px !important; box-shadow: none !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; text-transform: uppercase !important; transform: none !important;`;
+                }
+            }
         }
 
         function updateStatsDisplay() {
-            const panel = document.getElementById('statsPanel');
-            if (panel && stats.total > 0) {
-                const commonPercent = (stats.common / stats.total * 100).toFixed(1);
-                const rarePercent = (stats.rare / stats.total * 100).toFixed(1);
-                const superRarePercent = (stats.superRare / stats.total * 100).toFixed(1);
-                const epicPercent = (stats.epic / stats.total * 100).toFixed(1);
-                const mythicPercent = (stats.mythic / stats.total * 100).toFixed(1);
-                const legendaryPercent = (stats.legendary / stats.total * 100).toFixed(1);
-                panel.innerHTML = `
-                    <div class="stat-item">📊 Открыто: ${stats.total}</div>
-                    <div class="stat-item">⚪ Обычных: ${stats.common} (${commonPercent}%)</div>
-                    <div class="stat-item">🔵 Редких: ${stats.rare} (${rarePercent}%)</div>
-                    <div class="stat-item">🟣 Сверхредких: ${stats.superRare} (${superRarePercent}%)</div>
-                    <div class="stat-item">🩷 Эпических: ${stats.epic} (${epicPercent}%)</div>
-                    <div class="stat-item">🔴 Мифических: ${stats.mythic} (${mythicPercent}%)</div>
-                    <div class="stat-item">🟡 Легендарных: ${stats.legendary} (${legendaryPercent}%)</div>
-                `;
-            } else if (panel && stats.total === 0) {
-                panel.innerHTML = `
-                    <div class="stat-item">📊 Открыто: 0</div>
-                    <div class="stat-item">⚪ Обычных: 0 (0%)</div>
-                    <div class="stat-item">🔵 Редких: 0 (0%)</div>
-                    <div class="stat-item">🟣 Сверхредких: 0 (0%)</div>
-                    <div class="stat-item">🩷 Эпических: 0 (0%)</div>
-                    <div class="stat-item">🔴 Мифических: 0 (0%)</div>
-                    <div class="stat-item">🟡 Легендарных: 0 (0%)</div>
-                `;
-            }
+            // Функция оставлена для обратной совместимости
         }
 
         function updateUI() {
@@ -1683,7 +1678,12 @@
                 let isFirstInv = true;
                 
                 rarityOrder.forEach(key => {
-                    let itemsInRarity = collected.filter(i => i.rarityKey === key);
+                    let itemsInRarity = collected.filter(i => i.rarityKey === key).sort((a, b) => {
+                        const indexA = inventory.findIndex(inv => inv.id === a.id);
+                        const indexB = inventory.findIndex(inv => inv.id === b.id);
+                        return indexA - indexB;
+                    });
+                    
                     if (itemsInRarity.length > 0) {
                         let rarityName = pluralRarityNames[key];
                         
@@ -1742,7 +1742,8 @@
                 let isFirstColl = true;
                 
                 rarityOrder.forEach(key => {
-                    let missingInRarity = missing.filter(i => i.rarityKey === key);
+                    let missingInRarity = missing.filter(i => i.rarityKey === key).sort((a, b) => a.name.localeCompare(b.name));
+                    
                     if (missingInRarity.length > 0) {
                         let rarityName = pluralRarityNames[key];
                         
@@ -1775,6 +1776,9 @@
                                 <div class="item-name">${escapeHtml(item.name)}</div>
                                 <div class="badge ${textClass}">${rarity.name}</div>
                             `;
+                            
+                            card.addEventListener('contextmenu', e => e.preventDefault());
+                            card.addEventListener('dragstart', e => e.preventDefault());
                             
                             grid.appendChild(card);
                         });
@@ -1866,8 +1870,6 @@
                 `;
             }
             
-            document.getElementById("totalItemsCount").innerText = inventory.length;
-            document.getElementById("remainingCount").innerText = missing.length;
             console.log("✅ UI обновлён");
         }
 
@@ -1937,6 +1939,7 @@
             const sidePanel = document.getElementById("modalSidePanel");
             const infoDate = document.getElementById("infoDateRow");
             const infoRolls = document.getElementById("infoRollsRow");
+            const infoDup = document.getElementById("infoDuplicatesRow");
             
             let rarity = getItemRarity(item);
             let rarityClass = getRarityClass(item.rarityKey);
@@ -1953,11 +1956,17 @@
                 let cleanDate = invRecord.date ? invRecord.date.replace("Дата получения: ", "") : "--";
                 infoDate.innerHTML = `📅 Дата получения: <strong>${cleanDate}</strong>`;
                 infoRolls.innerHTML = `🎰 Круток потребовалось: <strong>${invRecord.rollsToDrop || "Неизвестно"}</strong>`;
+                
+                if (invRecord.duplicatesCount && invRecord.duplicatesCount > 0) {
+                    infoDup.innerHTML = `♻️ Количество повторов: <strong style="color: #ffffff !important;">${invRecord.duplicatesCount}</strong>`;
+                    infoDup.style.display = "block";
+                } else {
+                    infoDup.style.display = "none";
+                }
             }
             
             sidePanel.style.borderColor = rarity.color;
             
-            // Жёсткое принудительное отображение модалки через setProperty с important
             modal.style.setProperty("display", "flex", "important");
             modal.style.setProperty("visibility", "visible", "important");
             modal.style.setProperty("opacity", "1", "important");
@@ -2017,6 +2026,13 @@
             setArrowsSpinning();
             hideCenterHighlight();
             
+            let dotCount = 0;
+            clearInterval(spinTextInterval);
+            spinTextInterval = setInterval(() => {
+                dotCount = (dotCount + 1) % 4;
+                btn.textContent = "БАРАБАН ВРАЩАЕТСЯ" + ".".repeat(dotCount);
+            }, 600);
+            
             let isNew = !hasItem(won.id);
             
             await startSpin(won);
@@ -2027,7 +2043,7 @@
             }
             
             showResult(won, isNew);
-            addItem(won);
+            const wasNew = addItem(won);
             
             if (isNew) {
                 if (inventory.length === 1) {
@@ -2051,8 +2067,12 @@
             saveExtendedStats();
             
             if (isNew) {
-                const dot = document.getElementById("invDot");
-                if (dot) dot.style.display = "inline-block";
+                const activeTabBtn = document.querySelector(".tab-btn.active");
+                const isCurrentlyInInventory = activeTabBtn && activeTabBtn.getAttribute("data-tab") === "inventory";
+                if (!isCurrentlyInInventory) {
+                    const dot = document.getElementById("invDot");
+                    if (dot) dot.style.display = "inline-block";
+                }
             }
             
             stats.total++;
@@ -2060,21 +2080,31 @@
             saveStats();
             updateStatsDisplay();
             
-            let resDiv = document.getElementById("rollResult");
-            let color = getItemRarity(won).color;
-            resDiv.style.background = hexToRgba(color, 0.2);
-            
-            if (isNew) {
-                resDiv.innerHTML = `✨ ТЕСТ: НОВЫЙ ПРЕДМЕТ! ✨<br>🎉 ${won.name} [${getRarityName(won.rarityKey)}] 🎉<br>📊 Шанс: ${getItemChance(won)}%`;
-            } else {
-                resDiv.innerHTML = `🔄 ТЕСТ: ПОВТОР 🔄<br>📦 ${won.name} [${getRarityName(won.rarityKey)}]<br>📊 Шанс: ${getItemChance(won)}%`;
-            }
-            
             updateUI();
             
-            btn.textContent = "🔙 НАЗАД 🔙";
+            clearInterval(spinTextInterval);
+            btn.textContent = "ВЕРНУТЬСЯ НАЗАД";
             btn.disabled = false;
             isSpinning = false;
+            
+            // ЗАДАНИЕ 1: Плоская плашка вердиктов без 3D-эффекта кнопки
+            const verdictBlock = document.getElementById("rollVerdictBlock");
+            if (verdictBlock) {
+                if (!isNew) {
+                    // ПОВТОР: Плоский стильный зеленый овал без 3D тени кнопки
+                    const arr = verdictTexts.duplicate;
+                    verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
+                    verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 3px !important; box-shadow: none !important; text-transform: uppercase !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; transform: none !important;";
+                } else {
+                    // НОВЫЙ предмет: Плоский овал в цвет редкости без 3D тени кнопки
+                    const arr = verdictTexts[won.rarityKey] || verdictTexts.common;
+                    const rarityColor = getItemRarity(won).color;
+                    const textColor = won.rarityKey === "common" ? "#000000" : "#ffffff";
+                    
+                    verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
+                    verdictBlock.style.cssText = `display: block !important; background: ${rarityColor} !important; color: ${textColor} !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 1px !important; box-shadow: none !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; text-transform: uppercase !important; transform: none !important;`;
+                }
+            }
         }
 
         async function resetGame() {
@@ -2101,11 +2131,27 @@
             }
         }
 
+        // ==================== ФУНКЦИИ ДЛЯ ТЕКСТА КНОПКИ ====================
+        const randomBtnTexts = ["ПРОИЗВЕСТИ КРУТКУ", "ОТКРЫТЬ КЕЙС", "ИСПЫТАТЬ УДАЧУ", "ЗАПУСТИТЬ ВРАЩЕНИЕ", "РАСКРУТИТЬ ЭТО ЧЕРТОВО КОЛЕСО", "ЗАВЕСТИ ШАРМАНКУ", "СГЕНЕРИРОВАТЬ ПРЕДМЕТ", "РИСКНУТЬ", "ИНИЦИИРОВАТЬ ВРАЩЕНИЕ", "СОРВАТЬ ПЛОМБУ", "ПОКРУТИТЬ", "ОТКРОЙ МЕНЯ", "Я ВСЕГО ЛИШЬ БОЛЬШАЯ ЗЕЛЕНАЯ КНОПКА", "МЯУ", "ПОВЕРИТЬ В ЧУДО", "КРУЧУ-ВЕРЧУ, ОБМАНУТЬ СЕБЯ ХОЧУ!", "ПОЛУЧИТЬ ЛЕГЕНДАРКУ", "СОВЕРШИТЬ ПРОКРУТ", "ПРИВЕСТИ РУЛЕТКУ В ДВИЖЕНИЕ", "РОДИТЬ ПРЕДМЕТ"];
+        
+        function refreshOpenButtonText() {
+            const btn = document.getElementById("openCaseBtn");
+            if (!btn) return;
+            if (Math.random() < 0.01) {
+                const randomPhrase = randomBtnTexts[Math.floor(Math.random() * randomBtnTexts.length)];
+                btn.textContent = randomPhrase;
+            } else {
+                btn.textContent = "ВРАЩАТЬ БАРАБАН";
+            }
+        }
+        window.refreshOpenButtonText = refreshOpenButtonText;
+
         // ==================== ЭКСПОРТ В ГЛОБАЛЬНЫЙ ОБЪЕКТ WINDOW ====================
         window.testOpenCaseWithRarity = testOpenCaseWithRarity;
         window.openItemDescription = openItemDescription;
         window.closeItemDescription = closeItemDescription;
         window.resetGame = resetGame;
+        window.refreshOpenButtonText = refreshOpenButtonText;
 
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
         document.addEventListener("DOMContentLoaded", () => {
@@ -2114,15 +2160,15 @@
             const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 1024);
 
             if (isMobileDevice) {
-                // Полностью скрываем и изолируем ПК-элементы интерфейса
                 const appEl = document.querySelector(".app");
                 const authEl = document.getElementById("authOverlay");
                 const videoEl = document.getElementById("globalVideoBg");
+                const authBg = document.getElementById("authCustomBg");
                 if (appEl) appEl.style.setProperty("display", "none", "important");
                 if (authEl) authEl.style.setProperty("display", "none", "important");
                 if (videoEl) videoEl.style.setProperty("display", "none", "important");
+                if (authBg) authBg.style.setProperty("display", "none", "important");
                 
-                // Выбираем случайный смайл и выводим заглушку на весь экран
                 const randomSmile = mobileSmiles[Math.floor(Math.random() * mobileSmiles.length)];
                 const blocker = document.getElementById("mobileBlocker");
                 const smileDiv = document.getElementById("blockerSmile");
@@ -2130,7 +2176,7 @@
                     smileDiv.innerText = randomSmile;
                     blocker.style.setProperty("display", "flex", "important");
                 }
-                return; // Полностью прерываем дальнейшую инициализацию JS на телефонах
+                return;
             }
             
             console.log("🚀 DOM полностью загружен, инициализация...");
@@ -2143,6 +2189,7 @@
             const passwordInput = document.getElementById("authPassword");
             const errorDiv = document.getElementById("authError");
             const videoBg = document.getElementById("globalVideoBg");
+            const authCustomBg = document.getElementById("authCustomBg");
             
             const inventoryGrid = document.getElementById("inventoryGrid");
             if (inventoryGrid) {
@@ -2172,16 +2219,18 @@
                     document.querySelector(".app").style.display = "block";
                     document.getElementById("authOverlay").style.display = "none";
                     if (videoBg) videoBg.style.display = "none";
+                    if (authCustomBg) authCustomBg.style.display = "none";
                     
                     loadData();
                 } else {
                     currentUserUid = null;
-                    isDataLoaded = false; // Сбрасываем флаг при выходе из аккаунта
+                    isDataLoaded = false;
                     console.log("👤 Пользователь не авторизован");
                     
                     document.querySelector(".app").style.display = "none";
                     document.getElementById("authOverlay").style.display = "flex";
                     if (videoBg) videoBg.style.display = "block";
+                    if (authCustomBg) authCustomBg.style.setProperty("display", "block", "important");
                 }
             });
 
@@ -2202,7 +2251,6 @@
                     .then((userCredential) => {
                         console.log("✅ Вход выполнен успешно!");
                         currentUserUid = userCredential.user.uid;
-                        // loadData() удалён отсюда — теперь загрузка происходит только в onAuthStateChanged
                     })
                     .catch(error => {
                         console.error("🔴 Детали ошибки входа:", error);
@@ -2245,7 +2293,6 @@
                     .then((userCredential) => {
                         console.log("✅ Регистрация выполнена успешно!");
                         currentUserUid = userCredential.user.uid;
-                        // loadData() удалён отсюда — теперь загрузка происходит только в onAuthStateChanged
                     })
                     .catch(error => {
                         console.error("🔴 Детали ошибки регистрации:", error);
@@ -2278,6 +2325,36 @@
             };
 
             document.getElementById("resetProgressBtn").onclick = resetGame;
+            
+            refreshOpenButtonText();
+            
+            const topBtn = document.getElementById("scrollToTopBtn");
+            window.addEventListener("scroll", () => {
+                if (window.scrollY > 300) {
+                    topBtn.style.display = "flex";
+                } else {
+                    topBtn.style.display = "none";
+                }
+            });
+            topBtn.onclick = () => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            };
+            
+            window.addEventListener("keydown", (e) => {
+                if (e.code === "Space") {
+                    const activeTabBtn = document.querySelector(".tab-btn.active");
+                    const isCurrentlyInCaseTab = activeTabBtn && activeTabBtn.getAttribute("data-tab") === "case";
+                    const isUserTyping = document.activeElement.tagName === "INPUT";
+                    
+                    if (isCurrentlyInCaseTab && !isUserTyping) {
+                        e.preventDefault();
+                        const openBtn = document.getElementById("openCaseBtn");
+                        if (openBtn && !openBtn.disabled) {
+                            openBtn.click();
+                        }
+                    }
+                }
+            });
             
             setInterval(() => {
                 if (currentUserUid && !isSpinning) {
