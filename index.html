@@ -2160,6 +2160,7 @@
             const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 1024);
 
             if (isMobileDevice) {
+                /*
                 const appEl = document.querySelector(".app");
                 const authEl = document.getElementById("authOverlay");
                 const videoEl = document.getElementById("globalVideoBg");
@@ -2168,6 +2169,7 @@
                 if (authEl) authEl.style.setProperty("display", "none", "important");
                 if (videoEl) videoEl.style.setProperty("display", "none", "important");
                 if (authBg) authBg.style.setProperty("display", "none", "important");
+                */
                 
                 const randomSmile = mobileSmiles[Math.floor(Math.random() * mobileSmiles.length)];
                 const blocker = document.getElementById("mobileBlocker");
