@@ -585,6 +585,16 @@
             transform: none;
         }
         
+        .result-area {
+            background: #00000099;
+            border-radius: 32px;
+            padding: 16px;
+            margin-top: 16px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
         .items-grid {
             display: flex;
             flex-wrap: wrap;
@@ -661,14 +671,24 @@
         .celebration {
             text-align: center;
             padding: 60px 20px;
+            background: linear-gradient(135deg, #00ff66, #00cc44);
             border-radius: 48px;
             color: #1e1e2a;
-            background: #00cc44 !important;
-            animation: none !important;
+            animation: party 1s infinite alternate;
+        }
+        @keyframes party {
+            from { transform: scale(1); background: #00ff66; }
+            to { transform: scale(1.02); background: #00cc44; }
         }
         .celebration h1 {
             font-size: 3rem;
             margin: 0;
+        }
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 28px;
+            opacity: 0.5;
         }
         
         .stats-panel {
@@ -831,18 +851,6 @@
             cursor: pointer;
             font-weight: bold;
         }
-
-        /* Стиль для кнопки прокрутки */
-        #scrollToTopBtn {
-            transition: all 0.3s ease;
-        }
-        #scrollToTopBtn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 25px rgba(0,255,102,0.6) !important;
-        }
-        #scrollToTopBtn:active {
-            transform: scale(0.95);
-        }
     </style>
 </head>
 <body>
@@ -900,8 +908,15 @@
                     <div class="arrow-top animate" id="arrowTop"></div>
                     <div class="arrow-bottom animate" id="arrowBottom"></div>
                     <div class="center-indicator"></div>
+                    <div class="center-highlight" id="centerHighlight">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
                 </div>
-                <button class="open-btn" id="openCaseBtn">ВРАЩАТЬ БАРАБАН</button>
+                <button class="open-btn" id="openCaseBtn">🔓 ОТКРЫТЬ КЕЙС 🔓</button>
+                <div class="result-area" id="rollResult">✨ Готов к крутке? Жми на кнопку! ✨</div>
+            </div>
+            <div class="stats">
+                <span>💰 Уникальных предметов: <strong id="totalItemsCount">0</strong></span>
+                <span>⭐ Осталось выбить: <strong id="remainingCount">0</strong></span>
+                <button class="small-reset" id="resetProgressBtn">♻️ Сбросить прогресс</button>
             </div>
             <div class="test-admin-panel">
                 <button onclick="window.testOpenCaseWithRarity('common')" style="background: #dee3f2; color: #000;">⚪ Common</button>
@@ -931,9 +946,10 @@
         </div>
 
         <div id="statsTab" class="tab-content">
-            <button class="small-reset" id="resetProgressBtn" style="margin-bottom: 15px;">♻️ Сбросить прогресс</button>
             <div class="stats-panel-rows" id="globalStatsContainer" style="display: flex; flex-direction: column; gap: 20px; padding: 20px 10px; font-size: 1.15rem; color: #fff;"></div>
         </div>
+        
+        <footer>💖 200 ШАГОВ | УЛЬТРА-ЗВУКОВАЯ СКОРОСТЬ | ВИЗУАЛЬНЫЕ ШАНСЫ 79.6/15/3/1.8/0.3/0.3</footer>
     </div>
 
     <div id="descModal" class="modal-overlay" onclick="window.closeItemDescription()">
@@ -950,9 +966,6 @@
             <div class="modal-side-row" id="infoRollsRow">🎰 Круток потребовалось: <strong>--</strong></div>
         </div>
     </div>
-
-    <!-- Кнопка прокрутки наверх -->
-    <button id="scrollToTopBtn" style="display: none; position: fixed !important; bottom: 30px !important; right: 30px !important; width: 60px !important; height: 60px !important; border-radius: 50% !important; background: radial-gradient(circle, #00ff66, #00cc44) !important; border: none !important; color: #1e1e2a !important; font-size: 2rem !important; font-weight: bold !important; cursor: pointer !important; z-index: 99999 !important; box-shadow: 0 4px 15px rgba(0,255,102,0.4) !important; justify-content: center !important; align-items: center !important;">↑</button>
 
     <script type="module">
         // ==================== ПОДКЛЮЧЕНИЕ FIREBASE ====================
@@ -1350,21 +1363,26 @@
         function resetToInitialState() {
             const win = document.getElementById("slotWindow");
             const btn = document.getElementById("openCaseBtn");
+            const resDiv = document.getElementById("rollResult");
             
             win.innerHTML = `
                 <div class="arrow-top animate" id="arrowTop"></div>
                 <div class="arrow-bottom animate" id="arrowBottom"></div>
                 <div class="center-indicator"></div>
+                <div class="center-highlight" id="centerHighlight">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
             `;
             
-            refreshOpenButtonText();
+            btn.textContent = "🔓 ОТКРЫТЬ КЕЙС 🔓";
             btn.disabled = false;
+            resDiv.innerHTML = "✨ Готов к крутке? Жми на кнопку! ✨";
+            resDiv.style.background = "#00000099";
             isResultScreen = false;
             isSpinning = false;
             removeGlow();
             
             startArrowsAnimation();
             removeArrowsSpinning();
+            showCenterHighlight();
         }
 
         function showResult(item, isNew) {
@@ -1375,6 +1393,7 @@
             let color = item.rarityKey === 'common' ? '#333333' : rarity.color;
             
             hideArrows();
+            hideCenterHighlight();
             
             let rarityName = getRarityName(item.rarityKey).toUpperCase();
             
@@ -1541,6 +1560,7 @@
             removeGlow();
             stopArrowsAnimation();
             setArrowsSpinning();
+            hideCenterHighlight();
             
             let won = getRandomItem();
             let isNew = !hasItem(won.id);
@@ -1577,12 +1597,8 @@
             saveExtendedStats();
             
             if (isNew) {
-                const activeTabBtn = document.querySelector(".tab-btn.active");
-                const isCurrentlyInInventory = activeTabBtn && activeTabBtn.getAttribute("data-tab") === "inventory";
-                if (!isCurrentlyInInventory) {
-                    const dot = document.getElementById("invDot");
-                    if (dot) dot.style.display = "inline-block";
-                }
+                const dot = document.getElementById("invDot");
+                if (dot) dot.style.display = "inline-block";
             }
             
             stats.total++;
@@ -1595,13 +1611,19 @@
             saveStats();
             updateStatsDisplay();
             
-            updateUI();
+            let resDiv = document.getElementById("rollResult");
+            let color = getItemRarity(won).color;
+            resDiv.style.background = hexToRgba(color, 0.2);
             
             if (isNew) {
-                btn.textContent = "🎉 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🎉";
+                resDiv.innerHTML = `✨ НОВЫЙ ПРЕДМЕТ! ✨<br>🎉 ${won.name} [${getRarityName(won.rarityKey)}] 🎉<br>📊 Шанс: ${getItemChance(won)}%`;
             } else {
-                btn.textContent = "💤 ПОВТОР 💤";
+                resDiv.innerHTML = `🔄 ПОВТОР 🔄<br>📦 ${won.name} [${getRarityName(won.rarityKey)}]<br>📊 Шанс: ${getItemChance(won)}%`;
             }
+            
+            updateUI();
+            
+            btn.textContent = "🔙 НАЗАД 🔙";
             btn.disabled = false;
             isSpinning = false;
         }
@@ -1661,13 +1683,7 @@
                 let isFirstInv = true;
                 
                 rarityOrder.forEach(key => {
-                    // Сортируем предметы по порядку их реального добавления в массив inventory (от старых к новым)
-                    let itemsInRarity = collected.filter(i => i.rarityKey === key).sort((a, b) => {
-                        const indexA = inventory.findIndex(inv => inv.id === a.id);
-                        const indexB = inventory.findIndex(inv => inv.id === b.id);
-                        return indexA - indexB;
-                    });
-                    
+                    let itemsInRarity = collected.filter(i => i.rarityKey === key);
                     if (itemsInRarity.length > 0) {
                         let rarityName = pluralRarityNames[key];
                         
@@ -1726,9 +1742,7 @@
                 let isFirstColl = true;
                 
                 rarityOrder.forEach(key => {
-                    // Сортируем отсутствующие предметы строго по алфавиту от А до Я
-                    let missingInRarity = missing.filter(i => i.rarityKey === key).sort((a, b) => a.name.localeCompare(b.name));
-                    
+                    let missingInRarity = missing.filter(i => i.rarityKey === key);
                     if (missingInRarity.length > 0) {
                         let rarityName = pluralRarityNames[key];
                         
@@ -1761,10 +1775,6 @@
                                 <div class="item-name">${escapeHtml(item.name)}</div>
                                 <div class="badge ${textClass}">${rarity.name}</div>
                             `;
-                            
-                            // Защита от перетаскивания и правого клика
-                            card.addEventListener('contextmenu', e => e.preventDefault());
-                            card.addEventListener('dragstart', e => e.preventDefault());
                             
                             grid.appendChild(card);
                         });
@@ -1856,6 +1866,8 @@
                 `;
             }
             
+            document.getElementById("totalItemsCount").innerText = inventory.length;
+            document.getElementById("remainingCount").innerText = missing.length;
             console.log("✅ UI обновлён");
         }
 
@@ -2003,6 +2015,7 @@
             removeGlow();
             stopArrowsAnimation();
             setArrowsSpinning();
+            hideCenterHighlight();
             
             let isNew = !hasItem(won.id);
             
@@ -2038,12 +2051,8 @@
             saveExtendedStats();
             
             if (isNew) {
-                const activeTabBtn = document.querySelector(".tab-btn.active");
-                const isCurrentlyInInventory = activeTabBtn && activeTabBtn.getAttribute("data-tab") === "inventory";
-                if (!isCurrentlyInInventory) {
-                    const dot = document.getElementById("invDot");
-                    if (dot) dot.style.display = "inline-block";
-                }
+                const dot = document.getElementById("invDot");
+                if (dot) dot.style.display = "inline-block";
             }
             
             stats.total++;
@@ -2051,13 +2060,19 @@
             saveStats();
             updateStatsDisplay();
             
-            updateUI();
+            let resDiv = document.getElementById("rollResult");
+            let color = getItemRarity(won).color;
+            resDiv.style.background = hexToRgba(color, 0.2);
             
             if (isNew) {
-                btn.textContent = "🎉 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🎉";
+                resDiv.innerHTML = `✨ ТЕСТ: НОВЫЙ ПРЕДМЕТ! ✨<br>🎉 ${won.name} [${getRarityName(won.rarityKey)}] 🎉<br>📊 Шанс: ${getItemChance(won)}%`;
             } else {
-                btn.textContent = "💤 ПОВТОР 💤";
+                resDiv.innerHTML = `🔄 ТЕСТ: ПОВТОР 🔄<br>📦 ${won.name} [${getRarityName(won.rarityKey)}]<br>📊 Шанс: ${getItemChance(won)}%`;
             }
+            
+            updateUI();
+            
+            btn.textContent = "🔙 НАЗАД 🔙";
             btn.disabled = false;
             isSpinning = false;
         }
@@ -2086,27 +2101,11 @@
             }
         }
 
-        // ==================== ФУНКЦИИ ДЛЯ ТЕКСТА КНОПКИ ====================
-        const randomBtnTexts = ["ПРОИЗВЕСТИ КРУТКУ", "ОТКРЫТЬ КЕЙС", "ИСПЫТАТЬ УДАЧУ", "ЗАПУСТИТЬ ВРАЩЕНИЕ", "РАСКРУТИТЬ ЭТО ЧЕРТОВО КОЛЕСО", "ЗАВЕСТИ ШАРМАНКУ", "СГЕНЕРИРОВАТЬ ПРЕДМЕТ", "РИСКНУТЬ", "ИНИЦИИРОВАТЬ ВРАЩЕНИЕ", "СОРВАТЬ ПЛОМБУ", "ПОКРУТИТЬ", "ОТКРОЙ МЕНЯ", "Я ВСЕГО ЛИШЬ БОЛЬШАЯ ЗЕЛЕНАЯ КНОПКА", "МЯУ", "ПОВЕРИТЬ В ЧУДО", "КРУЧУ-ВЕРЧУ, ОБМАНУТЬ СЕБЯ ХОЧУ!", "ПОЛУЧИТЬ ЛЕГЕНДАРКУ", "СОВЕРШИТЬ ПРОКРУТ", "ПРИВЕСТИ РУЛЕТКУ В ДВИЖЕНИЕ", "РОДИТЬ ПРЕДМЕТ"];
-        
-        function refreshOpenButtonText() {
-            const btn = document.getElementById("openCaseBtn");
-            if (!btn) return;
-            if (Math.random() < 0.10) { // 10% шанс на кастомную фразу
-                const randomPhrase = randomBtnTexts[Math.floor(Math.random() * randomBtnTexts.length)];
-                btn.textContent = randomPhrase;
-            } else {
-                btn.textContent = "ВРАЩАТЬ БАРАБАН";
-            }
-        }
-        window.refreshOpenButtonText = refreshOpenButtonText;
-
         // ==================== ЭКСПОРТ В ГЛОБАЛЬНЫЙ ОБЪЕКТ WINDOW ====================
         window.testOpenCaseWithRarity = testOpenCaseWithRarity;
         window.openItemDescription = openItemDescription;
         window.closeItemDescription = closeItemDescription;
         window.resetGame = resetGame;
-        window.refreshOpenButtonText = refreshOpenButtonText;
 
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
         document.addEventListener("DOMContentLoaded", () => {
@@ -2279,39 +2278,6 @@
             };
 
             document.getElementById("resetProgressBtn").onclick = resetGame;
-            
-            // Инициализация текста кнопки при старте
-            refreshOpenButtonText();
-            
-            // Кнопка прокрутки наверх
-            const topBtn = document.getElementById("scrollToTopBtn");
-            window.addEventListener("scroll", () => {
-                if (window.scrollY > 300) {
-                    topBtn.style.display = "flex";
-                } else {
-                    topBtn.style.display = "none";
-                }
-            });
-            topBtn.onclick = () => {
-                window.scrollTo({ top: 0, behavior: "smooth" });
-            };
-            
-            // Клавиатурный пробел для крутки
-            window.addEventListener("keydown", (e) => {
-                if (e.code === "Space") {
-                    const activeTabBtn = document.querySelector(".tab-btn.active");
-                    const isCurrentlyInCaseTab = activeTabBtn && activeTabBtn.getAttribute("data-tab") === "case";
-                    const isUserTyping = document.activeElement.tagName === "INPUT";
-                    
-                    if (isCurrentlyInCaseTab && !isUserTyping) {
-                        e.preventDefault(); // Предотвращаем скролл страницы пробелом
-                        const openBtn = document.getElementById("openCaseBtn");
-                        if (openBtn && !openBtn.disabled) {
-                            openBtn.click(); // Симулируем клик по кнопке
-                        }
-                    }
-                }
-            });
             
             setInterval(() => {
                 if (currentUserUid && !isSpinning) {
