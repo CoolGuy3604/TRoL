@@ -223,7 +223,9 @@
         
         .arrow-top {
             position: absolute;
+            top: 11px;
             left: 50%;
+            transform: translateX(-50%);
             width: 0;
             height: 0;
             border-left: 28px solid transparent;
@@ -232,9 +234,6 @@
             filter: drop-shadow(0 0 15px rgba(0, 255, 102, 0.9));
             z-index: 40;
             transition: all 0.3s ease;
-            /* ИГРОВОЙ ФИКС ЛАГОВ: Форсируем 3D рендеринг */
-            will-change: transform, opacity;
-            transform: translateX(-50%) translate3d(0,0,0) !important;
         }
         
         .arrow-top.animate {
@@ -248,7 +247,9 @@
         
         .arrow-bottom {
             position: absolute;
+            bottom: 11px;
             left: 50%;
+            transform: translateX(-50%);
             width: 0;
             height: 0;
             border-left: 28px solid transparent;
@@ -257,9 +258,6 @@
             filter: drop-shadow(0 0 15px rgba(0, 255, 102, 0.9));
             z-index: 40;
             transition: all 0.3s ease;
-            /* ИГРОВОЙ ФИКС ЛАГОВ: Форсируем 3D рендеринг */
-            will-change: transform, opacity;
-            transform: translateX(-50%) translate3d(0,0,0) !important;
         }
         
         .arrow-bottom.animate {
@@ -272,21 +270,22 @@
         }
         
         @keyframes arrowTopPulse {
-            0% { opacity: 0.8; transform: translateX(-50%) translateY(0px) translate3d(0,0,0); }
-            50% { opacity: 1; transform: translateX(-50%) translateY(6px) translate3d(0,0,0); }
-            100% { opacity: 0.8; transform: translateX(-50%) translateY(0px) translate3d(0,0,0); }
+            0% { opacity: 0.8; transform: translateX(-50%) translateY(0px); }
+            50% { opacity: 1; transform: translateX(-50%) translateY(6px); }
+            100% { opacity: 0.8; transform: translateX(-50%) translateY(0px); }
         }
         
         @keyframes arrowBottomPulse {
-            0% { opacity: 0.8; transform: translateX(-50%) translateY(0px) translate3d(0,0,0); }
-            50% { opacity: 1; transform: translateX(-50%) translateY(-6px) translate3d(0,0,0); }
-            100% { opacity: 0.8; transform: translateX(-50%) translateY(0px) translate3d(0,0,0); }
+            0% { opacity: 0.8; transform: translateX(-50%) translateY(0px); }
+            50% { opacity: 1; transform: translateX(-50%) translateY(-6px); }
+            100% { opacity: 0.8; transform: translateX(-50%) translateY(0px); }
         }
         
         .center-highlight {
             position: absolute;
             top: 50%;
             left: 50%;
+            transform: translate(-50%, -50%);
             width: 245px !important;
             height: 245px !important;
             border: 3px solid #00ff66;
@@ -303,9 +302,6 @@
             font-size: 3.2rem !important;
             line-height: 1 !important;
             box-sizing: border-box !important;
-            /* ИГРОВОЙ ФИКС ЛАГОВ */
-            will-change: transform;
-            transform: translate(-50%, -50%) translate3d(0,0,0) !important;
         }
         
         .center-indicator {
@@ -1360,7 +1356,7 @@
                     <div class="arrow-top animate" id="arrowTop"></div>
                     <div class="arrow-bottom animate" id="arrowBottom"></div>
                     <div class="center-indicator"></div>
-                    <div class="center-highlight" id="centerHighlight" style="display: flex !important;">🐇🐈♾️</div>
+                    <div class="center-highlight" id="centerHighlight">🐇🐈♾️</div>
                 `;
             }
             
@@ -1383,12 +1379,13 @@
             let color = item.rarityKey === 'common' ? '#333333' : rarity.color;
             
             hideArrows();
+            hideCenterHighlight();
             
             let rarityName = getRarityName(item.rarityKey).toUpperCase();
             
             let content = `
                 <div class="center-indicator"></div>
-                <div class="center-highlight" id="centerHighlight">🐇🐈♾️</div>
+                <div class="center-highlight" id="centerHighlight" style="display: none !important;">🐇🐈♾️</div>
                 <div class="final-container">
                     <div class="final-item ${isNew ? 'rarity-common' : rarityClass}">
                         ${isNew ? `<div class="new-rarity-title" style="--rarity-color: ${color};">${rarityName}!</div>` : ''}
@@ -1463,7 +1460,7 @@
                     `;
                 }
                 html += `</div>`;
-                win.innerHTML = `<div class="arrow-top spinning" id="arrowTop"></div><div class="arrow-bottom spinning" id="arrowBottom"></div><div class="center-indicator"></div><div class="center-highlight" id="centerHighlight" style="display: none !important;">🐇🐈♾️</div>${html}`;
+                win.innerHTML = `<div class="arrow-top spinning" id="arrowTop"></div><div class="arrow-bottom spinning" id="arrowBottom"></div><div class="center-indicator"></div>${html}`;
             }
             
             renderSlots();
@@ -1519,10 +1516,6 @@
             let btn = document.getElementById("openCaseBtn");
             if (isSpinning || btn.disabled) return;
             
-            // Скрываем рамку при старте
-            const targetHighlight = document.getElementById("centerHighlight");
-            if (targetHighlight) targetHighlight.style.setProperty("display", "none", "important");
-            
             if (!extendedStats) extendedStats = {};
             if (!extendedStats.dailyCalendar) extendedStats.dailyCalendar = {};
             if (!extendedStats.itemRollCounters) extendedStats.itemRollCounters = {};
@@ -1554,6 +1547,8 @@
             removeGlow();
             stopArrowsAnimation();
             setArrowsSpinning();
+            
+            hideCenterHighlight();
             
             // Анимация точек на кнопке
             let dotCount = 0;
@@ -1971,10 +1966,6 @@
             let btn = document.getElementById("openCaseBtn");
             if (isSpinning || btn.disabled) return;
             
-            // Скрываем рамку при старте
-            const targetHighlight = document.getElementById("centerHighlight");
-            if (targetHighlight) targetHighlight.style.setProperty("display", "none", "important");
-            
             if (!extendedStats) extendedStats = {};
             if (!extendedStats.dailyCalendar) extendedStats.dailyCalendar = {};
             if (!extendedStats.itemRollCounters) extendedStats.itemRollCounters = {};
@@ -2014,6 +2005,8 @@
             removeGlow();
             stopArrowsAnimation();
             setArrowsSpinning();
+            
+            hideCenterHighlight();
             
             // Анимация точек на кнопке
             let dotCount = 0;
