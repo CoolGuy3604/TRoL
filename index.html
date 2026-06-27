@@ -286,15 +286,22 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 250px !important;
-            height: 187px !important;
+            width: 245px !important;
+            height: 245px !important;
             border: 3px solid #00ff66;
             border-radius: 28px;
             box-shadow: 0 0 30px rgba(0, 255, 102, 0.5);
-            z-index: 10 !important;
-            background: transparent !important;
             pointer-events: none;
-            overflow: hidden;
+            z-index: 18;
+            background: rgba(0, 255, 102, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            backdrop-filter: blur(2px);
+            font-size: 3.2rem !important;
+            line-height: 1 !important;
+            box-sizing: border-box !important;
         }
         
         .center-indicator {
@@ -895,11 +902,7 @@
                     <div class="arrow-top animate" id="arrowTop"></div>
                     <div class="arrow-bottom animate" id="arrowBottom"></div>
                     <div class="center-indicator"></div>
-                    <div class="center-highlight" id="centerHighlight"></div>
-                    
-                    <!-- Два скрытых предзагруженных видео под рамку -->
-                    <video id="videoA" src="images/kittentomommy.mp4" preload="auto" muted playsinline style="position: absolute; width: 250px !important; height: 187px !important; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; display: none; object-fit: cover; border-radius: 24px;"></video>
-                    <video id="videoB" src="images/mommytokitten.mp4" preload="auto" muted playsinline style="position: absolute; width: 250px !important; height: 187px !important; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; display: none; object-fit: cover; border-radius: 24px;"></video>
+                    <div class="center-highlight" id="centerHighlight">🐇🐈♾️</div>
                 </div>
                 <button class="open-btn" id="openCaseBtn">ВРАЩАТЬ БАРАБАН</button>
                 <div id="rollVerdictBlock" style="display: none; width: 100% !important; border-radius: 80px !important; padding: 16px 42px !important; font-size: 1.6rem !important; font-weight: bold !important; text-align: center !important; margin: 20px 0 !important; box-sizing: border-box !important;"></div>
@@ -1343,70 +1346,6 @@
             if (centerHighlight) centerHighlight.style.display = 'block';
         }
         
-        // ==================== ВИДЕО-ДВИЖОК ====================
-        function restartVideoEngine() {
-            const vA = document.getElementById("videoA");
-            const vB = document.getElementById("videoB");
-            if (vA && vB) {
-                vA.pause();
-                vB.pause();
-                vA.style.display = "none";
-                vB.style.display = "none";
-                
-                if (Math.random() < 0.5) {
-                    console.log("🎬 Активирован кинематографический Порядок №1");
-                    runOrder1();
-                } else {
-                    console.log("🎬 Активирован кинематографический Порядок №2");
-                    runOrder2();
-                }
-            }
-        }
-
-        function runOrder1() {
-            const vA = document.getElementById("videoA");
-            const vB = document.getElementById("videoB");
-            if (!vA || !vB) return;
-            
-            vB.style.display = "none";
-            vB.pause();
-            vA.style.display = "block";
-            vA.currentTime = 0;
-            vA.play().catch(() => {});
-            vA.onended = () => {
-                vA.style.display = "none";
-                vA.pause();
-                vB.style.display = "block";
-                vB.currentTime = 0;
-                vB.play().catch(() => {});
-                vB.onended = runOrder1;
-            };
-        }
-
-        function runOrder2() {
-            const vA = document.getElementById("videoA");
-            const vB = document.getElementById("videoB");
-            if (!vA || !vB) return;
-            
-            vA.style.display = "none";
-            vA.pause();
-            vB.style.display = "block";
-            vB.currentTime = 0;
-            vB.play().catch(() => {});
-            vB.onended = () => {
-                vB.style.display = "none";
-                vB.pause();
-                vA.style.display = "block";
-                vA.currentTime = 0;
-                vA.play().catch(() => {});
-                vA.onended = runOrder2;
-            };
-        }
-
-        // Делаем функции глобальными
-        window.runOrder1 = runOrder1;
-        window.runOrder2 = runOrder2;
-        
         function resetToInitialState() {
             const win = document.getElementById("slotWindow");
             const btn = document.getElementById("openCaseBtn");
@@ -1415,9 +1354,7 @@
                 <div class="arrow-top animate" id="arrowTop"></div>
                 <div class="arrow-bottom animate" id="arrowBottom"></div>
                 <div class="center-indicator"></div>
-                <div class="center-highlight" id="centerHighlight"></div>
-                <video id="videoA" src="images/kittentomommy.mp4" preload="auto" muted playsinline style="position: absolute; width: 250px !important; height: 187px !important; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; display: none; object-fit: cover; border-radius: 24px;"></video>
-                <video id="videoB" src="images/mommytokitten.mp4" preload="auto" muted playsinline style="position: absolute; width: 250px !important; height: 187px !important; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; display: none; object-fit: cover; border-radius: 24px;"></video>
+                <div class="center-highlight" id="centerHighlight">🐇🐈♾️</div>
             `;
             
             refreshOpenButtonText();
@@ -1428,14 +1365,7 @@
             
             startArrowsAnimation();
             removeArrowsSpinning();
-            
-            // Показываем рамку и видео при возврате назад
-            document.getElementById("centerHighlight").style.display = "block";
-            if (Math.random() < 0.5) { 
-                runOrder1(); 
-            } else { 
-                runOrder2(); 
-            }
+            showCenterHighlight();
             
             document.getElementById("rollVerdictBlock").style.display = "none";
         }
@@ -1453,7 +1383,7 @@
             
             let content = `
                 <div class="center-indicator"></div>
-                <div class="center-highlight" id="centerHighlight"></div>
+                <div class="center-highlight" id="centerHighlight">🐇🐈♾️</div>
                 <div class="final-container">
                     <div class="final-item ${isNew ? 'rarity-common' : rarityClass}">
                         ${isNew ? `<div class="new-rarity-title" style="--rarity-color: ${color};">${rarityName}!</div>` : ''}
@@ -1462,14 +1392,9 @@
                         <div class="rarity-badge ${textClass}">${rarity.name}</div>
                     </div>
                 </div>
-                <video id="videoA" src="images/kittentomommy.mp4" preload="auto" muted playsinline style="position: absolute; width: 250px !important; height: 187px !important; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; display: none; object-fit: cover; border-radius: 24px;"></video>
-                <video id="videoB" src="images/mommytokitten.mp4" preload="auto" muted playsinline style="position: absolute; width: 250px !important; height: 187px !important; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; display: none; object-fit: cover; border-radius: 24px;"></video>
             `;
             
             win.innerHTML = content;
-            
-            // Перезапускаем видео-движок после обновления DOM
-            setTimeout(() => restartVideoEngine(), 100);
             
             let flash = document.createElement('div');
             flash.style.position = 'absolute';
@@ -1537,14 +1462,9 @@
                     <div class="arrow-top spinning" id="arrowTop"></div>
                     <div class="arrow-bottom spinning" id="arrowBottom"></div>
                     <div class="center-indicator"></div>
-                    <div class="center-highlight" id="centerHighlight"></div>
+                    <div class="center-highlight" id="centerHighlight">🐇🐈♾️</div>
                     ${html}
-                    <video id="videoA" src="images/kittentomommy.mp4" preload="auto" muted playsinline style="position: absolute; width: 250px !important; height: 187px !important; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; display: none; object-fit: cover; border-radius: 24px;"></video>
-                    <video id="videoB" src="images/mommytokitten.mp4" preload="auto" muted playsinline style="position: absolute; width: 250px !important; height: 187px !important; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; display: none; object-fit: cover; border-radius: 24px;"></video>
                 `;
-                
-                // Перезапускаем видео-движок после обновления DOM
-                setTimeout(() => restartVideoEngine(), 50);
             }
             
             renderSlots();
@@ -1632,12 +1552,10 @@
             stopArrowsAnimation();
             setArrowsSpinning();
             
-            // Скрываем рамку и видео во время крутки
+            // Скрываем рамку во время крутки
             document.getElementById("centerHighlight").style.display = "none";
-            document.getElementById("videoA").style.display = "none";
-            document.getElementById("videoB").style.display = "none";
             
-            // Анимация точек на кнопке (600мс)
+            // Анимация точек на кнопке
             let dotCount = 0;
             clearInterval(spinTextInterval);
             spinTextInterval = setInterval(() => {
@@ -1710,14 +1628,14 @@
                 if (!isNew) {
                     const arr = verdictTexts.duplicate;
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
-                    verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 3px !important; box-shadow: 0 8px 0 #009933 !important; text-transform: uppercase !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important;";
+                    verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 3px !important; box-shadow: none !important; text-transform: uppercase !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; transform: none !important;";
                 } else {
                     const arr = verdictTexts[won.rarityKey] || verdictTexts.common;
                     const rarityColor = getItemRarity(won).color;
                     const textColor = won.rarityKey === "common" ? "#000000" : "#ffffff";
                     
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
-                    verdictBlock.style.cssText = `display: block !important; background: ${rarityColor} !important; color: ${textColor} !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 1px !important; box-shadow: 0 8px 0 ${hexToRgba(rarityColor, 0.5)} !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; text-transform: uppercase !important;`;
+                    verdictBlock.style.cssText = `display: block !important; background: ${rarityColor} !important; color: ${textColor} !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 1px !important; box-shadow: none !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; text-transform: uppercase !important; transform: none !important;`;
                 }
             }
         }
@@ -2093,12 +2011,10 @@
             stopArrowsAnimation();
             setArrowsSpinning();
             
-            // Скрываем рамку и видео во время крутки
+            // Скрываем рамку во время крутки
             document.getElementById("centerHighlight").style.display = "none";
-            document.getElementById("videoA").style.display = "none";
-            document.getElementById("videoB").style.display = "none";
             
-            // Анимация точек на кнопке (600мс)
+            // Анимация точек на кнопке
             let dotCount = 0;
             clearInterval(spinTextInterval);
             spinTextInterval = setInterval(() => {
@@ -2165,14 +2081,14 @@
                 if (!isNew) {
                     const arr = verdictTexts.duplicate;
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
-                    verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 3px !important; box-shadow: 0 8px 0 #009933 !important; text-transform: uppercase !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important;";
+                    verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 3px !important; box-shadow: none !important; text-transform: uppercase !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; transform: none !important;";
                 } else {
                     const arr = verdictTexts[won.rarityKey] || verdictTexts.common;
                     const rarityColor = getItemRarity(won).color;
                     const textColor = won.rarityKey === "common" ? "#000000" : "#ffffff";
                     
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
-                    verdictBlock.style.cssText = `display: block !important; background: ${rarityColor} !important; color: ${textColor} !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 1px !important; box-shadow: 0 8px 0 ${hexToRgba(rarityColor, 0.5)} !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; text-transform: uppercase !important;`;
+                    verdictBlock.style.cssText = `display: block !important; background: ${rarityColor} !important; color: ${textColor} !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 1px !important; box-shadow: none !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; text-transform: uppercase !important; transform: none !important;`;
                 }
             }
         }
@@ -2232,8 +2148,6 @@
         window.closeItemDescription = closeItemDescription;
         window.resetGame = resetGame;
         window.refreshOpenButtonText = refreshOpenButtonText;
-        window.runOrder1 = runOrder1;
-        window.runOrder2 = runOrder2;
 
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
         document.addEventListener("DOMContentLoaded", () => {
@@ -2304,8 +2218,6 @@
                     if (customBg) customBg.style.display = "none";
                     
                     loadData();
-                    
-                    setTimeout(() => restartVideoEngine(), 500);
                 } else {
                     currentUserUid = null;
                     isDataLoaded = false;
@@ -2439,12 +2351,6 @@
                     }
                 }
             });
-            
-            setTimeout(() => {
-                if (currentUserUid) {
-                    restartVideoEngine();
-                }
-            }, 1000);
             
             setInterval(() => {
                 if (currentUserUid && !isSpinning) {
