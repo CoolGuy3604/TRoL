@@ -286,8 +286,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 245px !important;
-            height: 245px !important;
+            width: 245px;
+            height: 245px;
             border: 3px solid #00ff66;
             border-radius: 28px;
             box-shadow: 0 0 30px rgba(0, 255, 102, 0.5);
@@ -298,10 +298,11 @@
             align-items: center;
             justify-content: center;
             text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #00ff66;
+            text-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
             backdrop-filter: blur(2px);
-            font-size: 3.2rem !important;
-            line-height: 1 !important;
-            box-sizing: border-box !important;
         }
         
         .center-indicator {
@@ -847,7 +848,7 @@
 <body>
     <!-- ЭКСКЛЮЗИВНЫЙ ФОН ДЛЯ СТРАНИЦЫ АВТОРИЗАЦИИ -->
     <div id="authCustomBg" style="position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: url('images/sifon.png') no-repeat center center !important; background-size: cover !important; z-index: -50 !important; display: block;"></div>
-    
+
     <div id="mobileBlocker" style="display: none; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: #0a0f1e !important; z-index: 999999999 !important; justify-content: center !important; align-items: center !important; box-sizing: border-box !important;">
         <div id="blockerSmile" style="font-size: min(35vw, 35vh) !important; line-height: 1 !important; user-select: none !important;"></div>
     </div>
@@ -902,11 +903,10 @@
                     <div class="arrow-top animate" id="arrowTop"></div>
                     <div class="arrow-bottom animate" id="arrowBottom"></div>
                     <div class="center-indicator"></div>
-                    <div class="center-highlight" id="centerHighlight">🐇🐈♾️</div>
-                    <!-- Изолированный контейнер для бегущей ленты скинов -->
-                    <div id="tapeContainer" style="width: 100%; display: flex; justify-content: center; z-index: 10;"></div>
+                    <div class="center-highlight" id="centerHighlight">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
                 </div>
                 <button class="open-btn" id="openCaseBtn">ВРАЩАТЬ БАРАБАН</button>
+                <!-- ПЛАШКА ВЕРДИКТОВ (ПОД КНОПКОЙ) -->
                 <div id="rollVerdictBlock" style="display: none; width: 100% !important; border-radius: 80px !important; padding: 16px 42px !important; font-size: 1.6rem !important; font-weight: bold !important; text-align: center !important; margin: 20px 0 !important; box-sizing: border-box !important;"></div>
             </div>
             <div class="test-admin-panel">
@@ -973,7 +973,6 @@
 
         let currentUserUid = null;
         let isDataLoaded = false;
-        let spinTextInterval = null;
 
         // ==================== ЗВУКОВОЙ ДВИЖОК ====================
         const clickAudio = new Audio('click.mp3');
@@ -1081,6 +1080,7 @@
         let currentGlow = null;
         let stats = { total: 0, common: 0, rare: 0, superRare: 0, epic: 0, mythic: 0, legendary: 0 };
         let isResultScreen = false;
+        let spinTextInterval = null;
 
         let extendedStats = {
             totalRollsEver: 0,
@@ -1096,6 +1096,17 @@
             dailyCalendar: {},
             itemClicks: {},
             itemRollCounters: {}
+        };
+
+        // ==================== МАССИВЫ ТЕКСТОВ СО СМАЙЛИКАМИ ====================
+        const verdictTexts = {
+            common: ["🙂 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🙂", "🙃 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🙃", "😉 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😉", "😙 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😙", "☺️ НОВЫЙ ПРЕДМЕТ! УР-РАА!! ☺️", "😌 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😌", "😊 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😊", "😁 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😁", "😜 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😜"],
+            rare: ["👍 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 👍", "🤘 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤘", "🤞 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤞", "💪 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💪", "🦾 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🦾", "🤜 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤛"],
+            superRare: ["❤️ НОВЫЙ ПРЕДМЕТ! УР-РАА!! ❤️", "🧡 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🧡", "💛 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💛", "💚 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💚", "💙 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💙", "🤎 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤎", "🖤 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🖤", "🤍 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤍"],
+            epic: ["🤩 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤩", "😍 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😍", "😻 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😻", "🤑 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤑"],
+            mythic: ["😱 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😱", "😲 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😲", "🙀 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🙀", "🤯 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤯", "😨 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😨"],
+            legendary: ["🥵 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🥵", "😵 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😵", "🔥 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🔥", "🙊 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🙊", "⚰️ НОВЫЙ ПРЕДМЕТ! УР-РАА!! ⚰️", "💀 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💀", "🎷 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🎷", "💕 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💕", "🐠 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🐠", "👑 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 👑", "🧿 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🧿"],
+            duplicate: ["😔 ПОВТОР 😔", "😂 ПОВТОР 😂", "🤣 ПОВТОР 🤣", "😒 ПОВТОР 😒", "🙄 ПОВТОР 🙄", "😴 ПОВТОР 😴", "😕 ПОВТОР 😕", "🙁 ПОВТОР 🙁", "☹️ ПОВТОР ☹️", "😢 ПОВТОР 😢", "😞 ПОВТОР 😞", "😩 ПОВТОР 😩", "🥱 ПОВТОР 🥱", "😤 ПОВТОР 😤", "😡 ПОВТОР 😡", "😠 ПОВТОР 😠", "🤬 ПОВТОР 🤬", "😣 ПОВТОР 😣", "💩 ПОВТОР 💩", "😹 ПОВТОР 😹", "💢 ПОВТОР 💢", "🗿 ПОВТОР 🗿", "😾 ПОВТОР 😾", "🗑️ ПОВТОР 🗑️", "🆒 ПОВТОР 🆒", "💤 ПОВТОР 💤", "👎 ПОВТОР 👎", "🤡 ПОВТОР 🤡", "🤔 ПОВТОР 🤔", "👏 ПОВТОР 👏", "😭 ПОВТОР 😭", "🤦‍♂️ ПОВТОР 🤦‍♂️", "🤦‍♀️ ПОВТОР 🤦‍♀️", "😪 ПОВТОР 😪", "😛 ПОВТОР 😛", "💅 ПОВТОР 💅", "💔 ПОВТОР 💔", "🕯️ ПОВТОР 🕯️"]
         };
 
         // ==================== ОБЛАЧНЫЕ ФУНКЦИИ СОХРАНЕНИЯ ====================
@@ -1181,6 +1192,7 @@
                 }
                 isDataLoaded = true;
                 updateUI();
+                updateStatsDisplay();
             } catch (error) {
                 console.error("🔴 КРИТИЧЕСКАЯ ОШИБКА ЗАГРУЗКИ:", error);
                 console.error("🔴 Код ошибки:", error.code);
@@ -1351,32 +1363,26 @@
         function resetToInitialState() {
             const win = document.getElementById("slotWindow");
             const btn = document.getElementById("openCaseBtn");
-            const verdictBlock = document.getElementById("rollVerdictBlock");
-            const tape = document.getElementById("tapeContainer");
             
-            // Полностью очищаем ленту предметов после предыдущей крутки
-            if (tape) tape.innerHTML = "";
+            win.innerHTML = `
+                <div class="arrow-top animate" id="arrowTop"></div>
+                <div class="arrow-bottom animate" id="arrowBottom"></div>
+                <div class="center-indicator"></div>
+                <div class="center-highlight" id="centerHighlight">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
+            `;
             
-            // Восстанавливаем оригинальную разметку стрелок и индикаторов без пересоздания элементов
-            if (win) {
-                win.innerHTML = `
-                    <div class="arrow-top animate" id="arrowTop"></div>
-                    <div class="arrow-bottom animate" id="arrowBottom"></div>
-                    <div class="center-indicator"></div>
-                    <div class="center-highlight" id="centerHighlight" style="display: flex !important;">🐇🐈♾️</div>
-                    <div id="tapeContainer" style="width: 100%; display: flex; justify-content: center; z-index: 10;"></div>
-                `;
-            }
-            
-            if (verdictBlock) verdictBlock.style.setProperty("display", "none", "important");
-            
+            refreshOpenButtonText();
+            btn.disabled = false;
             isResultScreen = false;
             isSpinning = false;
             removeGlow();
             
             startArrowsAnimation();
             removeArrowsSpinning();
-            refreshOpenButtonText();
+            showCenterHighlight();
+            
+            const verdictBlock = document.getElementById("rollVerdictBlock");
+            if (verdictBlock) verdictBlock.style.display = "none";
         }
 
         function showResult(item, isNew) {
@@ -1393,7 +1399,6 @@
             
             let content = `
                 <div class="center-indicator"></div>
-                <div class="center-highlight" id="centerHighlight" style="display: none !important;">🐇🐈♾️</div>
                 <div class="final-container">
                     <div class="final-item ${isNew ? 'rarity-common' : rarityClass}">
                         ${isNew ? `<div class="new-rarity-title" style="--rarity-color: ${color};">${rarityName}!</div>` : ''}
@@ -1402,7 +1407,6 @@
                         <div class="rarity-badge ${textClass}">${rarity.name}</div>
                     </div>
                 </div>
-                <div id="tapeContainer" style="width: 100%; display: flex; justify-content: center; z-index: 10;"></div>
             `;
             
             win.innerHTML = content;
@@ -1430,7 +1434,6 @@
 
         async function startSpin(finalItem) {
             let win = document.getElementById("slotWindow");
-            const tape = document.getElementById("tapeContainer");
             const SLOTS_COUNT = 7;
             const TOTAL_STEPS = 200;
             
@@ -1451,13 +1454,6 @@
             let currentStep = 0;
             let queueIndex = SLOTS_COUNT;
             
-            // При старте крутки гарантированно очищаем контейнер вердиктов и сбрасываем видимость элементов каркаса окна
-            const verdictBlock = document.getElementById("rollVerdictBlock");
-            if (verdictBlock) verdictBlock.style.setProperty("display", "none", "important");
-            
-            // Каркас окна НЕ перерисовывается, мы просто очищаем ленту перед стартом
-            if (tape) tape.innerHTML = "";
-            
             function renderSlots() {
                 let html = `<div class="slots-container">`;
                 for (let i = 0; i < SLOTS_COUNT; i++) {
@@ -1477,9 +1473,8 @@
                     `;
                 }
                 html += `</div>`;
-                
-                // КРИТИЧЕСКИЙ ФИКС ЛАГОВ: обновляем ТОЛЬКО изолированную ленту! Стрелки и рамка не трогаются!
-                if (tape) tape.innerHTML = html;
+                win.innerHTML = `<div class="arrow-top spinning" id="arrowTop"></div><div class="arrow-bottom spinning" id="arrowBottom"></div><div class="center-indicator"></div>${html}`;
+                hideCenterHighlight();
             }
             
             renderSlots();
@@ -1496,11 +1491,17 @@
                     
                     const progress = currentStep / TOTAL_STEPS;
                     let delay;
-                    if (progress < 0.5) delay = 12;
-                    else if (progress < 0.75) delay = 35;
-                    else if (progress < 0.88) delay = 90;
-                    else if (progress < 0.95) delay = 220;
-                    else delay = 500;
+                    if (progress < 0.5) {
+                        delay = 12;
+                    } else if (progress < 0.75) {
+                        delay = 35;
+                    } else if (progress < 0.88) {
+                        delay = 90;
+                    } else if (progress < 0.95) {
+                        delay = 220;
+                    } else {
+                        delay = 500;
+                    }
                     
                     for (let i = 0; i < SLOTS_COUNT - 1; i++) {
                         currentItems[i] = currentItems[i + 1];
@@ -1519,6 +1520,7 @@
                     currentStep++;
                     setTimeout(step, delay);
                 }
+                
                 step();
             });
         }
@@ -1559,10 +1561,8 @@
             removeGlow();
             stopArrowsAnimation();
             setArrowsSpinning();
-            
             hideCenterHighlight();
             
-            // Анимация точек на кнопке
             let dotCount = 0;
             clearInterval(spinTextInterval);
             spinTextInterval = setInterval(() => {
@@ -1581,7 +1581,7 @@
             }
             
             showResult(won, isNew);
-            addItem(won);
+            const wasNew = addItem(won);
             
             if (isNew) {
                 if (inventory.length === 1) {
@@ -1621,6 +1621,7 @@
             else if (won.rarityKey === 'mythic') stats.mythic++;
             else if (won.rarityKey === 'legendary') stats.legendary++;
             saveStats();
+            updateStatsDisplay();
             
             updateUI();
             
@@ -1629,14 +1630,16 @@
             btn.disabled = false;
             isSpinning = false;
             
-            // Вывод плашки вердикта
+            // ЗАДАНИЕ 1: Плоская плашка вердиктов без 3D-эффекта кнопки
             const verdictBlock = document.getElementById("rollVerdictBlock");
             if (verdictBlock) {
                 if (!isNew) {
+                    // ПОВТОР: Плоский стильный зеленый овал без 3D тени кнопки
                     const arr = verdictTexts.duplicate;
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
                     verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 3px !important; box-shadow: none !important; text-transform: uppercase !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; transform: none !important;";
                 } else {
+                    // НОВЫЙ предмет: Плоский овал в цвет редкости без 3D тени кнопки
                     const arr = verdictTexts[won.rarityKey] || verdictTexts.common;
                     const rarityColor = getItemRarity(won).color;
                     const textColor = won.rarityKey === "common" ? "#000000" : "#ffffff";
@@ -1645,6 +1648,10 @@
                     verdictBlock.style.cssText = `display: block !important; background: ${rarityColor} !important; color: ${textColor} !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 1px !important; box-shadow: none !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; text-transform: uppercase !important; transform: none !important;`;
                 }
             }
+        }
+
+        function updateStatsDisplay() {
+            // Функция оставлена для обратной совместимости
         }
 
         function updateUI() {
@@ -2017,10 +2024,8 @@
             removeGlow();
             stopArrowsAnimation();
             setArrowsSpinning();
-            
             hideCenterHighlight();
             
-            // Анимация точек на кнопке
             let dotCount = 0;
             clearInterval(spinTextInterval);
             spinTextInterval = setInterval(() => {
@@ -2038,7 +2043,7 @@
             }
             
             showResult(won, isNew);
-            addItem(won);
+            const wasNew = addItem(won);
             
             if (isNew) {
                 if (inventory.length === 1) {
@@ -2073,6 +2078,7 @@
             stats.total++;
             stats[won.rarityKey]++;
             saveStats();
+            updateStatsDisplay();
             
             updateUI();
             
@@ -2081,14 +2087,16 @@
             btn.disabled = false;
             isSpinning = false;
             
-            // Вывод плашки вердикта
+            // ЗАДАНИЕ 1: Плоская плашка вердиктов без 3D-эффекта кнопки
             const verdictBlock = document.getElementById("rollVerdictBlock");
             if (verdictBlock) {
                 if (!isNew) {
+                    // ПОВТОР: Плоский стильный зеленый овал без 3D тени кнопки
                     const arr = verdictTexts.duplicate;
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
                     verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 3px !important; box-shadow: none !important; text-transform: uppercase !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; transform: none !important;";
                 } else {
+                    // НОВЫЙ предмет: Плоский овал в цвет редкости без 3D тени кнопки
                     const arr = verdictTexts[won.rarityKey] || verdictTexts.common;
                     const rarityColor = getItemRarity(won).color;
                     const textColor = won.rarityKey === "common" ? "#000000" : "#ffffff";
@@ -2119,6 +2127,7 @@
                 }
                 resetToInitialState();
                 updateUI();
+                updateStatsDisplay();
             }
         }
 
@@ -2137,17 +2146,6 @@
         }
         window.refreshOpenButtonText = refreshOpenButtonText;
 
-        // ==================== МАССИВЫ ВЕРДИКТОВ ====================
-        const verdictTexts = {
-            common: ["🙂 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🙂", "🙃 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🙃", "😉 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😉", "😙 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😙", "☺️ НОВЫЙ ПРЕДМЕТ! УР-РАА!! ☺️", "😌 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😌", "😊 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😊", "😁 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😁", "😜 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😜"],
-            rare: ["👍 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 👍", "🤘 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤘", "🤞 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤞", "💪 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💪", "🦾 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🦾", "🤜 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤛"],
-            superRare: ["❤️ НОВЫЙ ПРЕДМЕТ! УР-РАА!! ❤️", "🧡 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🧡", "💛 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💛", "💚 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💚", "💙 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💙", "🤎 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤎", "🖤 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🖤", "🤍 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤍"],
-            epic: ["🤩 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤩", "😍 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😍", "😻 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😻", "🤑 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤑"],
-            mythic: ["😱 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😱", "😲 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😲", "🙀 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🙀", "🤯 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🤯", "😨 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😨"],
-            legendary: ["🥵 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🥵", "😵 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 😵", "🔥 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🔥", "🙊 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🙊", "⚰️ НОВЫЙ ПРЕДМЕТ! УР-РАА!! ⚰️", "💀 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💀", "🎷 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🎷", "💕 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 💕", "🐠 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🐠", "👑 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 👑", "🧿 НОВЫЙ ПРЕДМЕТ! УР-РАА!! 🧿"],
-            duplicate: ["😔 ПОВТОР 😔", "😂 ПОВТОР 😂", "🤣 ПОВТОР 🤣", "😒 ПОВТОР 😒", "🙄 ПОВТОР 🙄", "😴 ПОВТОР 😴", "😕 ПОВТОР 😕", "🙁 ПОВТОР 🙁", "☹️ ПОВТОР ☹️", "😢 ПОВТОР 😢", "😞 ПОВТОР 😞", "😩 ПОВТОР 😩", "🥱 ПОВТОР 🥱", "😤 ПОВТОР 😤", "😡 ПОВТОР 😡", "😠 ПОВТОР 😠", "🤬 ПОВТОР 🤬", "😣 ПОВТОР 😣", "💩 ПОВТОР 💩", "😹 ПОВТОР 😹", "💢 ПОВТОР 💢", "🗿 ПОВТОР 🗿", "😾 ПОВТОР 😾", "🗑️ ПОВТОР 🗑️", "🆒 ПОВТОР 🆒", "💤 ПОВТОР 💤", "👎 ПОВТОР 👎", "🤡 ПОВТОР 🤡", "🤔 ПОВТОР 🤔", "👏 ПОВТОР 👏", "😭 ПОВТОР 😭", "🤦‍♂️ ПОВТОР 🤦‍♂️", "🤦‍♀️ ПОВТОР 🤦‍♀️", "😪 ПОВТОР 😪", "😛 ПОВТОР 😛", "💅 ПОВТОР 💅", "💔 ПОВТОР 💔", "🕯️ ПОВТОР 🕯️"]
-        };
-
         // ==================== ЭКСПОРТ В ГЛОБАЛЬНЫЙ ОБЪЕКТ WINDOW ====================
         window.testOpenCaseWithRarity = testOpenCaseWithRarity;
         window.openItemDescription = openItemDescription;
@@ -2165,11 +2163,11 @@
                 const appEl = document.querySelector(".app");
                 const authEl = document.getElementById("authOverlay");
                 const videoEl = document.getElementById("globalVideoBg");
-                const customBg = document.getElementById("authCustomBg");
+                const authBg = document.getElementById("authCustomBg");
                 if (appEl) appEl.style.setProperty("display", "none", "important");
                 if (authEl) authEl.style.setProperty("display", "none", "important");
                 if (videoEl) videoEl.style.setProperty("display", "none", "important");
-                if (customBg) customBg.style.setProperty("display", "none", "important");
+                if (authBg) authBg.style.setProperty("display", "none", "important");
                 
                 const randomSmile = mobileSmiles[Math.floor(Math.random() * mobileSmiles.length)];
                 const blocker = document.getElementById("mobileBlocker");
@@ -2191,7 +2189,7 @@
             const passwordInput = document.getElementById("authPassword");
             const errorDiv = document.getElementById("authError");
             const videoBg = document.getElementById("globalVideoBg");
-            const customBg = document.getElementById("authCustomBg");
+            const authCustomBg = document.getElementById("authCustomBg");
             
             const inventoryGrid = document.getElementById("inventoryGrid");
             if (inventoryGrid) {
@@ -2221,7 +2219,7 @@
                     document.querySelector(".app").style.display = "block";
                     document.getElementById("authOverlay").style.display = "none";
                     if (videoBg) videoBg.style.display = "none";
-                    if (customBg) customBg.style.display = "none";
+                    if (authCustomBg) authCustomBg.style.display = "none";
                     
                     loadData();
                 } else {
@@ -2232,7 +2230,7 @@
                     document.querySelector(".app").style.display = "none";
                     document.getElementById("authOverlay").style.display = "flex";
                     if (videoBg) videoBg.style.display = "block";
-                    if (customBg) customBg.style.setProperty("display", "block", "important");
+                    if (authCustomBg) authCustomBg.style.setProperty("display", "block", "important");
                 }
             });
 
