@@ -1028,32 +1028,31 @@
             return ITEMS[0];
         }
 
-        function getRandomItemByRarity() {
-            const rand = Math.random() * 100;
-            if (rand < 79.6) {
-                const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'common');
-                if (itemsOfThisRarity.length === 0) return ITEMS[0];
-                return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
-            } else if (rand < 94.6) {
-                const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'rare');
-                if (itemsOfThisRarity.length === 0) return ITEMS[0];
-                return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
-            } else if (rand < 97.6) {
-                const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'superRare');
-                if (itemsOfThisRarity.length === 0) return ITEMS[0];
-                return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
-            } else if (rand < 99.4) {
-                const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'epic');
-                if (itemsOfThisRarity.length === 0) return ITEMS[0];
-                return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
-            } else if (rand < 99.7) {
-                const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'mythic');
-                if (itemsOfThisRarity.length === 0) return ITEMS[0];
-                return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
-            } else {
-                const itemsOfThisRarity = ITEMS.filter(i => i.rarityKey === 'legendary');
-                if (itemsOfThisRarity.length === 0) return ITEMS[0];
-                return itemsOfThisRarity[Math.floor(Math.random() * itemsOfThisRarity.length)];
+        // Высокоскоростной кэшированный выбор предметов по редкости (0ms нагрузки на процессор)
+const cachedItemsByRarity = {
+    common: ITEMS.filter(i => i.rarityKey === 'common'),
+    rare: ITEMS.filter(i => i.rarityKey === 'rare'),
+    superRare: ITEMS.filter(i => i.rarityKey === 'superRare'),
+    epic: ITEMS.filter(i => i.rarityKey === 'epic'),
+    mythic: ITEMS.filter(i => i.rarityKey === 'mythic'),
+    legendary: ITEMS.filter(i => i.rarityKey === 'legendary')
+};
+
+function getRandomItemByRarity() {
+    const rand = Math.random() * 100;
+    let targetRarity = 'common';
+    
+    if (rand < 79.6) targetRarity = 'common';
+    else if (rand < 94.6) targetRarity = 'rare';
+    else if (rand < 97.6) targetRarity = 'superRare';
+    else if (rand < 99.4) targetRarity = 'epic';
+    else if (rand < 99.7) targetRarity = 'mythic';
+    else targetRarity = 'legendary';
+    
+    const pool = cachedItemsByRarity[targetRarity];
+    if (!pool || pool.length === 0) return ITEMS[0];
+    return pool[Math.floor(Math.random() * pool.length)];
+}
             }
         }
 
