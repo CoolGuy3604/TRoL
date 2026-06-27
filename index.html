@@ -1191,6 +1191,7 @@
                     console.log("🟡 Аккаунт новый, в облаке нет старых данных. Инициализированы дефолтные значения.");
                 }
                 isDataLoaded = true;
+                updateDotStatus(); // Проверка глобальной точки при первой загрузке
                 updateUI();
                 updateStatsDisplay();
             } catch (error) {
@@ -1230,11 +1231,13 @@
             if (!invRecord) {
                 const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
                 const dateStr = `${formatter.format(new Date())}`;
+                // ЗАДАЧА 1: Присваиваем unviewed: true строго новому уникальному предмету
                 inventory.push({ 
                     id: item.id, 
                     date: dateStr,
                     rollsToDrop: extendedStats.itemRollCounters[item.id] || 1,
-                    duplicatesCount: 0
+                    duplicatesCount: 0,
+                    unviewed: true
                 });
                 saveData();
                 return true;
@@ -1242,6 +1245,19 @@
                 invRecord.duplicatesCount = (invRecord.duplicatesCount || 0) + 1;
                 saveData();
                 return false;
+            }
+        }
+        
+        // ЗАДАЧА 1: Управление отображением точки на самой кнопке "🎒 Инвентарь"
+        function updateDotStatus() {
+            const dot = document.getElementById("invDot");
+            if (!dot) return;
+            // Проверяем, есть ли хотя бы один unviewed предмет
+            const hasUnviewed = inventory.some(i => i.unviewed === true);
+            if (hasUnviewed) {
+                dot.style.display = "inline-block";
+            } else {
+                dot.style.display = "none";
             }
         }
         
@@ -1301,10 +1317,13 @@
             currentGlow = glow;
         }
 
+        // ЗАДАЧА 6: Аппаратное ускорение слоев через CSS для идеальной плавной трансформации без тряски контента
         const styleSheet = document.createElement('style');
         styleSheet.textContent = `
             @keyframes eternalPulse { 0% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); filter: blur(20px); } 50% { opacity: 0.85; transform: translate(-50%, -50%) scale(1.02); filter: blur(22px); } 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); filter: blur(20px); } }
             @keyframes flashAnim { 0% { opacity: 0; width: 0%; height: 0%; } 15% { opacity: 1; width: 100%; height: 100%; } 100% { opacity: 0; width: 180%; height: 180%; } }
+            .item-card { will-change: transform; backface-visibility: hidden; transform-style: preserve-3d; }
+            .item-card * { backface-visibility: hidden; }
         `;
         document.head.appendChild(styleSheet);
         
@@ -1360,6 +1379,7 @@
             if (centerHighlight) centerHighlight.style.display = 'flex';
         }
         
+        // ЗАДАЧА 3: Замена стартового текста в рамке на кастомный смайл-код с масштабированием шрифта на 65%
         function resetToInitialState() {
             const win = document.getElementById("slotWindow");
             const btn = document.getElementById("openCaseBtn");
@@ -1368,7 +1388,7 @@
                 <div class="arrow-top animate" id="arrowTop"></div>
                 <div class="arrow-bottom animate" id="arrowBottom"></div>
                 <div class="center-indicator"></div>
-                <div class="center-highlight" id="centerHighlight">🎰 Нажми "ОТКРЫТЬ" 🎰</div>
+                <div class="center-highlight" id="centerHighlight" style="font-size: 5rem !important; display: flex; align-items: center; justify-content: center;">🐇♾️🐈</div>
             `;
             
             refreshOpenButtonText();
@@ -1402,7 +1422,7 @@
                 <div class="final-container">
                     <div class="final-item ${isNew ? 'rarity-common' : rarityClass}">
                         ${isNew ? `<div class="new-rarity-title" style="--rarity-color: ${color};">${rarityName}!</div>` : ''}
-                        <img src="${item.img}" class="final-img" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
+                        <img src="${item.img}" class="final-img" id="finalResultImg" alt="${escapeHtml(item.name)}" onerror="this.style.display='none'">
                         <div class="name">${escapeHtml(item.name)}</div>
                         <div class="rarity-badge ${textClass}">${rarity.name}</div>
                     </div>
@@ -1410,6 +1430,13 @@
             `;
             
             win.innerHTML = content;
+            
+            // ЗАДАЧА 5: Ювелирная защита финальной картинки выигрыша от копирования/перетаскивания
+            const finalImg = document.getElementById("finalResultImg");
+            if (finalImg) {
+                finalImg.addEventListener('contextmenu', e => e.preventDefault());
+                finalImg.addEventListener('dragstart', e => e.preventDefault());
+            }
             
             let flash = document.createElement('div');
             flash.style.position = 'absolute';
@@ -1604,6 +1631,9 @@
             }
             saveExtendedStats();
             
+            // ЗАДАЧА 1: Обновляем точку после добавления предмета
+            updateDotStatus();
+            
             if (isNew) {
                 const activeTabBtn = document.querySelector(".tab-btn.active");
                 const isCurrentlyInInventory = activeTabBtn && activeTabBtn.getAttribute("data-tab") === "inventory";
@@ -1630,16 +1660,13 @@
             btn.disabled = false;
             isSpinning = false;
             
-            // ЗАДАНИЕ 1: Плоская плашка вердиктов без 3D-эффекта кнопки
             const verdictBlock = document.getElementById("rollVerdictBlock");
             if (verdictBlock) {
                 if (!isNew) {
-                    // ПОВТОР: Плоский стильный зеленый овал без 3D тени кнопки
                     const arr = verdictTexts.duplicate;
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
                     verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 3px !important; box-shadow: none !important; text-transform: uppercase !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; transform: none !important;";
                 } else {
-                    // НОВЫЙ предмет: Плоский овал в цвет редкости без 3D тени кнопки
                     const arr = verdictTexts[won.rarityKey] || verdictTexts.common;
                     const rarityColor = getItemRarity(won).color;
                     const textColor = won.rarityKey === "common" ? "#000000" : "#ffffff";
@@ -1717,10 +1744,21 @@
                                 <div class="badge ${textClass}">${rarity.name}</div>
                             `;
                             
+                            // ЗАДАЧА 1: При клике на карточку инвентаря снимаем unviewed у предмета
                             card.addEventListener('click', function(e) {
                                 e.stopPropagation();
                                 const id = parseInt(this.getAttribute('data-item-id'));
                                 console.log("🖱️ Клик по карточке (addEventListener) с ID:", id);
+                                
+                                // Снимаем unviewed статус при просмотре карточки
+                                const invRecord = inventory.find(record => record.id === id);
+                                if (invRecord && invRecord.unviewed === true) {
+                                    invRecord.unviewed = false;
+                                    saveData();
+                                    updateDotStatus();
+                                    console.log("🔴 unviewed снят для предмета:", id);
+                                }
+                                
                                 window.openItemDescription(id);
                             });
                             
@@ -1886,7 +1924,19 @@
                     document.getElementById("statsTab").classList.remove("active");
                     document.getElementById(id + "Tab").classList.add("active");
                     
+                    // ЗАДАЧА 1: При переходе на вкладку инвентаря снимаем unviewed у всех предметов
                     if (id === "inventory") {
+                        let hasUnviewed = false;
+                        inventory.forEach(record => {
+                            if (record.unviewed === true) {
+                                record.unviewed = false;
+                                hasUnviewed = true;
+                            }
+                        });
+                        if (hasUnviewed) {
+                            saveData();
+                            console.log("🔴 Все unviewed сняты при переходе в инвентарь");
+                        }
                         const dot = document.getElementById("invDot");
                         if (dot) dot.style.display = "none";
                     }
@@ -2066,6 +2116,9 @@
             }
             saveExtendedStats();
             
+            // ЗАДАЧА 1: Обновляем точку после добавления предмета
+            updateDotStatus();
+            
             if (isNew) {
                 const activeTabBtn = document.querySelector(".tab-btn.active");
                 const isCurrentlyInInventory = activeTabBtn && activeTabBtn.getAttribute("data-tab") === "inventory";
@@ -2087,16 +2140,13 @@
             btn.disabled = false;
             isSpinning = false;
             
-            // ЗАДАНИЕ 1: Плоская плашка вердиктов без 3D-эффекта кнопки
             const verdictBlock = document.getElementById("rollVerdictBlock");
             if (verdictBlock) {
                 if (!isNew) {
-                    // ПОВТОР: Плоский стильный зеленый овал без 3D тени кнопки
                     const arr = verdictTexts.duplicate;
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
                     verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 3px !important; box-shadow: none !important; text-transform: uppercase !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; transform: none !important;";
                 } else {
-                    // НОВЫЙ предмет: Плоский овал в цвет редкости без 3D тени кнопки
                     const arr = verdictTexts[won.rarityKey] || verdictTexts.common;
                     const rarityColor = getItemRarity(won).color;
                     const textColor = won.rarityKey === "common" ? "#000000" : "#ffffff";
@@ -2128,6 +2178,7 @@
                 resetToInitialState();
                 updateUI();
                 updateStatsDisplay();
+                updateDotStatus();
             }
         }
 
@@ -2199,6 +2250,14 @@
                         const id = parseInt(card.getAttribute("data-item-id"));
                         console.log("🌐 Глобальный перехват клика по карточке с ID:", id);
                         if (!isNaN(id)) {
+                            // Снимаем unviewed статус при просмотре карточки
+                            const invRecord = inventory.find(record => record.id === id);
+                            if (invRecord && invRecord.unviewed === true) {
+                                invRecord.unviewed = false;
+                                saveData();
+                                updateDotStatus();
+                                console.log("🔴 unviewed снят для предмета:", id);
+                            }
                             window.openItemDescription(id);
                         } else {
                             console.warn("⚠️ ID не найден в data-атрибуте карточки");
