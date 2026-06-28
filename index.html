@@ -844,7 +844,34 @@
             transform: scale(0.95);
         }
 
-        /* ЗАДАЧА 6: Фикс плавного ховера карточек без дерганья внутренних элементов */
+        /* ЗАДАЧА 3: Смещение точки на кнопке «🎒 Инвентарь» на 10px вниз */
+        #invDot {
+            display: none;
+            position: absolute;
+            top: 12px !important; /* ЗАДАЧА 3: Смещено на 10px ниже */
+            right: 6px;
+            width: 12px;
+            height: 12px;
+            background-color: #ff1414;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #ff1414;
+        }
+
+        /* ЗАДАЧА 3: Обновленное положение красной точки на карточке сдвинуто на 3px вправо (right: 9px) */
+        .card-dot {
+            position: absolute !important;
+            top: 12px !important;
+            right: 9px !important; 
+            width: 12px !important;
+            height: 12px !important;
+            background-color: #ff1414 !important;
+            border-radius: 50% !important;
+            box-shadow: 0 0 8px #ff1414 !important;
+            z-index: 100 !important;
+            display: inline-block;
+        }
+
+        /* ЗАДАЧА 4 и 6: Корректный фикс ховера без микро-сдвигов и БЕЗ размытия шрифтов (текст как в коллекции) */
         .slot-item, .item-card {
             will-change: transform;
             backface-visibility: hidden;
@@ -853,10 +880,17 @@
             -webkit-transform-style: preserve-3d;
             transform: translateZ(0);
         }
-        .slot-item *, .item-card * {
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            transform: translateZ(0);
+
+        /* Названия и бейджи выводятся из 3D-слоя, чтобы текст не мылился, не сжимался и был как в коллекции */
+        .item-card .item-name, 
+        .item-card .badge, 
+        .slot-item .name, 
+        .slot-item .rarity-badge {
+            transform: none !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            -webkit-font-smoothing: subpixel-antialiased !important;
+            font-smooth: always !important;
         }
     </style>
 </head>
@@ -896,7 +930,7 @@
             <!-- Левая часть: Кнопки навигации -->
             <div class="tabs" style="margin-bottom: 0 !important; border-bottom: none !important; padding-bottom: 0 !important;">
                 <button class="tab-btn active" data-tab="case">📦 Кейс</button>
-                <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot" style="display: none; position: absolute; top: 2px; right: 6px; width: 12px; height: 12px; background-color: #ff1414; border-radius: 50%; box-shadow: 0 0 8px #ff1414;"></span></button>
+                <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot" style="display: none; position: absolute; top: 12px; right: 6px; width: 12px; height: 12px; background-color: #ff1414; border-radius: 50%; box-shadow: 0 0 8px #ff1414;"></span></button>
                 <button class="tab-btn" data-tab="collection">🏆 Коллекция</button>
                 <button class="tab-btn" data-tab="stats">📊 Статистика</button>
             </div>
@@ -918,8 +952,8 @@
                     <div class="arrow-top animate" id="arrowTop"></div>
                     <div class="arrow-bottom animate" id="arrowBottom"></div>
                     <div class="center-indicator"></div>
-                    <!-- ЗАДАЧА 3: Обновление текста центральной рамки -->
-                    <div class="center-highlight" id="centerHighlight" style="font-size: 5rem !important;">🐇♾️🐈</div>
+                    <!-- ЗАДАЧА 1: Калибровка размера текста центральной рамки -->
+                    <div class="center-highlight" id="centerHighlight" style="font-size: 3.5rem !important; white-space: nowrap !important;">🐇♾️🐈</div>
                 </div>
                 <button class="open-btn" id="openCaseBtn">ВРАЩАТЬ БАРАБАН</button>
                 <!-- ПЛАШКА ВЕРДИКТОВ (ПОД КНОПКОЙ) -->
@@ -1384,7 +1418,7 @@
             if (centerHighlight) centerHighlight.style.display = 'flex';
         }
         
-        // ЗАДАЧА 3: ОБНОВЛЕННАЯ ФУНКЦИЯ resetToInitialState
+        // ЗАДАЧА 1: ОБНОВЛЕННАЯ ФУНКЦИЯ resetToInitialState
         function resetToInitialState() {
             const win = document.getElementById("slotWindow");
             const btn = document.getElementById("openCaseBtn");
@@ -1393,7 +1427,7 @@
                 <div class="arrow-top animate" id="arrowTop"></div>
                 <div class="arrow-bottom animate" id="arrowBottom"></div>
                 <div class="center-indicator"></div>
-                <div class="center-highlight" id="centerHighlight" style="font-size: 5rem !important;">🐇♾️🐈</div>
+                <div class="center-highlight" id="centerHighlight" style="font-size: 3.5rem !important; white-space: nowrap !important;">🐇♾️🐈</div>
             `;
             refreshOpenButtonText();
             btn.disabled = false;
@@ -1760,8 +1794,8 @@
                             card.setAttribute('data-item-id', item.id);
                             card.style.position = 'relative'; // Для позиционирования точки
                             
-                            // ЗАДАЧА 1: Рендерим жирную красную точку, если предмет не просмотрен
-                            let dotHtml = isUnviewed ? `<span class="card-dot" style="position: absolute !important; top: 12px !important; right: 12px !important; width: 12px !important; height: 12px !important; background-color: #ff1414 !important; border-radius: 50% !important; box-shadow: 0 0 8px #ff1414 !important; z-index: 100 !important; display: inline-block;"></span>` : '';
+                            // ЗАДАЧА 3: Используем класс .card-dot с обновлённым положением
+                            let dotHtml = isUnviewed ? `<span class="card-dot"></span>` : '';
                             
                             card.innerHTML = `
                                 ${dotHtml}
@@ -1977,7 +2011,7 @@
             });
         }
 
-        // ЗАДАЧА 1: ОБНОВЛЕННАЯ ФУНКЦИЯ openItemDescription
+        // ЗАДАЧА 2: ОБНОВЛЕННАЯ ФУНКЦИЯ openItemDescription с моментальным удалением точки
         function openItemDescription(id) {
             console.log("🟢 Вызов модалки для ID:", id);
             
@@ -1992,11 +2026,25 @@
             extendedStats.itemClicks[id] = (extendedStats.itemClicks[id] || 0) + 1;
             saveExtendedStats();
             
-            // ЗАДАЧА 1: Сброс флага unviewed при клике и мгновенное облачное сохранение
+            // ЗАДАЧА 2: Сброс флага просмотренности, мгновенное удаление точки из DOM и пересчет кнопки таба
             const invRecord = inventory.find(record => record.id === id);
             if (invRecord && invRecord.unviewed === true) {
                 invRecord.unviewed = false;
-                saveData(); // Мгновенный улет в Firebase
+                saveData(); // Мгновенная отправка в Firebase
+                
+                // Находим кликнутую карточку в инвентаре и удаляем её красную точку прямо сейчас
+                const clickedCard = document.querySelector(`.item-card[data-item-id="${id}"]`);
+                if (clickedCard) {
+                    const dot = clickedCard.querySelector('.card-dot');
+                    if (dot) dot.remove();
+                }
+                
+                // Моментально пересчитываем, остались ли еще непросмотренные предметы в инвентаре
+                const hasUnviewedNow = inventory.some(i => i.unviewed === true);
+                const mainInvDot = document.getElementById("invDot");
+                if (mainInvDot) {
+                    mainInvDot.style.display = hasUnviewedNow ? "inline-block" : "none";
+                }
             }
             
             const modal = document.getElementById("descModal");
