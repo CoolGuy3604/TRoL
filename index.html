@@ -858,42 +858,42 @@
             border: 2px solid #000000 !important;
         }
 
-        /* ===== ЗАДАЧА 2: Красная точка внутри иконки предмета смещена на 1px вверх ===== */
+        /* ===== Красная точка внутри иконки предмета (Без изменений) ===== */
         .card-dot {
             position: absolute !important;
-            top: 7px !important;     /* Смещено на 1px вверх (было 8px) */
-            right: 9px !important;   /* Положение по горизонтали сохранено */
+            top: 7px !important;
+            right: 9px !important;
             width: 12px !important;
             height: 12px !important;
             background-color: #ff1414 !important;
             border-radius: 50% !important;
             box-shadow: none !important;
-            border: 2px solid #000000 !important; /* Обводка, как у кнопки, сохранена */
+            border: 2px solid #000000 !important;
             z-index: 100 !important;
             display: inline-block;
         }
 
-        /* ===== ЗАДАЧА 1: Принудительное включение графического слоя для перманентной чёткости шрифтов ===== */
+        /* ===== ЗАДАЧА 1: Полный отказ от transition для устранения таймеров сглаживания Chromium ===== */
         .slot-item, .item-card {
             position: relative !important;
-            transition: background 0.2s ease;
+            transition: none !important; /* УБИРАЕМ любые переходы, подсветка меняется МГНОВЕННО */
             
-            /* Сверхважный трюк: заставляем браузер ВСЕГДА держать текст в режиме максимальной чёткости */
-            opacity: 0.999 !important; 
-            will-change: opacity, background !important;
+            /* Бронебойная изоляция слоя: отрезаем карточку от внешних перерасчетов браузера */
+            isolation: isolate !important; 
             
             -webkit-font-smoothing: antialiased !important;
             -moz-osx-font-smoothing: grayscale !important;
             text-rendering: optimizeLegibility !important;
         }
 
-        /* При наведении меняется строго фон, карточка и тексты остаются абсолютно неподвижными */
+        /* При наведении мгновенно меняется фон, карточка и тексты остаются абсолютно мертвыми и статичными */
         .item-card:hover {
             transform: none !important;
-            background: #1e2540;
+            background: #1e2540 !important;
+            transition: none !important;
         }
 
-        /* Тексты всегда отрисовываются в своём лучшем, качественном виде и не перещёлкиваются при ховере */
+        /* Тексты жестко зафиксированы в своем лучшем, качественном векторном виде и физически не могут перещелкиваться */
         .item-card .item-name, 
         .item-card .badge, 
         .item-card img,
@@ -906,6 +906,7 @@
             transform: none !important;
             backface-visibility: visible !important;
             -webkit-backface-visibility: visible !important;
+            transition: none !important;
             display: block;
         }
 
