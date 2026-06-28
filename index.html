@@ -844,54 +844,56 @@
             transform: scale(0.95);
         }
 
-        /* ===== ЗАДАЧА 2: Красная точка на кнопке «🎒 Инвентарь» ===== */
-        /* Смещена на 1px влево (свечение отключено, обводка сохранена) */
+        /* ===== Красная точка на кнопке «🎒 Инвентарь» (Без изменений) ===== */
         #invDot {
             display: none;
             position: absolute;
-            top: 8px !important;     /* Положение по вертикали сохранено */
-            right: 10px !important;  /* Смещено на 1px влево (было 9px) */
+            top: 8px !important;
+            right: 10px !important;
             width: 12px;
             height: 12px;
             background-color: #ff1414;
             border-radius: 50%;
-            box-shadow: none !important; /* Свечение полностью отключено */
-            border: 2px solid #000000 !important; /* Черная обводка для видимости на зеленом фоне */
+            box-shadow: none !important;
+            border: 2px solid #000000 !important;
         }
 
-        /* ===== ЗАДАЧА 3: Красная точка внутри иконки предмета ===== */
-        /* Сделана ТОЧНО ТАКОЙ ЖЕ (добавлена обводка, убрано свечение) и смещена на 1px вниз */
+        /* ===== ЗАДАЧА 2: Красная точка внутри иконки предмета смещена на 1px вверх ===== */
         .card-dot {
             position: absolute !important;
-            top: 8px !important;     /* Смещено на 1px вниз (было 7px) */
+            top: 7px !important;     /* Смещено на 1px вверх (было 8px) */
             right: 9px !important;   /* Положение по горизонтали сохранено */
             width: 12px !important;
             height: 12px !important;
             background-color: #ff1414 !important;
             border-radius: 50% !important;
-            box-shadow: none !important; /* ЗАДАЧА 3: Свечение убрано, как у кнопки */
-            border: 2px solid #000000 !important; /* ЗАДАЧА 3: Добавлена черная обводка, как у кнопки */
+            box-shadow: none !important;
+            border: 2px solid #000000 !important; /* Обводка, как у кнопки, сохранена */
             z-index: 100 !important;
             display: inline-block;
         }
 
-        /* ===== ЗАДАЧА 1: Полная статика внутренних элементов и отмена анимации увеличения ===== */
+        /* ===== ЗАДАЧА 1: Принудительное включение графического слоя для перманентной чёткости шрифтов ===== */
         .slot-item, .item-card {
             position: relative !important;
-            /* УБРАНО свойство transform из transition, анимации увеличения больше нет */
-            transition: background 0.2s ease; 
+            transition: background 0.2s ease;
+            
+            /* Сверхважный трюк: заставляем браузер ВСЕГДА держать текст в режиме максимальной чёткости */
+            opacity: 0.999 !important; 
+            will-change: opacity, background !important;
+            
             -webkit-font-smoothing: antialiased !important;
             -moz-osx-font-smoothing: grayscale !important;
             text-rendering: optimizeLegibility !important;
         }
 
-        /* При наведении меняется ТОЛЬКО фон, сама карточка НЕ увеличивается в размере */
+        /* При наведении меняется строго фон, карточка и тексты остаются абсолютно неподвижными */
         .item-card:hover {
-            transform: none !important; /* Карточка железно остается статичной */
+            transform: none !important;
             background: #1e2540;
         }
 
-        /* Все элементы внутри карточки абсолютно неподвижны, не деформируются и не мылятся */
+        /* Тексты всегда отрисовываются в своём лучшем, качественном виде и не перещёлкиваются при ховере */
         .item-card .item-name, 
         .item-card .badge, 
         .item-card img,
@@ -901,13 +903,13 @@
             -webkit-font-smoothing: antialiased !important;
             -moz-osx-font-smoothing: grayscale !important;
             text-rendering: optimizeLegibility !important;
-            transform: none !important; /* Никаких сдвигов */
+            transform: none !important;
             backface-visibility: visible !important;
             -webkit-backface-visibility: visible !important;
             display: block;
         }
 
-        /* Фикс для бейджа редкости, чтобы он сохранял пропорции, четкость и не сжимался */
+        /* Стабилизация бейджа редкости */
         .item-card .badge, .slot-item .rarity-badge {
             flex-shrink: 0 !important;
             white-space: nowrap !important;
