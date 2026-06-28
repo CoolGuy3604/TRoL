@@ -844,12 +844,12 @@
             transform: scale(0.95);
         }
 
-        /* ЗАДАЧА 3: Смещение точки на кнопке «🎒 Инвентарь» на 10px вниз */
+        /* ЗАДАЧА 2: Смещение точки на кнопке «🎒 Инвентарь» на 3px влево и 3px наверх */
         #invDot {
             display: none;
             position: absolute;
-            top: 12px !important; /* ЗАДАЧА 3: Смещено на 10px ниже */
-            right: 6px;
+            top: 9px !important;    /* ЗАДАЧА 2: Смещено на 3px наверх (было 12px) */
+            right: 9px !important;  /* ЗАДАЧА 2: Смещено на 3px влево (было 6px) */
             width: 12px;
             height: 12px;
             background-color: #ff1414;
@@ -857,11 +857,11 @@
             box-shadow: 0 0 8px #ff1414;
         }
 
-        /* ЗАДАЧА 3: Обновленное положение красной точки на карточке сдвинуто на 3px вправо (right: 9px) */
+        /* ЗАДАЧА 3: Красная точка внутри иконки смещена на 4px наверх (top: 8px, right: 9px) */
         .card-dot {
             position: absolute !important;
-            top: 12px !important;
-            right: 9px !important; 
+            top: 8px !important;    /* Смещено на 4px наверх (было 12px) */
+            right: 9px !important;  /* Позиция по горизонтали из прошлого фикса сохранена */
             width: 12px !important;
             height: 12px !important;
             background-color: #ff1414 !important;
@@ -871,8 +871,9 @@
             display: inline-block;
         }
 
-        /* ЗАДАЧА 4 и 6: Корректный фикс ховера без микро-сдвигов и БЕЗ размытия шрифтов (текст как в коллекции) */
+        /* ЗАДАЧА 1 и 6: Фикс ховера и ЖЕСТКАЯ фиксация контекста рендеринга */
         .slot-item, .item-card {
+            position: relative !important; /* ЗАДАЧА 1: Всегда relative, независимо от наличия точки! */
             will-change: transform;
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
@@ -881,7 +882,8 @@
             transform: translateZ(0);
         }
 
-        /* Названия и бейджи выводятся из 3D-слоя, чтобы текст не мылился, не сжимался и был как в коллекции */
+        /* Названия и бейджи принудительно выводятся из 3D-контекста с субпиксельным сглаживанием */
+        /* Текст ВСЕГДА будет четким и качественным, как в коллекции, в том числе ПОСЛЕ удаления точки */
         .item-card .item-name, 
         .item-card .badge, 
         .slot-item .name, 
@@ -930,7 +932,7 @@
             <!-- Левая часть: Кнопки навигации -->
             <div class="tabs" style="margin-bottom: 0 !important; border-bottom: none !important; padding-bottom: 0 !important;">
                 <button class="tab-btn active" data-tab="case">📦 Кейс</button>
-                <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot" style="display: none; position: absolute; top: 12px; right: 6px; width: 12px; height: 12px; background-color: #ff1414; border-radius: 50%; box-shadow: 0 0 8px #ff1414;"></span></button>
+                <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot" style="display: none; position: absolute; top: 9px; right: 9px; width: 12px; height: 12px; background-color: #ff1414; border-radius: 50%; box-shadow: 0 0 8px #ff1414;"></span></button>
                 <button class="tab-btn" data-tab="collection">🏆 Коллекция</button>
                 <button class="tab-btn" data-tab="stats">📊 Статистика</button>
             </div>
@@ -952,7 +954,6 @@
                     <div class="arrow-top animate" id="arrowTop"></div>
                     <div class="arrow-bottom animate" id="arrowBottom"></div>
                     <div class="center-indicator"></div>
-                    <!-- ЗАДАЧА 1: Калибровка размера текста центральной рамки -->
                     <div class="center-highlight" id="centerHighlight" style="font-size: 3.5rem !important; white-space: nowrap !important;">🐇♾️🐈</div>
                 </div>
                 <button class="open-btn" id="openCaseBtn">ВРАЩАТЬ БАРАБАН</button>
@@ -1215,7 +1216,7 @@
                     const data = snapshot.val();
                     inventory = data.inventory || [];
                     
-                    // ЗАДАЧА 1: Защита старых аккаунтов от поломки
+                    // Защита старых аккаунтов от поломки
                     inventory.forEach(item => {
                         if (item.unviewed === undefined) item.unviewed = false;
                     });
@@ -1281,7 +1282,6 @@
             return inventory.some(i => i.id === id); 
         }
         
-        // ЗАДАЧА 1: ОБНОВЛЕННАЯ ФУНКЦИЯ addItem с полем unviewed
         function addItem(item) {
             const invRecord = inventory.find(i => i.id === item.id);
             if (!invRecord) {
@@ -1292,7 +1292,7 @@
                     date: dateStr,
                     rollsToDrop: extendedStats.itemRollCounters[item.id] || 1,
                     duplicatesCount: 0,
-                    unviewed: true // ЗАДАЧА 1: Помечаем как непросмотренный
+                    unviewed: true
                 });
                 saveData();
                 return true;
@@ -1418,7 +1418,6 @@
             if (centerHighlight) centerHighlight.style.display = 'flex';
         }
         
-        // ЗАДАЧА 1: ОБНОВЛЕННАЯ ФУНКЦИЯ resetToInitialState
         function resetToInitialState() {
             const win = document.getElementById("slotWindow");
             const btn = document.getElementById("openCaseBtn");
@@ -1443,7 +1442,6 @@
             if (verdictBlock) verdictBlock.style.display = "none";
         }
 
-        // ЗАДАЧИ 2 и 5: ОБНОВЛЕННАЯ ФУНКЦИЯ showResult
         function showResult(item, isNew) {
             let win = document.getElementById("slotWindow");
             let rarity = getItemRarity(item);
@@ -1470,7 +1468,6 @@
             
             win.innerHTML = content;
 
-            // ЗАДАЧА 5: Защита финальной картинки от перетаскивания и ПКМ
             const finalImgEl = document.getElementById("finalDropImg");
             if (finalImgEl) {
                 finalImgEl.addEventListener('contextmenu', e => e.preventDefault());
@@ -1520,7 +1517,6 @@
             let currentStep = 0;
             let queueIndex = SLOTS_COUNT;
             
-            // ЗАДАЧА 5: Заменённая функция renderSlots с защитой
             function renderSlots() {
                 let html = `<div class="slots-container">`;
                 for (let i = 0; i < SLOTS_COUNT; i++) {
@@ -1542,7 +1538,6 @@
                 html += `</div>`;
                 win.innerHTML = `<div class="arrow-top spinning" id="arrowTop"></div><div class="arrow-bottom spinning" id="arrowBottom"></div><div class="center-indicator"></div>${html}`;
                 
-                // Блокируем перетаскивание и контекстное меню для всех элементов в прокрутке барабана
                 document.querySelectorAll('[data-tape-slot="true"]').forEach(el => {
                     el.addEventListener('contextmenu', e => e.preventDefault());
                     el.addEventListener('dragstart', e => e.preventDefault());
@@ -1709,19 +1704,15 @@
             btn.disabled = false;
             isSpinning = false;
             
-            // ЗАДАНИЕ 1: Плоская плашка вердиктов без 3D-эффекта кнопки
             const verdictBlock = document.getElementById("rollVerdictBlock");
             if (verdictBlock) {
                 if (!isNew) {
-                    // ПОВТОР: Плоский стильный зеленый овал без 3D тени кнопки
                     const arr = verdictTexts.duplicate;
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
                     verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 3px !important; box-shadow: none !important; text-transform: uppercase !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; transform: none !important;";
                 } else {
-                    // ЗАДАЧА 2: НОВЫЙ предмет с обновлённым цветом текста
                     const arr = verdictTexts[won.rarityKey] || verdictTexts.common;
                     const rarityColor = getItemRarity(won).color;
-                    // Исключение: черный цвет текста для обычных и легендарных предметов
                     const textColor = (won.rarityKey === "common" || won.rarityKey === "legendary") ? "#000000" : "#ffffff";
                     
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
@@ -1734,7 +1725,7 @@
             // Функция оставлена для обратной совместимости
         }
 
-        // ЗАДАЧИ 1 и 4: ОБНОВЛЕННАЯ ФУНКЦИЯ updateUI
+        // ЗАДАЧА 1: ОБНОВЛЕННАЯ ФУНКЦИЯ updateUI с фиксацией position: relative
         function updateUI() {
             console.log("🔄 Обновление UI...");
             const rarityOrder = ['common', 'rare', 'superRare', 'epic', 'mythic', 'legendary'];
@@ -1785,16 +1776,15 @@
                             let rarityClass = getRarityClass(item.rarityKey);
                             let textClass = getRarityTextClass(item.rarityKey);
                             
-                            // Проверяем статус из базы данных (по умолчанию false для старых вещей)
                             const invRecord = inventory.find(record => record.id === item.id);
                             const isUnviewed = invRecord && invRecord.unviewed === true;
                             
                             let card = document.createElement('div');
                             card.className = `item-card ${rarityClass}`;
                             card.setAttribute('data-item-id', item.id);
-                            card.style.position = 'relative'; // Для позиционирования точки
+                            // ЗАДАЧА 1: Принудительно держим relative в DOM всегда!
+                            card.style.cssText = "position: relative !important;";
                             
-                            // ЗАДАЧА 3: Используем класс .card-dot с обновлённым положением
                             let dotHtml = isUnviewed ? `<span class="card-dot"></span>` : '';
                             
                             card.innerHTML = `
@@ -1810,7 +1800,6 @@
                                 window.openItemDescription(id);
                             });
                             
-                            // ЗАДАЧА 4: Блокировка перетаскивания картинок и ПКМ в инвентаре
                             card.addEventListener('contextmenu', e => e.preventDefault());
                             card.addEventListener('dragstart', e => e.preventDefault());
                             
@@ -1822,7 +1811,6 @@
                 });
             }
             
-            // Обновляем состояние главной кнопки таба на основе наличия непросмотренных предметов
             const hasUnviewedItems = inventory.some(i => i.unviewed === true);
             const mainInvDot = document.getElementById("invDot");
             if (mainInvDot) {
@@ -2011,7 +1999,6 @@
             });
         }
 
-        // ЗАДАЧА 2: ОБНОВЛЕННАЯ ФУНКЦИЯ openItemDescription с моментальным удалением точки
         function openItemDescription(id) {
             console.log("🟢 Вызов модалки для ID:", id);
             
@@ -2026,20 +2013,17 @@
             extendedStats.itemClicks[id] = (extendedStats.itemClicks[id] || 0) + 1;
             saveExtendedStats();
             
-            // ЗАДАЧА 2: Сброс флага просмотренности, мгновенное удаление точки из DOM и пересчет кнопки таба
             const invRecord = inventory.find(record => record.id === id);
             if (invRecord && invRecord.unviewed === true) {
                 invRecord.unviewed = false;
-                saveData(); // Мгновенная отправка в Firebase
+                saveData();
                 
-                // Находим кликнутую карточку в инвентаре и удаляем её красную точку прямо сейчас
                 const clickedCard = document.querySelector(`.item-card[data-item-id="${id}"]`);
                 if (clickedCard) {
                     const dot = clickedCard.querySelector('.card-dot');
                     if (dot) dot.remove();
                 }
                 
-                // Моментально пересчитываем, остались ли еще непросмотренные предметы в инвентаре
                 const hasUnviewedNow = inventory.some(i => i.unviewed === true);
                 const mainInvDot = document.getElementById("invDot");
                 if (mainInvDot) {
@@ -2205,19 +2189,15 @@
             btn.disabled = false;
             isSpinning = false;
             
-            // ЗАДАНИЕ 1: Плоская плашка вердиктов без 3D-эффекта кнопки
             const verdictBlock = document.getElementById("rollVerdictBlock");
             if (verdictBlock) {
                 if (!isNew) {
-                    // ПОВТОР: Плоский стильный зеленый овал без 3D тени кнопки
                     const arr = verdictTexts.duplicate;
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
                     verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 3px !important; box-shadow: none !important; text-transform: uppercase !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; transform: none !important;";
                 } else {
-                    // ЗАДАЧА 2: НОВЫЙ предмет с обновлённым цветом текста
                     const arr = verdictTexts[won.rarityKey] || verdictTexts.common;
                     const rarityColor = getItemRarity(won).color;
-                    // Исключение: черный цвет текста для обычных и легендарных предметов
                     const textColor = (won.rarityKey === "common" || won.rarityKey === "legendary") ? "#000000" : "#ffffff";
                     
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
