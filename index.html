@@ -845,52 +845,53 @@
         }
 
         /* ===== ЗАДАЧА 2: Красная точка на кнопке «🎒 Инвентарь» ===== */
-        /* Смещена на 1px вниз и убрано неоновое свечение (box-shadow) */
+        /* Смещена на 1px влево (свечение отключено, обводка сохранена) */
         #invDot {
             display: none;
             position: absolute;
-            top: 8px !important;     /* Смещено на 1px вниз (было 7px) */
-            right: 9px !important;   /* Положение по горизонтали сохранено */
+            top: 8px !important;     /* Положение по вертикали сохранено */
+            right: 10px !important;  /* Смещено на 1px влево (было 9px) */
             width: 12px;
             height: 12px;
             background-color: #ff1414;
             border-radius: 50%;
-            box-shadow: none !important; /* УБРАНО анимированное неоновое свечение по краям */
-            border: 2px solid #000000 !important; /* Черная обводка сохранена для видимости на зеленом фоне */
+            box-shadow: none !important; /* Свечение полностью отключено */
+            border: 2px solid #000000 !important; /* Черная обводка для видимости на зеленом фоне */
         }
 
         /* ===== ЗАДАЧА 3: Красная точка внутри иконки предмета ===== */
-        /* Смещена на 2px вниз (свечение box-shadow сохранено) */
+        /* Сделана ТОЧНО ТАКОЙ ЖЕ (добавлена обводка, убрано свечение) и смещена на 1px вниз */
         .card-dot {
             position: absolute !important;
-            top: 7px !important;     /* Смещено на 2px вниз (было 5px) */
+            top: 8px !important;     /* Смещено на 1px вниз (было 7px) */
             right: 9px !important;   /* Положение по горизонтали сохранено */
             width: 12px !important;
             height: 12px !important;
             background-color: #ff1414 !important;
             border-radius: 50% !important;
-            box-shadow: 0 0 8px #ff1414 !important; /* Свечение оставлено строго у иконок предметов */
+            box-shadow: none !important; /* ЗАДАЧА 3: Свечение убрано, как у кнопки */
+            border: 2px solid #000000 !important; /* ЗАДАЧА 3: Добавлена черная обводка, как у кнопки */
             z-index: 100 !important;
             display: inline-block;
         }
 
-        /* ===== ЗАДАЧА 1: Стабилизация контейнеров карточек ===== */
+        /* ===== ЗАДАЧА 1: Полная статика внутренних элементов и отмена анимации увеличения ===== */
         .slot-item, .item-card {
             position: relative !important;
-            transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), background 0.2s ease;
+            /* УБРАНО свойство transform из transition, анимации увеличения больше нет */
+            transition: background 0.2s ease; 
             -webkit-font-smoothing: antialiased !important;
             -moz-osx-font-smoothing: grayscale !important;
             text-rendering: optimizeLegibility !important;
         }
 
-        /* Чистое 2D-масштабирование контейнера при наведении */
+        /* При наведении меняется ТОЛЬКО фон, сама карточка НЕ увеличивается в размере */
         .item-card:hover {
-            transform: scale(1.05) !important;
+            transform: none !important; /* Карточка железно остается статичной */
             background: #1e2540;
         }
 
-        /* МАКСИМАЛЬНАЯ СТАБИЛИЗАЦИЯ: Принудительно фиксируем текст и картинки внутри карточек */
-        /* Свойство translate3d намертво привязывает их к пиксельной сетке, прекращая любое "гуляние" и дрожание при ховере */
+        /* Все элементы внутри карточки абсолютно неподвижны, не деформируются и не мылятся */
         .item-card .item-name, 
         .item-card .badge, 
         .item-card img,
@@ -900,9 +901,9 @@
             -webkit-font-smoothing: antialiased !important;
             -moz-osx-font-smoothing: grayscale !important;
             text-rendering: optimizeLegibility !important;
-            transform: translate3d(0, 0, 0) !important; /* Жесткая посадка на пиксели */
-            backface-visibility: hidden !important;
-            -webkit-backface-visibility: hidden !important;
+            transform: none !important; /* Никаких сдвигов */
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
             display: block;
         }
 
@@ -951,7 +952,7 @@
             <!-- Левая часть: Кнопки навигации -->
             <div class="tabs" style="margin-bottom: 0 !important; border-bottom: none !important; padding-bottom: 0 !important;">
                 <button class="tab-btn active" data-tab="case">📦 Кейс</button>
-                <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot" style="display: none; position: absolute; top: 8px; right: 9px; width: 12px; height: 12px; background-color: #ff1414; border-radius: 50%; box-shadow: none; border: 2px solid #000000;"></span></button>
+                <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot" style="display: none; position: absolute; top: 8px; right: 10px; width: 12px; height: 12px; background-color: #ff1414; border-radius: 50%; box-shadow: none; border: 2px solid #000000;"></span></button>
                 <button class="tab-btn" data-tab="collection">🏆 Коллекция</button>
                 <button class="tab-btn" data-tab="stats">📊 Статистика</button>
             </div>
