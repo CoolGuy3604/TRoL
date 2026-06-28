@@ -858,11 +858,11 @@
             border: 2px solid #000000 !important;
         }
 
-        /* ===== ЗАДАЧА 1: Красная точка внутри иконки предмета смещена на 1px вниз (обводка сохранена) ===== */
+        /* ===== Красная точка внутри иконки предмета (Без изменений, позиция 8px зафиксирована) ===== */
         .card-dot {
             position: absolute !important;
-            top: 8px !important;     /* Смещено на 1px вниз (было 7px) */
-            right: 9px !important;   /* Положение по горизонтали сохранено */
+            top: 8px !important;
+            right: 9px !important;
             width: 12px !important;
             height: 12px !important;
             background-color: #ff1414 !important;
@@ -873,46 +873,58 @@
             display: inline-block;
         }
 
-        /* ===== Стабилизация контейнеров карточек ===== */
+        /* ===== Базовый контейнер карточки ===== */
         .slot-item, .item-card {
             position: relative !important;
+            /* УБИРАЕМ переходы и изменения фона с самого контейнера, чтобы не триггерить перерисовку текста */
             transition: none !important;
-            isolation: isolate !important;
+            background: linear-gradient(135deg, rgba(222,227,242,0.05), rgba(222,227,242,0.02)); /* Дефолтный фон (будет перекрыт классами редкости) */
+            overflow: hidden !important; /* Чтобы псевдослой ховера не вылезал за скругленные углы */
+            z-index: 1;
         }
 
-        /* При наведении мгновенно меняется фон, карточка и тексты остаются абсолютно неподвижными */
+        /* ===== ЭФФЕКТ ХОВЕРА ЧЕРЕЗ НЕЗАВИСИМЫЙ ГРАФИЧЕСКИЙ СЛОЙ ===== */
+        /* Создаем скрытую подложку, которая примет на себя новый цвет фона */
+        .item-card::before {
+            content: "" !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: #1e2540 !important; /* Тот самый цвет ховера */
+            opacity: 0 !important; /* Изначально полностью прозрачный */
+            transition: opacity 0.2s ease !important; /* Плавное проявление */
+            z-index: -1 !important; /* Уходит строго ПОД картинку и текст */
+        }
+
+        /* При наведении плавно проявляем подложку. Сам контейнер карточки и текст при этом НЕ ПЕРЕРИСОВЫВАЮТСЯ! */
+        .item-card:hover::before {
+            opacity: 1 !important;
+        }
+
+        /* Отменяем любые изменения на самой карточке при ховере */
         .item-card:hover {
             transform: none !important;
-            background: #1e2540 !important;
             transition: none !important;
         }
 
-        /* ===== ЗАДАЧА 2: БРОНЕБОЙНЫЙ ВЕКТОРНЫЙ АНТИАЛИАСИНГ ДЛЯ ВСЕХ ТЕКСТОВ ===== */
-        /* Отключаем субпиксельный ClearType рендеринг, который реагирует на смену фона. */
-        /* Теперь шрифт ВСЕГДА (и до, и во время ховера) будет монолитным, четким и одинаковым! */
+        /* ===== Принудительная перманентная векторная чёткость для всех текстов ===== */
+        /* Текст физически изолирован от эффекта ховера и всегда стоит в идеальном монолитном качестве */
         .item-card .item-name, 
         .item-card .badge, 
         .item-card img,
         .slot-item .name, 
         .slot-item .rarity-badge,
         .slot-item img {
-            transform: none !important;
-            backface-visibility: visible !important;
-            
-            /* Жестко заставляем Chromium рендерить чистый вектор, не зависящий от подложки */
             -webkit-font-smoothing: antialiased !important;
             -moz-osx-font-smoothing: grayscale !important;
             text-rendering: optimizeLegibility !important;
-            
-            transition: none !important;
-            display: block;
-        }
-
-        /* Дополнительный фикс, запрещающий тексту менять субпиксельные полутона при ховере */
-        .item-card:hover .item-name,
-        .item-card:hover .badge {
-            -webkit-font-smoothing: antialiased !important;
-            -moz-osx-font-smoothing: grayscale !important;
+            transform: none !important;
+            backface-visibility: visible !important;
+            -webkit-backface-visibility: visible !important;
+            position: relative;
+            z-index: 2; /* Приподнимаем над слоем ховера */
         }
 
         /* Стабилизация бейджа редкости */
