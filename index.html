@@ -858,11 +858,11 @@
             border: 2px solid #000000 !important;
         }
 
-        /* ===== Красная точка внутри иконки предмета (Без изменений) ===== */
+        /* ===== ЗАДАЧА 1: Красная точка внутри иконки предмета смещена на 1px вниз (обводка сохранена) ===== */
         .card-dot {
             position: absolute !important;
-            top: 7px !important;
-            right: 9px !important;
+            top: 8px !important;     /* Смещено на 1px вниз (было 7px) */
+            right: 9px !important;   /* Положение по горизонтали сохранено */
             width: 12px !important;
             height: 12px !important;
             background-color: #ff1414 !important;
@@ -873,41 +873,46 @@
             display: inline-block;
         }
 
-        /* ===== ЗАДАЧА 1: Полный отказ от transition для устранения таймеров сглаживания Chromium ===== */
+        /* ===== Стабилизация контейнеров карточек ===== */
         .slot-item, .item-card {
             position: relative !important;
-            transition: none !important; /* УБИРАЕМ любые переходы, подсветка меняется МГНОВЕННО */
-            
-            /* Бронебойная изоляция слоя: отрезаем карточку от внешних перерасчетов браузера */
-            isolation: isolate !important; 
-            
-            -webkit-font-smoothing: antialiased !important;
-            -moz-osx-font-smoothing: grayscale !important;
-            text-rendering: optimizeLegibility !important;
+            transition: none !important;
+            isolation: isolate !important;
         }
 
-        /* При наведении мгновенно меняется фон, карточка и тексты остаются абсолютно мертвыми и статичными */
+        /* При наведении мгновенно меняется фон, карточка и тексты остаются абсолютно неподвижными */
         .item-card:hover {
             transform: none !important;
             background: #1e2540 !important;
             transition: none !important;
         }
 
-        /* Тексты жестко зафиксированы в своем лучшем, качественном векторном виде и физически не могут перещелкиваться */
+        /* ===== ЗАДАЧА 2: БРОНЕБОЙНЫЙ ВЕКТОРНЫЙ АНТИАЛИАСИНГ ДЛЯ ВСЕХ ТЕКСТОВ ===== */
+        /* Отключаем субпиксельный ClearType рендеринг, который реагирует на смену фона. */
+        /* Теперь шрифт ВСЕГДА (и до, и во время ховера) будет монолитным, четким и одинаковым! */
         .item-card .item-name, 
         .item-card .badge, 
         .item-card img,
         .slot-item .name, 
         .slot-item .rarity-badge,
         .slot-item img {
+            transform: none !important;
+            backface-visibility: visible !important;
+            
+            /* Жестко заставляем Chromium рендерить чистый вектор, не зависящий от подложки */
             -webkit-font-smoothing: antialiased !important;
             -moz-osx-font-smoothing: grayscale !important;
             text-rendering: optimizeLegibility !important;
-            transform: none !important;
-            backface-visibility: visible !important;
-            -webkit-backface-visibility: visible !important;
+            
             transition: none !important;
             display: block;
+        }
+
+        /* Дополнительный фикс, запрещающий тексту менять субпиксельные полутона при ховере */
+        .item-card:hover .item-name,
+        .item-card:hover .badge {
+            -webkit-font-smoothing: antialiased !important;
+            -moz-osx-font-smoothing: grayscale !important;
         }
 
         /* Стабилизация бейджа редкости */
