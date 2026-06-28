@@ -845,68 +845,73 @@
         }
 
         /* ===== ЗАДАЧА 2: Красная точка на кнопке «🎒 Инвентарь» ===== */
-        /* Смещена на 2px наверх и добавлена черная обводка */
+        /* Смещена на 1px вниз и убрано неоновое свечение (box-shadow) */
         #invDot {
             display: none;
             position: absolute;
-            top: 7px !important;     /* Смещено еще на 2px наверх (было 9px) */
+            top: 8px !important;     /* Смещено на 1px вниз (было 7px) */
             right: 9px !important;   /* Положение по горизонтали сохранено */
             width: 12px;
             height: 12px;
             background-color: #ff1414;
             border-radius: 50%;
-            box-shadow: 0 0 8px #ff1414;
-            border: 2px solid #000000 !important; /* Черная обводка краев для видимости на зеленом фоне */
+            box-shadow: none !important; /* УБРАНО анимированное неоновое свечение по краям */
+            border: 2px solid #000000 !important; /* Черная обводка сохранена для видимости на зеленом фоне */
         }
 
         /* ===== ЗАДАЧА 3: Красная точка внутри иконки предмета ===== */
-        /* Смещена еще на 3px наверх (без обводки) */
+        /* Смещена на 2px вниз (свечение box-shadow сохранено) */
         .card-dot {
             position: absolute !important;
-            top: 5px !important;     /* Смещено на 3px наверх (было 8px) */
-            right: 9px !important;   /* Положение по горизонтали из прошлых фиксов сохранено */
+            top: 7px !important;     /* Смещено на 2px вниз (было 5px) */
+            right: 9px !important;   /* Положение по горизонтали сохранено */
             width: 12px !important;
             height: 12px !important;
             background-color: #ff1414 !important;
             border-radius: 50% !important;
-            box-shadow: 0 0 8px #ff1414 !important;
+            box-shadow: 0 0 8px #ff1414 !important; /* Свечение оставлено строго у иконок предметов */
             z-index: 100 !important;
             display: inline-block;
         }
 
-        /* ===== ЗАДАЧА 1: Идеально плавный и чёткий ховер без 3D-замыливания шрифтов ===== */
+        /* ===== ЗАДАЧА 1: Стабилизация контейнеров карточек ===== */
         .slot-item, .item-card {
             position: relative !important;
             transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), background 0.2s ease;
-            /* Включаем векторное сглаживание шрифтов на уровне контейнера */
             -webkit-font-smoothing: antialiased !important;
             -moz-osx-font-smoothing: grayscale !important;
             text-rendering: optimizeLegibility !important;
         }
 
-        /* При ховере используем чистое 2D-масштабирование без translateZ, чтобы не ломать структуру шрифта */
+        /* Чистое 2D-масштабирование контейнера при наведении */
         .item-card:hover {
             transform: scale(1.05) !important;
             background: #1e2540;
         }
 
-        /* Принудительная векторная чёткость для всех текстов внутри карточек инвентаря */
-        /* Текст будет выглядеть шедеврально, как в коллекции, и при ховере, и после удаления точки */
+        /* МАКСИМАЛЬНАЯ СТАБИЛИЗАЦИЯ: Принудительно фиксируем текст и картинки внутри карточек */
+        /* Свойство translate3d намертво привязывает их к пиксельной сетке, прекращая любое "гуляние" и дрожание при ховере */
         .item-card .item-name, 
         .item-card .badge, 
+        .item-card img,
         .slot-item .name, 
-        .slot-item .rarity-badge {
+        .slot-item .rarity-badge,
+        .slot-item img {
             -webkit-font-smoothing: antialiased !important;
             -moz-osx-font-smoothing: grayscale !important;
             text-rendering: optimizeLegibility !important;
-            transform: none !important;
+            transform: translate3d(0, 0, 0) !important; /* Жесткая посадка на пиксели */
+            backface-visibility: hidden !important;
+            -webkit-backface-visibility: hidden !important;
             display: block;
         }
 
-        /* Фикс для бейджа редкости, чтобы он не сжимался и не мылился внутри flex-ячейки */
+        /* Фикс для бейджа редкости, чтобы он сохранял пропорции, четкость и не сжимался */
         .item-card .badge, .slot-item .rarity-badge {
             flex-shrink: 0 !important;
             white-space: nowrap !important;
+            margin-left: auto;
+            margin-right: auto;
         }
     </style>
 </head>
@@ -946,7 +951,7 @@
             <!-- Левая часть: Кнопки навигации -->
             <div class="tabs" style="margin-bottom: 0 !important; border-bottom: none !important; padding-bottom: 0 !important;">
                 <button class="tab-btn active" data-tab="case">📦 Кейс</button>
-                <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot" style="display: none; position: absolute; top: 7px; right: 9px; width: 12px; height: 12px; background-color: #ff1414; border-radius: 50%; box-shadow: 0 0 8px #ff1414; border: 2px solid #000000;"></span></button>
+                <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot" style="display: none; position: absolute; top: 8px; right: 9px; width: 12px; height: 12px; background-color: #ff1414; border-radius: 50%; box-shadow: none; border: 2px solid #000000;"></span></button>
                 <button class="tab-btn" data-tab="collection">🏆 Коллекция</button>
                 <button class="tab-btn" data-tab="stats">📊 Статистика</button>
             </div>
