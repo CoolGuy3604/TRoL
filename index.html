@@ -844,24 +844,27 @@
             transform: scale(0.95);
         }
 
-        /* ЗАДАЧА 2: Смещение точки на кнопке «🎒 Инвентарь» на 3px влево и 3px наверх */
+        /* ===== ЗАДАЧА 2: Красная точка на кнопке «🎒 Инвентарь» ===== */
+        /* Смещена на 2px наверх и добавлена черная обводка */
         #invDot {
             display: none;
             position: absolute;
-            top: 9px !important;    /* ЗАДАЧА 2: Смещено на 3px наверх (было 12px) */
-            right: 9px !important;  /* ЗАДАЧА 2: Смещено на 3px влево (было 6px) */
+            top: 7px !important;     /* Смещено еще на 2px наверх (было 9px) */
+            right: 9px !important;   /* Положение по горизонтали сохранено */
             width: 12px;
             height: 12px;
             background-color: #ff1414;
             border-radius: 50%;
             box-shadow: 0 0 8px #ff1414;
+            border: 2px solid #000000 !important; /* Черная обводка краев для видимости на зеленом фоне */
         }
 
-        /* ЗАДАЧА 3: Красная точка внутри иконки смещена на 4px наверх (top: 8px, right: 9px) */
+        /* ===== ЗАДАЧА 3: Красная точка внутри иконки предмета ===== */
+        /* Смещена еще на 3px наверх (без обводки) */
         .card-dot {
             position: absolute !important;
-            top: 8px !important;    /* Смещено на 4px наверх (было 12px) */
-            right: 9px !important;  /* Позиция по горизонтали из прошлого фикса сохранена */
+            top: 5px !important;     /* Смещено на 3px наверх (было 8px) */
+            right: 9px !important;   /* Положение по горизонтали из прошлых фиксов сохранено */
             width: 12px !important;
             height: 12px !important;
             background-color: #ff1414 !important;
@@ -871,28 +874,39 @@
             display: inline-block;
         }
 
-        /* ЗАДАЧА 1 и 6: Фикс ховера и ЖЕСТКАЯ фиксация контекста рендеринга */
+        /* ===== ЗАДАЧА 1: Идеально плавный и чёткий ховер без 3D-замыливания шрифтов ===== */
         .slot-item, .item-card {
-            position: relative !important; /* ЗАДАЧА 1: Всегда relative, независимо от наличия точки! */
-            will-change: transform;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            transform-style: preserve-3d;
-            -webkit-transform-style: preserve-3d;
-            transform: translateZ(0);
+            position: relative !important;
+            transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), background 0.2s ease;
+            /* Включаем векторное сглаживание шрифтов на уровне контейнера */
+            -webkit-font-smoothing: antialiased !important;
+            -moz-osx-font-smoothing: grayscale !important;
+            text-rendering: optimizeLegibility !important;
         }
 
-        /* Названия и бейджи принудительно выводятся из 3D-контекста с субпиксельным сглаживанием */
-        /* Текст ВСЕГДА будет четким и качественным, как в коллекции, в том числе ПОСЛЕ удаления точки */
+        /* При ховере используем чистое 2D-масштабирование без translateZ, чтобы не ломать структуру шрифта */
+        .item-card:hover {
+            transform: scale(1.05) !important;
+            background: #1e2540;
+        }
+
+        /* Принудительная векторная чёткость для всех текстов внутри карточек инвентаря */
+        /* Текст будет выглядеть шедеврально, как в коллекции, и при ховере, и после удаления точки */
         .item-card .item-name, 
         .item-card .badge, 
         .slot-item .name, 
         .slot-item .rarity-badge {
+            -webkit-font-smoothing: antialiased !important;
+            -moz-osx-font-smoothing: grayscale !important;
+            text-rendering: optimizeLegibility !important;
             transform: none !important;
-            backface-visibility: visible !important;
-            -webkit-backface-visibility: visible !important;
-            -webkit-font-smoothing: subpixel-antialiased !important;
-            font-smooth: always !important;
+            display: block;
+        }
+
+        /* Фикс для бейджа редкости, чтобы он не сжимался и не мылился внутри flex-ячейки */
+        .item-card .badge, .slot-item .rarity-badge {
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
         }
     </style>
 </head>
@@ -932,7 +946,7 @@
             <!-- Левая часть: Кнопки навигации -->
             <div class="tabs" style="margin-bottom: 0 !important; border-bottom: none !important; padding-bottom: 0 !important;">
                 <button class="tab-btn active" data-tab="case">📦 Кейс</button>
-                <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot" style="display: none; position: absolute; top: 9px; right: 9px; width: 12px; height: 12px; background-color: #ff1414; border-radius: 50%; box-shadow: 0 0 8px #ff1414;"></span></button>
+                <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot" style="display: none; position: absolute; top: 7px; right: 9px; width: 12px; height: 12px; background-color: #ff1414; border-radius: 50%; box-shadow: 0 0 8px #ff1414; border: 2px solid #000000;"></span></button>
                 <button class="tab-btn" data-tab="collection">🏆 Коллекция</button>
                 <button class="tab-btn" data-tab="stats">📊 Статистика</button>
             </div>
@@ -1216,7 +1230,6 @@
                     const data = snapshot.val();
                     inventory = data.inventory || [];
                     
-                    // Защита старых аккаунтов от поломки
                     inventory.forEach(item => {
                         if (item.unviewed === undefined) item.unviewed = false;
                     });
@@ -1725,7 +1738,6 @@
             // Функция оставлена для обратной совместимости
         }
 
-        // ЗАДАЧА 1: ОБНОВЛЕННАЯ ФУНКЦИЯ updateUI с фиксацией position: relative
         function updateUI() {
             console.log("🔄 Обновление UI...");
             const rarityOrder = ['common', 'rare', 'superRare', 'epic', 'mythic', 'legendary'];
@@ -1782,7 +1794,6 @@
                             let card = document.createElement('div');
                             card.className = `item-card ${rarityClass}`;
                             card.setAttribute('data-item-id', item.id);
-                            // ЗАДАЧА 1: Принудительно держим relative в DOM всегда!
                             card.style.cssText = "position: relative !important;";
                             
                             let dotHtml = isUnviewed ? `<span class="card-dot"></span>` : '';
