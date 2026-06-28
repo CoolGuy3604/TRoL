@@ -858,11 +858,11 @@
             border: 2px solid #000000 !important;
         }
 
-        /* ===== Красная точка внутри иконки предмета (Без изменений, позиция 8px зафиксирована) ===== */
+        /* ===== ЗАДАЧА 2: Красная точка внутри иконки предмета смещена на 1px вниз ===== */
         .card-dot {
             position: absolute !important;
-            top: 8px !important;
-            right: 9px !important;
+            top: 9px !important;     /* Смещено на 1px вниз (было 8px) */
+            right: 9px !important;   /* Положение по горизонтали сохранено */
             width: 12px !important;
             height: 12px !important;
             background-color: #ff1414 !important;
@@ -876,41 +876,39 @@
         /* ===== Базовый контейнер карточки ===== */
         .slot-item, .item-card {
             position: relative !important;
-            /* УБИРАЕМ переходы и изменения фона с самого контейнера, чтобы не триггерить перерисовку текста */
             transition: none !important;
-            background: linear-gradient(135deg, rgba(222,227,242,0.05), rgba(222,227,242,0.02)); /* Дефолтный фон (будет перекрыт классами редкости) */
-            overflow: hidden !important; /* Чтобы псевдослой ховера не вылезал за скругленные углы */
+            background: linear-gradient(135deg, rgba(222,227,242,0.05), rgba(222,227,242,0.02));
+            overflow: hidden !important;
             z-index: 1;
         }
 
-        /* ===== ЭФФЕКТ ХОВЕРА ЧЕРЕЗ НЕЗАВИСИМЫЙ ГРАФИЧЕСКИЙ СЛОЙ ===== */
-        /* Создаем скрытую подложку, которая примет на себя новый цвет фона */
-        .item-card::before {
+        /* ===== ЗАДАЧА 1: ЭФФЕКТ ХОВЕРА СТРОГО ДЛЯ ИНВЕНТАРЯ (Исключаем Коллекцию) ===== */
+        /* Псевдослой ховера создается только для карточек, которые НЕ находятся внутри #collectionContainer */
+        .item-card:not(#collectionContainer *)::before {
             content: "" !important;
             position: absolute !important;
             top: 0 !important;
             left: 0 !important;
             width: 100% !important;
             height: 100% !important;
-            background: #1e2540 !important; /* Тот самый цвет ховера */
-            opacity: 0 !important; /* Изначально полностью прозрачный */
-            transition: opacity 0.2s ease !important; /* Плавное проявление */
-            z-index: -1 !important; /* Уходит строго ПОД картинку и текст */
+            background: #1e2540 !important;
+            opacity: 0 !important;
+            transition: opacity 0.2s ease !important;
+            z-index: -1 !important;
         }
 
-        /* При наведении плавно проявляем подложку. Сам контейнер карточки и текст при этом НЕ ПЕРЕРИСОВЫВАЮТСЯ! */
-        .item-card:hover::before {
+        /* Проявление фона при наведении работает ТОЛЬКО в Инвентаре */
+        .item-card:not(#collectionContainer *):hover::before {
             opacity: 1 !important;
         }
 
-        /* Отменяем любые изменения на самой карточке при ховере */
+        /* Жесткая блокировка трансформаций для всех карточек при ховере */
         .item-card:hover {
             transform: none !important;
             transition: none !important;
         }
 
-        /* ===== Принудительная перманентная векторная чёткость для всех текстов ===== */
-        /* Текст физически изолирован от эффекта ховера и всегда стоит в идеальном монолитном качестве */
+        /* ===== Принудительная перманентная чёткость шрифтов ===== */
         .item-card .item-name, 
         .item-card .badge, 
         .item-card img,
@@ -924,7 +922,7 @@
             backface-visibility: visible !important;
             -webkit-backface-visibility: visible !important;
             position: relative;
-            z-index: 2; /* Приподнимаем над слоем ховера */
+            z-index: 2;
         }
 
         /* Стабилизация бейджа редкости */
