@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1366, initial-scale=0.3, minimum-scale=0.1, maximum-scale=1.0, user-scalable=yes">
     <title>Симулятор кейсов | ЭЛИТНЫЙ ДИЗАЙН</title>
+    <!-- ЗАДАЧА 7: Подключение прозрачного фавикона с гитхаба -->
+    <link rel="icon" type="image/png" href="images/favik.png">
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
     <style>
         * {
@@ -844,7 +846,7 @@
             transform: scale(0.95);
         }
 
-        /* ===== Красная точка на кнопке «🎒 Инвентарь» (Без изменений) ===== */
+        /* Красная точка на кнопке «🎒 Инвентарь» (Без изменений) */
         #invDot {
             display: none;
             position: absolute;
@@ -858,11 +860,11 @@
             border: 2px solid #000000 !important;
         }
 
-        /* ===== ЗАДАЧА 2: Красная точка внутри иконки предмета смещена на 1px вниз ===== */
+        /* Красная точка внутри иконки предмета (Без изменений, позиция 9px зафиксирована) */
         .card-dot {
             position: absolute !important;
-            top: 9px !important;     /* Смещено на 1px вниз (было 8px) */
-            right: 9px !important;   /* Положение по горизонтали сохранено */
+            top: 9px !important;
+            right: 9px !important;
             width: 12px !important;
             height: 12px !important;
             background-color: #ff1414 !important;
@@ -873,7 +875,7 @@
             display: inline-block;
         }
 
-        /* ===== Базовый контейнер карточки ===== */
+        /* Базовый контейнер карточки */
         .slot-item, .item-card {
             position: relative !important;
             transition: none !important;
@@ -882,8 +884,7 @@
             z-index: 1;
         }
 
-        /* ===== ЗАДАЧА 1: ЭФФЕКТ ХОВЕРА СТРОГО ДЛЯ ИНВЕНТАРЯ (Исключаем Коллекцию) ===== */
-        /* Псевдослой ховера создается только для карточек, которые НЕ находятся внутри #collectionContainer */
+        /* ЭФФЕКТ ХОВЕРА СТРОГО ДЛЯ ИНВЕНТАРЯ (Исключаем Коллекцию) */
         .item-card:not(#collectionContainer *)::before {
             content: "" !important;
             position: absolute !important;
@@ -897,18 +898,16 @@
             z-index: -1 !important;
         }
 
-        /* Проявление фона при наведении работает ТОЛЬКО в Инвентаре */
         .item-card:not(#collectionContainer *):hover::before {
             opacity: 1 !important;
         }
 
-        /* Жесткая блокировка трансформаций для всех карточек при ховере */
         .item-card:hover {
             transform: none !important;
             transition: none !important;
         }
 
-        /* ===== Принудительная перманентная чёткость шрифтов ===== */
+        /* Принудительная перманентная чёткость шрифтов */
         .item-card .item-name, 
         .item-card .badge, 
         .item-card img,
@@ -931,6 +930,12 @@
             white-space: nowrap !important;
             margin-left: auto;
             margin-right: auto;
+        }
+
+        /* ЗАДАЧА 1: Жирная красная обводка по контуру кнопки таба */
+        .tab-btn-alert-border {
+            border: 3px solid #ff1414 !important;
+            box-shadow: 0 0 10px rgba(255, 20, 20, 0.4) !important;
         }
     </style>
 </head>
@@ -967,11 +972,11 @@
         <!-- НОВАЯ ШАПКА С ЗАГОЛОВКОМ -->
         <div class="app-header" style="display: flex !important; justify-content: space-between !important; align-items: center !important; margin-bottom: 30px !important; border-bottom: 2px solid #2a2e3f !important; padding-bottom: 15px !important; flex-wrap: wrap !important; gap: 20px !important;">
             
-            <!-- Левая часть: Кнопки навигации -->
+            <!-- ЗАДАЧА 6: Левая часть: Кнопки навигации с обновленными смайлами -->
             <div class="tabs" style="margin-bottom: 0 !important; border-bottom: none !important; padding-bottom: 0 !important;">
-                <button class="tab-btn active" data-tab="case">📦 Кейс</button>
-                <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot" style="display: none; position: absolute; top: 8px; right: 10px; width: 12px; height: 12px; background-color: #ff1414; border-radius: 50%; box-shadow: none; border: 2px solid #000000;"></span></button>
-                <button class="tab-btn" data-tab="collection">🏆 Коллекция</button>
+                <button class="tab-btn active" data-tab="case">🎰 Кейс</button>
+                <button class="tab-btn" data-tab="inventory" style="position: relative;">🎒 Инвентарь <span id="invDot"></span></button>
+                <button class="tab-btn" data-tab="collection">📖 Коллекция</button>
                 <button class="tab-btn" data-tab="stats">📊 Статистика</button>
             </div>
 
@@ -1722,6 +1727,8 @@
                     const dot = document.getElementById("invDot");
                     if (dot) dot.style.display = "inline-block";
                 }
+                // ЗАДАЧА 1: При появлении новых вещей обновляем состояние уведомлений
+                updateTabsNotificationState();
             }
             
             stats.total++;
@@ -1744,16 +1751,23 @@
             const verdictBlock = document.getElementById("rollVerdictBlock");
             if (verdictBlock) {
                 if (!isNew) {
+                    // ПОВТОР: Плоский стильный зеленый овал без 3D тени кнопки
                     const arr = verdictTexts.duplicate;
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
                     verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 3px !important; box-shadow: none !important; text-transform: uppercase !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; transform: none !important;";
                 } else {
+                    // ЗАДАЧА 3: НОВЫЙ предмет с обновлённым цветом текста и обводкой для легендарок
                     const arr = verdictTexts[won.rarityKey] || verdictTexts.common;
                     const rarityColor = getItemRarity(won).color;
-                    const textColor = (won.rarityKey === "common" || won.rarityKey === "legendary") ? "#000000" : "#ffffff";
+                    
+                    // Обычные предметы остаются черными, а все остальные (включая Легендарки) — белые
+                    const textColor = won.rarityKey === "common" ? "#000000" : "#ffffff";
+                    
+                    // ЗАДАЧА 3: Если предмет легендарный, добавляем жирный черный контур для белых букв
+                    const strokeStyle = won.rarityKey === "legendary" ? "-webkit-text-stroke: 1.5px #000000; text-shadow: 1px 1px 2px #000;" : "";
                     
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
-                    verdictBlock.style.cssText = `display: block !important; background: ${rarityColor} !important; color: ${textColor} !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 1px !important; box-shadow: none !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; text-transform: uppercase !important; transform: none !important;`;
+                    verdictBlock.style.cssText = `display: block !important; background: ${rarityColor} !important; color: ${textColor} !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 1px !important; box-shadow: none !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; text-transform: uppercase !important; transform: none !important; ${strokeStyle}`;
                 }
             }
         }
@@ -1762,6 +1776,138 @@
             // Функция оставлена для обратной совместимости
         }
 
+        // ЗАДАЧА 1: Вспомогательная функция для мгновенного обновления состояний точки/обводки
+        function updateTabsNotificationState() {
+            const mainInvDot = document.getElementById("invDot");
+            const invTabBtn = document.querySelector('.tab-btn[data-tab="inventory"]');
+            if (!invTabBtn) return;
+
+            const hasUnviewedItems = inventory.some(i => i.unviewed === true);
+            const isCurrentlyInInventory = invTabBtn.classList.contains("active");
+
+            if (hasUnviewedItems) {
+                if (isCurrentlyInInventory) {
+                    // Если мы ВНУТРИ инвентаря: убираем точку, включаем жирную обводку
+                    if (mainInvDot) mainInvDot.style.display = "none";
+                    invTabBtn.classList.add("tab-btn-alert-border");
+                } else {
+                    // Если мы в ДРУГОМ разделе: включаем точку, убираем обводку
+                    if (mainInvDot) mainInvDot.style.display = "inline-block";
+                    invTabBtn.classList.remove("tab-btn-alert-border");
+                }
+            } else {
+                // Если непросмотренных предметов нет: выключаем ВСЁ
+                if (mainInvDot) mainInvDot.style.display = "none";
+                invTabBtn.classList.remove("tab-btn-alert-border");
+            }
+        }
+
+        // ЗАДАЧИ 1, 2 и 4: ОБНОВЛЁННАЯ ФУНКЦИЯ initTabs
+        function initTabs() {
+            let btns = document.querySelectorAll(".tab-btn");
+            btns.forEach(btn => {
+                btn.onclick = () => {
+                    let id = btn.getAttribute("data-tab");
+                    btns.forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    document.getElementById("caseTab").classList.remove("active");
+                    document.getElementById("inventoryTab").classList.remove("active");
+                    document.getElementById("collectionTab").classList.remove("active");
+                    document.getElementById("statsTab").classList.remove("active");
+                    document.getElementById(id + "Tab").classList.add("active");
+                    
+                    // ЗАДАЧА 1: Логика управления точкой и обводкой при переключении табов
+                    updateTabsNotificationState();
+                };
+            });
+        }
+
+        // ЗАДАЧИ 1, 2 и 4: ОБНОВЛЁННАЯ ФУНКЦИЯ openItemDescription
+        function openItemDescription(id) {
+            console.log("🟢 Вызов модалки для ID:", id);
+            
+            const item = ITEMS.find(i => i.id === id);
+            if (!item) {
+                console.error("❌ Предмет с ID", id, "не найден!");
+                return;
+            }
+            
+            extendedStats.itemClicks[id] = (extendedStats.itemClicks[id] || 0) + 1;
+            saveExtendedStats();
+            
+            const invRecord = inventory.find(record => record.id === id);
+            if (invRecord && invRecord.unviewed === true) {
+                invRecord.unviewed = false;
+                saveData(); // Синхронизация с Firebase
+                
+                // Удаляем точку с карточки прямо сейчас
+                const clickedCard = document.querySelector(`.item-card[data-item-id="${id}"]`);
+                if (clickedCard) {
+                    const dot = clickedCard.querySelector('.card-dot');
+                    if (dot) dot.remove();
+                }
+                
+                // ЗАДАЧА 1: Моментально пересчитываем состояние точки/обводки на кнопке таба
+                updateTabsNotificationState();
+            }
+            
+            const modal = document.getElementById("descModal");
+            const card = document.getElementById("modalCard");
+            const img = document.getElementById("modalImg");
+            const name = document.getElementById("modalName");
+            const badge = document.getElementById("modalBadge");
+            const desc = document.getElementById("modalDesc");
+            
+            const sidePanel = document.getElementById("modalSidePanel");
+            const infoDate = document.getElementById("infoDateRow");
+            const infoRolls = document.getElementById("infoRollsRow");
+            const infoDup = document.getElementById("infoDuplicatesRow");
+            
+            let rarity = getItemRarity(item);
+            let rarityClass = getRarityClass(item.rarityKey);
+            let textClass = getRarityTextClass(item.rarityKey);
+            
+            img.src = item.img;
+            name.innerText = item.name;
+            badge.innerText = rarity.name;
+            desc.innerText = item.description || "У этого предмета пока нет описания.";
+            card.className = "modal-card " + rarityClass;
+            badge.className = "badge " + textClass;
+            
+            // ЗАДАЧА 2: Защита картинки внутри раскрытого окна описания от перетаскивания и ПКМ
+            if (img) {
+                img.addEventListener('contextmenu', e => e.preventDefault());
+                img.addEventListener('dragstart', e => e.preventDefault());
+            }
+            
+            if (invRecord) {
+                let cleanDate = invRecord.date ? invRecord.date.replace("Дата получения: ", "") : "--";
+                infoDate.innerHTML = `📅 Дата получения: <strong>${cleanDate}</strong>`;
+                infoRolls.innerHTML = `🎰 Круток потребовалось: <strong>${invRecord.rollsToDrop || "Неизвестно"}</strong>`;
+                
+                if (invRecord.duplicatesCount && invRecord.duplicatesCount > 0) {
+                    infoDup.innerHTML = `♻️ Количество повторов: <strong style="color: #ffffff !important;">${invRecord.duplicatesCount}</strong>`;
+                    infoDup.style.display = "block";
+                } else {
+                    infoDup.style.display = "none";
+                }
+            }
+            
+            sidePanel.style.borderColor = rarity.color;
+            
+            modal.style.setProperty("display", "flex", "important");
+            modal.style.setProperty("visibility", "visible", "important");
+            modal.style.setProperty("opacity", "1", "important");
+            modal.style.setProperty("z-index", "999999", "important");
+        }
+
+        function closeItemDescription() {
+            const modal = document.getElementById("descModal");
+            modal.style.setProperty("display", "none", "important");
+            console.log("❌ Модалка закрыта");
+        }
+
+        // ==================== ФУНКЦИЯ updateUI ====================
         function updateUI() {
             console.log("🔄 Обновление UI...");
             const rarityOrder = ['common', 'rare', 'superRare', 'epic', 'mythic', 'legendary'];
@@ -1777,7 +1923,8 @@
             invDiv.innerHTML = "";
             
             if (collected.length === 0) {
-                invDiv.innerHTML = '<div style="text-align:center;padding:40px;width:100%;">🧸 Инвентарь пуст...</div>';
+                // ЗАДАЧА 5: Новый текст без точек
+                invDiv.innerHTML = '<div style="text-align:center;padding:40px;width:100%;">Твой инвентарь пуст 😢</div>';
             } else {
                 let isFirstInv = true;
                 
@@ -1992,32 +2139,13 @@
                 `;
             }
             
+            // ЗАДАЧА 1: Актуализируем обводку/точку при обновлении данных
+            updateTabsNotificationState();
+            
             console.log("✅ UI обновлён");
         }
 
-        function initTabs() {
-            let btns = document.querySelectorAll(".tab-btn");
-            btns.forEach(btn => {
-                btn.onclick = () => {
-                    let id = btn.getAttribute("data-tab");
-                    btns.forEach(b => b.classList.remove("active"));
-                    btn.classList.add("active");
-                    document.getElementById("caseTab").classList.remove("active");
-                    document.getElementById("inventoryTab").classList.remove("active");
-                    document.getElementById("collectionTab").classList.remove("active");
-                    document.getElementById("statsTab").classList.remove("active");
-                    document.getElementById(id + "Tab").classList.add("active");
-                    
-                    if (id === "inventory") {
-                        const dot = document.getElementById("invDot");
-                        if (dot) dot.style.display = "none";
-                    }
-                    
-                    updateUI();
-                };
-            });
-        }
-
+        // ==================== ОСТАЛЬНЫЕ ФУНКЦИИ ====================
         function initAudioControls() {
             const muteBtn = document.getElementById('muteBtn');
             const volumeSlider = document.getElementById('volumeSlider');
@@ -2032,89 +2160,6 @@
                 isMuted = !isMuted;
                 muteBtn.textContent = isMuted ? '🔇' : '🔊';
             });
-        }
-
-        function openItemDescription(id) {
-            console.log("🟢 Вызов модалки для ID:", id);
-            
-            const item = ITEMS.find(i => i.id === id);
-            if (!item) {
-                console.error("❌ Предмет с ID", id, "не найден!");
-                return;
-            }
-            
-            console.log("🔍 Найден предмет:", item.name);
-            
-            extendedStats.itemClicks[id] = (extendedStats.itemClicks[id] || 0) + 1;
-            saveExtendedStats();
-            
-            const invRecord = inventory.find(record => record.id === id);
-            if (invRecord && invRecord.unviewed === true) {
-                invRecord.unviewed = false;
-                saveData();
-                
-                const clickedCard = document.querySelector(`.item-card[data-item-id="${id}"]`);
-                if (clickedCard) {
-                    const dot = clickedCard.querySelector('.card-dot');
-                    if (dot) dot.remove();
-                }
-                
-                const hasUnviewedNow = inventory.some(i => i.unviewed === true);
-                const mainInvDot = document.getElementById("invDot");
-                if (mainInvDot) {
-                    mainInvDot.style.display = hasUnviewedNow ? "inline-block" : "none";
-                }
-            }
-            
-            const modal = document.getElementById("descModal");
-            const card = document.getElementById("modalCard");
-            const img = document.getElementById("modalImg");
-            const name = document.getElementById("modalName");
-            const badge = document.getElementById("modalBadge");
-            const desc = document.getElementById("modalDesc");
-            
-            const sidePanel = document.getElementById("modalSidePanel");
-            const infoDate = document.getElementById("infoDateRow");
-            const infoRolls = document.getElementById("infoRollsRow");
-            const infoDup = document.getElementById("infoDuplicatesRow");
-            
-            let rarity = getItemRarity(item);
-            let rarityClass = getRarityClass(item.rarityKey);
-            let textClass = getRarityTextClass(item.rarityKey);
-            
-            img.src = item.img;
-            name.innerText = item.name;
-            badge.innerText = rarity.name;
-            desc.innerText = item.description || "У этого предмета пока нет описания.";
-            card.className = "modal-card " + rarityClass;
-            badge.className = "badge " + textClass;
-            
-            if (invRecord) {
-                let cleanDate = invRecord.date ? invRecord.date.replace("Дата получения: ", "") : "--";
-                infoDate.innerHTML = `📅 Дата получения: <strong>${cleanDate}</strong>`;
-                infoRolls.innerHTML = `🎰 Круток потребовалось: <strong>${invRecord.rollsToDrop || "Неизвестно"}</strong>`;
-                
-                if (invRecord.duplicatesCount && invRecord.duplicatesCount > 0) {
-                    infoDup.innerHTML = `♻️ Количество повторов: <strong style="color: #ffffff !important;">${invRecord.duplicatesCount}</strong>`;
-                    infoDup.style.display = "block";
-                } else {
-                    infoDup.style.display = "none";
-                }
-            }
-            
-            sidePanel.style.borderColor = rarity.color;
-            
-            modal.style.setProperty("display", "flex", "important");
-            modal.style.setProperty("visibility", "visible", "important");
-            modal.style.setProperty("opacity", "1", "important");
-            modal.style.setProperty("z-index", "999999", "important");
-            console.log("✅ Модалка принудительно показана");
-        }
-
-        function closeItemDescription() {
-            const modal = document.getElementById("descModal");
-            modal.style.setProperty("display", "none", "important");
-            console.log("❌ Модалка закрыта");
         }
 
         // ==================== ФУНКЦИЯ testOpenCaseWithRarity ====================
@@ -2210,6 +2255,7 @@
                     const dot = document.getElementById("invDot");
                     if (dot) dot.style.display = "inline-block";
                 }
+                updateTabsNotificationState();
             }
             
             stats.total++;
@@ -2231,12 +2277,16 @@
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
                     verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 3px !important; box-shadow: none !important; text-transform: uppercase !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; transform: none !important;";
                 } else {
+                    // ЗАДАЧА 3: НОВЫЙ предмет с обновлённым цветом текста и обводкой для легендарок
                     const arr = verdictTexts[won.rarityKey] || verdictTexts.common;
                     const rarityColor = getItemRarity(won).color;
-                    const textColor = (won.rarityKey === "common" || won.rarityKey === "legendary") ? "#000000" : "#ffffff";
+                    
+                    const textColor = won.rarityKey === "common" ? "#000000" : "#ffffff";
+                    
+                    const strokeStyle = won.rarityKey === "legendary" ? "-webkit-text-stroke: 1.5px #000000; text-shadow: 1px 1px 2px #000;" : "";
                     
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
-                    verdictBlock.style.cssText = `display: block !important; background: ${rarityColor} !important; color: ${textColor} !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 1px !important; box-shadow: none !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; text-transform: uppercase !important; transform: none !important;`;
+                    verdictBlock.style.cssText = `display: block !important; background: ${rarityColor} !important; color: ${textColor} !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 1px !important; box-shadow: none !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; text-transform: uppercase !important; transform: none !important; ${strokeStyle}`;
                 }
             }
         }
@@ -2474,6 +2524,7 @@
                 window.scrollTo({ top: 0, behavior: "smooth" });
             };
             
+            // ЗАДАЧА 4: Умный клавиатурный фильтр для клавиши Пробел
             window.addEventListener("keydown", (e) => {
                 if (e.code === "Space") {
                     const activeTabBtn = document.querySelector(".tab-btn.active");
@@ -2482,9 +2533,27 @@
                     
                     if (isCurrentlyInCaseTab && !isUserTyping) {
                         e.preventDefault();
-                        const openBtn = document.getElementById("openCaseBtn");
-                        if (openBtn && !openBtn.disabled) {
-                            openBtn.click();
+                        
+                        if (isResultScreen) {
+                            // Если мы находимся на экране выпавшего предмета:
+                            const openBtn = document.getElementById("openCaseBtn");
+                            // Находим плашку вердикта, чтобы понять, выпал повтор или новый предмет
+                            const verdictBlock = document.getElementById("rollVerdictBlock");
+                            const isDuplicateDrop = verdictBlock && verdictBlock.textContent.includes("ПОВТОР");
+                            
+                            if (isDuplicateDrop) {
+                                // Если это ПОВТОР — Пробел сработает и вернет назад
+                                resetToInitialState();
+                            } else {
+                                // Если это НОВЫЙ предмет — Пробел заблокирован (ничего не делаем)
+                                console.log("⌨️ Нажатие Пробела заблокировано для нового предмета. Закройте окно мышкой!");
+                            }
+                        } else {
+                            // Если мы в начале («ВРАЩАТЬ БАРАБАН») — Пробел запускает крутку как обычно
+                            const openBtn = document.getElementById("openCaseBtn");
+                            if (openBtn && !openBtn.disabled) {
+                                openBtn.click();
+                            }
                         }
                     }
                 }
