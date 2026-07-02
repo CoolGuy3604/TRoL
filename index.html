@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1366, initial-scale=0.3, minimum-scale=0.1, maximum-scale=1.0, user-scalable=yes">
-    <title>Симулятор кейсов | ЭЛИТНЫЙ ДИЗАЙН</title>
+    <!-- ЗАДАЧА 1: Фирменное название проекта вместо старого текста -->
+    <title>The Roulette of Love</title>
     <!-- ЗАДАЧА 7: Подключение прозрачного фавикона с гитхаба -->
     <link rel="icon" type="image/png" href="images/favik.png">
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
@@ -834,13 +835,33 @@
             font-weight: bold;
         }
 
-        /* Стиль для кнопки прокрутки */
+        /* ЗАДАЧА 2: Новый дизайн кнопки наверх без свечения */
         #scrollToTopBtn {
             transition: all 0.3s ease;
+            display: none; 
+            position: fixed !important; 
+            bottom: 30px !important; 
+            right: 30px !important; 
+            width: 60px !important; 
+            height: 60px !important; 
+            border-radius: 50% !important; 
+            background: radial-gradient(circle, #00ff66, #00cc44) !important; 
+            border: none !important; 
+            color: #1e1e2a !important; 
+            font-size: 1.8rem !important;
+            font-weight: bold !important; 
+            cursor: pointer !important; 
+            z-index: 99999 !important; 
+            flex-direction: row !important;
+            justify-content: center !important; 
+            align-items: center !important;
+            padding: 0 !important;
+            line-height: 1 !important;
+            box-shadow: none !important;
         }
         #scrollToTopBtn:hover {
             transform: scale(1.1);
-            box-shadow: 0 6px 25px rgba(0,255,102,0.6) !important;
+            box-shadow: none !important;
         }
         #scrollToTopBtn:active {
             transform: scale(0.95);
@@ -1043,8 +1064,8 @@
         </div>
     </div>
 
-    <!-- Кнопка прокрутки наверх -->
-    <button id="scrollToTopBtn" style="display: none; position: fixed !important; bottom: 30px !important; right: 30px !important; width: 60px !important; height: 60px !important; border-radius: 50% !important; background: radial-gradient(circle, #00ff66, #00cc44) !important; border: none !important; color: #1e1e2a !important; font-size: 2rem !important; font-weight: bold !important; cursor: pointer !important; z-index: 99999 !important; box-shadow: 0 4px 15px rgba(0,255,102,0.4) !important; justify-content: center !important; align-items: center !important;">↑</button>
+    <!-- ЗАДАЧА 2-б: Стрелочка заменена на смайлик пальца -->
+    <button id="scrollToTopBtn">☝️</button>
 
     <script type="module">
         // ==================== ПОДКЛЮЧЕНИЕ FIREBASE ====================
@@ -1727,7 +1748,6 @@
                     const dot = document.getElementById("invDot");
                     if (dot) dot.style.display = "inline-block";
                 }
-                // ЗАДАЧА 1: При появлении новых вещей обновляем состояние уведомлений
                 updateTabsNotificationState();
             }
             
@@ -1751,19 +1771,13 @@
             const verdictBlock = document.getElementById("rollVerdictBlock");
             if (verdictBlock) {
                 if (!isNew) {
-                    // ПОВТОР: Плоский стильный зеленый овал без 3D тени кнопки
                     const arr = verdictTexts.duplicate;
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
                     verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 3px !important; box-shadow: none !important; text-transform: uppercase !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; transform: none !important;";
                 } else {
-                    // ЗАДАЧА 3: НОВЫЙ предмет с обновлённым цветом текста и обводкой для легендарок
                     const arr = verdictTexts[won.rarityKey] || verdictTexts.common;
                     const rarityColor = getItemRarity(won).color;
-                    
-                    // Обычные предметы остаются черными, а все остальные (включая Легендарки) — белые
                     const textColor = won.rarityKey === "common" ? "#000000" : "#ffffff";
-                    
-                    // ЗАДАЧА 3: Если предмет легендарный, добавляем жирный черный контур для белых букв
                     const strokeStyle = won.rarityKey === "legendary" ? "-webkit-text-stroke: 1.5px #000000; text-shadow: 1px 1px 2px #000;" : "";
                     
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
@@ -1776,7 +1790,7 @@
             // Функция оставлена для обратной совместимости
         }
 
-        // ЗАДАЧА 1: Вспомогательная функция для мгновенного обновления состояний точки/обводки
+        // ==================== ФУНКЦИИ УПРАВЛЕНИЯ УВЕДОМЛЕНИЯМИ ====================
         function updateTabsNotificationState() {
             const mainInvDot = document.getElementById("invDot");
             const invTabBtn = document.querySelector('.tab-btn[data-tab="inventory"]');
@@ -1787,22 +1801,19 @@
 
             if (hasUnviewedItems) {
                 if (isCurrentlyInInventory) {
-                    // Если мы ВНУТРИ инвентаря: убираем точку, включаем жирную обводку
                     if (mainInvDot) mainInvDot.style.display = "none";
                     invTabBtn.classList.add("tab-btn-alert-border");
                 } else {
-                    // Если мы в ДРУГОМ разделе: включаем точку, убираем обводку
                     if (mainInvDot) mainInvDot.style.display = "inline-block";
                     invTabBtn.classList.remove("tab-btn-alert-border");
                 }
             } else {
-                // Если непросмотренных предметов нет: выключаем ВСЁ
                 if (mainInvDot) mainInvDot.style.display = "none";
                 invTabBtn.classList.remove("tab-btn-alert-border");
             }
         }
 
-        // ЗАДАЧИ 1, 2 и 4: ОБНОВЛЁННАЯ ФУНКЦИЯ initTabs
+        // ==================== ФУНКЦИЯ initTabs ====================
         function initTabs() {
             let btns = document.querySelectorAll(".tab-btn");
             btns.forEach(btn => {
@@ -1816,13 +1827,12 @@
                     document.getElementById("statsTab").classList.remove("active");
                     document.getElementById(id + "Tab").classList.add("active");
                     
-                    // ЗАДАЧА 1: Логика управления точкой и обводкой при переключении табов
                     updateTabsNotificationState();
                 };
             });
         }
 
-        // ЗАДАЧИ 1, 2 и 4: ОБНОВЛЁННАЯ ФУНКЦИЯ openItemDescription
+        // ==================== ФУНКЦИЯ openItemDescription ====================
         function openItemDescription(id) {
             console.log("🟢 Вызов модалки для ID:", id);
             
@@ -1838,16 +1848,14 @@
             const invRecord = inventory.find(record => record.id === id);
             if (invRecord && invRecord.unviewed === true) {
                 invRecord.unviewed = false;
-                saveData(); // Синхронизация с Firebase
+                saveData();
                 
-                // Удаляем точку с карточки прямо сейчас
                 const clickedCard = document.querySelector(`.item-card[data-item-id="${id}"]`);
                 if (clickedCard) {
                     const dot = clickedCard.querySelector('.card-dot');
                     if (dot) dot.remove();
                 }
                 
-                // ЗАДАЧА 1: Моментально пересчитываем состояние точки/обводки на кнопке таба
                 updateTabsNotificationState();
             }
             
@@ -1874,7 +1882,6 @@
             card.className = "modal-card " + rarityClass;
             badge.className = "badge " + textClass;
             
-            // ЗАДАЧА 2: Защита картинки внутри раскрытого окна описания от перетаскивания и ПКМ
             if (img) {
                 img.addEventListener('contextmenu', e => e.preventDefault());
                 img.addEventListener('dragstart', e => e.preventDefault());
@@ -1923,7 +1930,6 @@
             invDiv.innerHTML = "";
             
             if (collected.length === 0) {
-                // ЗАДАЧА 5: Новый текст без точек
                 invDiv.innerHTML = '<div style="text-align:center;padding:40px;width:100%;">Твой инвентарь пуст 😢</div>';
             } else {
                 let isFirstInv = true;
@@ -2005,7 +2011,8 @@
             collDiv.innerHTML = "";
             
             if (missing.length === 0) {
-                collDiv.innerHTML = `<div class="celebration"><h1>🏆 ВСЕ СОБРАНО! 🏆</h1><p style="font-size:1.5rem; font-weight:bold; margin-top:10px;">Все предметы собраны! Ур-рааааа!</p></div>`;
+                // ЗАДАЧА 3: Замена смайлов 🏆 на 🥳 в блоке триумфа коллекции
+                collDiv.innerHTML = `<div class="celebration"><h1>🥳 ВСЕ СОБРАНО! 🥳</h1><p style="font-size:1.5rem; font-weight:bold; margin-top:10px;">Все предметы собраны! Ур-рааааа!</p></div>`;
             } else {
                 let isFirstColl = true;
                 
@@ -2139,13 +2146,12 @@
                 `;
             }
             
-            // ЗАДАЧА 1: Актуализируем обводку/точку при обновлении данных
             updateTabsNotificationState();
             
             console.log("✅ UI обновлён");
         }
 
-        // ==================== ОСТАЛЬНЫЕ ФУНКЦИИ ====================
+        // ==================== ФУНКЦИЯ initAudioControls ====================
         function initAudioControls() {
             const muteBtn = document.getElementById('muteBtn');
             const volumeSlider = document.getElementById('volumeSlider');
@@ -2277,12 +2283,9 @@
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
                     verdictBlock.style.cssText = "display: block !important; background: radial-gradient(circle at 30% 10%, #00ff66, #00cc44) !important; color: #1e1e2a !important; font-family: inherit !important; font-size: 2rem !important; font-weight: bold !important; padding: 16px 42px !important; border-radius: 80px !important; letter-spacing: 3px !important; box-shadow: none !important; text-transform: uppercase !important; text-align: center !important; width: 100% !important; box-sizing: border-box !important; transform: none !important;";
                 } else {
-                    // ЗАДАЧА 3: НОВЫЙ предмет с обновлённым цветом текста и обводкой для легендарок
                     const arr = verdictTexts[won.rarityKey] || verdictTexts.common;
                     const rarityColor = getItemRarity(won).color;
-                    
                     const textColor = won.rarityKey === "common" ? "#000000" : "#ffffff";
-                    
                     const strokeStyle = won.rarityKey === "legendary" ? "-webkit-text-stroke: 1.5px #000000; text-shadow: 1px 1px 2px #000;" : "";
                     
                     verdictBlock.textContent = arr[Math.floor(Math.random() * arr.length)];
@@ -2524,7 +2527,6 @@
                 window.scrollTo({ top: 0, behavior: "smooth" });
             };
             
-            // ЗАДАЧА 4: Умный клавиатурный фильтр для клавиши Пробел
             window.addEventListener("keydown", (e) => {
                 if (e.code === "Space") {
                     const activeTabBtn = document.querySelector(".tab-btn.active");
@@ -2535,21 +2537,16 @@
                         e.preventDefault();
                         
                         if (isResultScreen) {
-                            // Если мы находимся на экране выпавшего предмета:
                             const openBtn = document.getElementById("openCaseBtn");
-                            // Находим плашку вердикта, чтобы понять, выпал повтор или новый предмет
                             const verdictBlock = document.getElementById("rollVerdictBlock");
                             const isDuplicateDrop = verdictBlock && verdictBlock.textContent.includes("ПОВТОР");
                             
                             if (isDuplicateDrop) {
-                                // Если это ПОВТОР — Пробел сработает и вернет назад
                                 resetToInitialState();
                             } else {
-                                // Если это НОВЫЙ предмет — Пробел заблокирован (ничего не делаем)
                                 console.log("⌨️ Нажатие Пробела заблокировано для нового предмета. Закройте окно мышкой!");
                             }
                         } else {
-                            // Если мы в начале («ВРАЩАТЬ БАРАБАН») — Пробел запускает крутку как обычно
                             const openBtn = document.getElementById("openCaseBtn");
                             if (openBtn && !openBtn.disabled) {
                                 openBtn.click();
