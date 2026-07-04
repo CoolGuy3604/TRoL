@@ -1089,50 +1089,77 @@
         let currentUserUid = null;
         let isDataLoaded = false;
 
-        // ==================== ЗВУКОВОЙ ДВИЖОК ====================
-        const clickAudio = new Audio('click.mp3');
+        // ==================== МОДЕРНИЗИРОВАННЫЙ ЗВУКОВОЙ ДВИЖОК С ПРЕДЗАГРУЗКОЙ ====================
         let isMuted = false;
         let currentVolume = 0.5;
-        
-        clickAudio.volume = currentVolume;
-
-        // ЗАДАЧА 1 (Часть 1): Индивидуальные звуки для НОВЫХ предметов по редкостям
-        const RARITY_SOUNDS = {
-            common: new Audio('obichnii.mp3'),
-            rare: new Audio('redkii.mp3'),
-            superRare: new Audio('sverhredkii.mp3'),
-            epic: new Audio('epicheskii.mp3'),
-            mythic: new Audio('mificheskii.mp3'),
-            legendary: new Audio('legendarnii.mp3')
-        };
-
-        // ЗАДАЧА 1 (Часть 2): Пул звуков для СЛУЧАЙНОГО выбора при выпадении ПОВТОРОВ
-        const DUPLICATE_SOUNDS_FILES = ['aa.mp3', 'apchi.mp3', 'hihihi.mp3', 'oou.mp3', 'ou.mp3', 'puk.mp3', 'rigaet.mp3', 'uuu.mp3', 'yeah.mp3'];
-        const DUPLICATE_SOUNDS = DUPLICATE_SOUNDS_FILES.map(file => new Audio(file));
-
-        // ЗАДАЧА 3: Звуки переключения вкладок разделов сайта
-        const TAB_SOUNDS = {
-            case: new Audio('keis.mp3'),
-            inventory: new Audio('inventar.mp3'),
-            collection: new Audio('kollekcia.mp3'),
-            stats: new Audio('statistika.mp3')
-        };
-
-        // Глобальный указатель на текущий воспроизводящийся звук выпадения (для блокировок из ЗАДАЧИ 3)
         let activeDropAudio = null;
 
-        // Функция массовой настройки громкости для всех новых аудиофайлов
+        // Создаем базовые аудио-объекты с принудительным свойством предзагрузки браузера
+        function createPreloadedAudio(src) {
+            const audio = new Audio(src);
+            audio.preload = "auto"; // Заставляем браузер качать файл сразу, не дожидаясь клика
+            return audio;
+        }
+
+        const clickAudio = createPreloadedAudio('click.mp3');
+
+        // Звуки для НОВЫХ предметов по редкостям
+        const RARITY_SOUNDS = {
+            common: createPreloadedAudio('obichnii.mp3'),
+            rare: createPreloadedAudio('redkii.mp3'),
+            superRare: createPreloadedAudio('sverhredkii.mp3'),
+            epic: createPreloadedAudio('epicheskii.mp3'),
+            mythic: createPreloadedAudio('mificheskii.mp3'),
+            legendary: createPreloadedAudio('legendarnii.mp3')
+        };
+
+        // Пул звуков для повторов
+        const DUPLICATE_SOUNDS_FILES = ['aa.mp3', 'apchi.mp3', 'hihihi.mp3', 'oou.mp3', 'ou.mp3', 'puk.mp3', 'rigaet.mp3', 'uuu.mp3', 'yeah.mp3'];
+        const DUPLICATE_SOUNDS = DUPLICATE_SOUNDS_FILES.map(file => createPreloadedAudio(file));
+
+        // Звуки переключения вкладок
+        const TAB_SOUNDS = {
+            case: createPreloadedAudio('keis.mp3'),
+            inventory: createPreloadedAudio('inventar.mp3'),
+            collection: createPreloadedAudio('kollekcia.mp3'),
+            stats: createPreloadedAudio('statistika.mp3')
+        };
+
+        // Собираем абсолютно все звуки в единый массив для фонового прогрева памяти
+        const ALL_APP_SOUNDS = [
+            clickAudio,
+            ...Object.values(RARITY_SOUNDS),
+            ...DUPLICATE_SOUNDS,
+            ...Object.values(TAB_SOUNDS)
+        ];
+
+        // Умная функция фонового кэширования звуков (прогрев аудио-контекста браузера)
+        // Вызывается автоматически при первой загрузке страницы, исключая задержки "холодного старта"
+        function warmUpAndCacheSounds() {
+            console.log("🎵 Запуск фонового кэширования аудио-движка...");
+            ALL_APP_SOUNDS.forEach(audio => {
+                audio.volume = 0; // Полная тишина, чтобы пользователь ничего не услышал
+                // Микро-запуск для принудительного удержания байтов файла в оперативной памяти компьютера
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        audio.pause();
+                        audio.currentTime = 0;
+                        audio.volume = currentVolume; // Возвращаем рабочую громкость
+                    }).catch(() => {
+                        // Игнорируем блокировки автоплея браузера, файлы все равно останутся в кэше
+                        audio.volume = currentVolume;
+                    });
+                }
+            });
+            console.log("🟢 Все звуки успешно закэшированы в памяти. Сетевые лаги устранены!");
+        }
+
+        // Функция массовой настройки громкости
         function syncAllVolumes() {
-            clickAudio.volume = currentVolume;
-            for (let key in RARITY_SOUNDS) {
-                RARITY_SOUNDS[key].volume = currentVolume;
-            }
-            DUPLICATE_SOUNDS.forEach(audio => {
+            ALL_APP_SOUNDS.forEach(audio => {
                 audio.volume = currentVolume;
             });
-            for (let key in TAB_SOUNDS) {
-                TAB_SOUNDS[key].volume = currentVolume;
-            }
         }
         syncAllVolumes();
 
@@ -1750,19 +1777,16 @@
             
             await startSpin(won);
             
-            // ЗАДАЧА 1: Умный звуковой движок при финише крутки барабана
+            // Умный звуковой движок при финише крутки барабана
             if (!isMuted) {
-                // Если в этот момент играл старый звук выпадения, принудительно останавливаем его
                 if (activeDropAudio) {
                     activeDropAudio.pause();
                     activeDropAudio.currentTime = 0;
                 }
 
                 if (isNew) {
-                    // ПРЕДМЕТ НОВЫЙ: Включаем жесткий звук соответствующей редкости
                     activeDropAudio = RARITY_SOUNDS[won.rarityKey] || RARITY_SOUNDS.common;
                 } else {
-                    // ПРЕДМЕТ ПОВТОРНЫЙ: Рандомно выбираем 1 из 9 звуков пула дубликатов
                     const randomIdx = Math.floor(Math.random() * DUPLICATE_SOUNDS.length);
                     activeDropAudio = DUPLICATE_SOUNDS[randomIdx];
                 }
@@ -1770,8 +1794,6 @@
                 if (activeDropAudio) {
                     activeDropAudio.currentTime = 0;
                     activeDropAudio.play().catch(() => {});
-                    
-                    // Как только трек доиграет до конца, сбрасываем указатель (ЗАДАЧА 3, Пункт 3)
                     activeDropAudio.onended = () => {
                         activeDropAudio = null;
                     };
@@ -1874,7 +1896,7 @@
             }
         }
 
-        // ЗАДАЧА 3: ОБНОВЛЁННАЯ ФУНКЦИЯ initTabs с умным звуком
+        // ==================== ФУНКЦИЯ initTabs ====================
         function initTabs() {
             let btns = document.querySelectorAll(".tab-btn");
             btns.forEach(btn => {
@@ -2083,12 +2105,12 @@
             collDiv.innerHTML = "";
             
             if (missing.length === 0) {
-                // ЗАДАЧА 2: Обновленный редизайн победного экрана коллекции с 💞
+                // Обновленный редизайн победного экрана коллекции с вертикальным центрированием и увеличенными размерами
                 collDiv.innerHTML = `
-                    <div class="celebration">
-                        <h1>🥳 ВСЕ ПРЕДМЕТЫ СОБРАНЫ! 🥳</h1>
-                        <p style="font-size:1.5rem; font-weight:bold; margin-top:10px;">Ур-раааа!!!</p>
-                        <p style="font-size:2rem; margin-top:10px; padding:0; line-height:1;">💞</p>
+                    <div class="celebration" style="display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important; min-height: 380px !important; box-sizing: border-box !important; padding: 40px !important;">
+                        <h1 style="font-size: 3rem; margin: 0 0 15px 0; padding: 0;">🥳 ВСЕ ПРЕДМЕТЫ СОБРАНЫ! 🥳</h1>
+                        <p style="font-size: 2rem !important; font-weight: bold; margin: 0 0 20px 0; padding: 0;">Ур-раааа!!!</p>
+                        <p style="font-size: 4rem !important; margin: 0; padding: 0; line-height: 1;">💞</p>
                     </div>
                 `;
             } else {
@@ -2302,7 +2324,6 @@
             
             await startSpin(won);
             
-            // ЗАДАЧА 1: Умный звуковой движок при финише крутки барабана
             if (!isMuted) {
                 if (activeDropAudio) {
                     activeDropAudio.pause();
@@ -2650,6 +2671,9 @@
                     }
                 }
             });
+            
+            // ЗАДАЧА: Запуск фонового кэширования звуков
+            warmUpAndCacheSounds();
             
             setInterval(() => {
                 if (currentUserUid && !isSpinning) {
