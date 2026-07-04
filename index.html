@@ -1091,12 +1091,50 @@
 
         // ==================== ЗВУКОВОЙ ДВИЖОК ====================
         const clickAudio = new Audio('click.mp3');
-        const winAudio = new Audio('win.mp3');
         let isMuted = false;
         let currentVolume = 0.5;
         
         clickAudio.volume = currentVolume;
-        winAudio.volume = currentVolume;
+
+        // ЗАДАЧА 1 (Часть 1): Индивидуальные звуки для НОВЫХ предметов по редкостям
+        const RARITY_SOUNDS = {
+            common: new Audio('obichnii.mp3'),
+            rare: new Audio('redkii.mp3'),
+            superRare: new Audio('sverhredkii.mp3'),
+            epic: new Audio('epicheskii.mp3'),
+            mythic: new Audio('mificheskii.mp3'),
+            legendary: new Audio('legendarnii.mp3')
+        };
+
+        // ЗАДАЧА 1 (Часть 2): Пул звуков для СЛУЧАЙНОГО выбора при выпадении ПОВТОРОВ
+        const DUPLICATE_SOUNDS_FILES = ['aa.mp3', 'apchi.mp3', 'hihihi.mp3', 'oou.mp3', 'ou.mp3', 'puk.mp3', 'rigaet.mp3', 'uuu.mp3', 'yeah.mp3'];
+        const DUPLICATE_SOUNDS = DUPLICATE_SOUNDS_FILES.map(file => new Audio(file));
+
+        // ЗАДАЧА 3: Звуки переключения вкладок разделов сайта
+        const TAB_SOUNDS = {
+            case: new Audio('keis.mp3'),
+            inventory: new Audio('inventar.mp3'),
+            collection: new Audio('kollekcia.mp3'),
+            stats: new Audio('statistika.mp3')
+        };
+
+        // Глобальный указатель на текущий воспроизводящийся звук выпадения (для блокировок из ЗАДАЧИ 3)
+        let activeDropAudio = null;
+
+        // Функция массовой настройки громкости для всех новых аудиофайлов
+        function syncAllVolumes() {
+            clickAudio.volume = currentVolume;
+            for (let key in RARITY_SOUNDS) {
+                RARITY_SOUNDS[key].volume = currentVolume;
+            }
+            DUPLICATE_SOUNDS.forEach(audio => {
+                audio.volume = currentVolume;
+            });
+            for (let key in TAB_SOUNDS) {
+                TAB_SOUNDS[key].volume = currentVolume;
+            }
+        }
+        syncAllVolumes();
 
         // ==================== СИСТЕМА РЕДКОСТЕЙ ====================
         const RARITIES = {
@@ -1712,9 +1750,32 @@
             
             await startSpin(won);
             
+            // ЗАДАЧА 1: Умный звуковой движок при финише крутки барабана
             if (!isMuted) {
-                winAudio.currentTime = 0;
-                winAudio.play().catch(() => {});
+                // Если в этот момент играл старый звук выпадения, принудительно останавливаем его
+                if (activeDropAudio) {
+                    activeDropAudio.pause();
+                    activeDropAudio.currentTime = 0;
+                }
+
+                if (isNew) {
+                    // ПРЕДМЕТ НОВЫЙ: Включаем жесткий звук соответствующей редкости
+                    activeDropAudio = RARITY_SOUNDS[won.rarityKey] || RARITY_SOUNDS.common;
+                } else {
+                    // ПРЕДМЕТ ПОВТОРНЫЙ: Рандомно выбираем 1 из 9 звуков пула дубликатов
+                    const randomIdx = Math.floor(Math.random() * DUPLICATE_SOUNDS.length);
+                    activeDropAudio = DUPLICATE_SOUNDS[randomIdx];
+                }
+
+                if (activeDropAudio) {
+                    activeDropAudio.currentTime = 0;
+                    activeDropAudio.play().catch(() => {});
+                    
+                    // Как только трек доиграет до конца, сбрасываем указатель (ЗАДАЧА 3, Пункт 3)
+                    activeDropAudio.onended = () => {
+                        activeDropAudio = null;
+                    };
+                }
             }
             
             showResult(won, isNew);
@@ -1813,12 +1874,23 @@
             }
         }
 
-        // ==================== ФУНКЦИЯ initTabs ====================
+        // ЗАДАЧА 3: ОБНОВЛЁННАЯ ФУНКЦИЯ initTabs с умным звуком
         function initTabs() {
             let btns = document.querySelectorAll(".tab-btn");
             btns.forEach(btn => {
                 btn.onclick = () => {
                     let id = btn.getAttribute("data-tab");
+                    
+                    // ПРОВЕРКА ЗАДАЧА 3: Включаем звук только если переходим на НОВУЮ вкладку,
+                    // барабан НЕ крутится (Пункт 2) и звук выпадения НЕ проигрывается (Пункт 3)
+                    const isTabAlreadyActive = btn.classList.contains("active");
+                    if (!isTabAlreadyActive && !isSpinning && activeDropAudio === null) {
+                        if (!isMuted && TAB_SOUNDS[id]) {
+                            TAB_SOUNDS[id].currentTime = 0;
+                            TAB_SOUNDS[id].play().catch(() => {});
+                        }
+                    }
+
                     btns.forEach(b => b.classList.remove("active"));
                     btn.classList.add("active");
                     document.getElementById("caseTab").classList.remove("active");
@@ -2011,8 +2083,14 @@
             collDiv.innerHTML = "";
             
             if (missing.length === 0) {
-                // ЗАДАЧА 3: Замена смайлов 🏆 на 🥳 в блоке триумфа коллекции
-                collDiv.innerHTML = `<div class="celebration"><h1>🥳 ВСЕ СОБРАНО! 🥳</h1><p style="font-size:1.5rem; font-weight:bold; margin-top:10px;">Все предметы собраны! Ур-рааааа!</p></div>`;
+                // ЗАДАЧА 2: Обновленный редизайн победного экрана коллекции с 💞
+                collDiv.innerHTML = `
+                    <div class="celebration">
+                        <h1>🥳 ВСЕ ПРЕДМЕТЫ СОБРАНЫ! 🥳</h1>
+                        <p style="font-size:1.5rem; font-weight:bold; margin-top:10px;">Ур-раааа!!!</p>
+                        <p style="font-size:2rem; margin-top:10px; padding:0; line-height:1;">💞</p>
+                    </div>
+                `;
             } else {
                 let isFirstColl = true;
                 
@@ -2158,8 +2236,7 @@
             
             volumeSlider.addEventListener('input', (e) => {
                 currentVolume = parseFloat(e.target.value);
-                clickAudio.volume = currentVolume;
-                winAudio.volume = currentVolume;
+                syncAllVolumes(); // Синхронизируем громкость абсолютно всех звуков на сайте
             });
             
             muteBtn.addEventListener('click', () => {
@@ -2225,9 +2302,27 @@
             
             await startSpin(won);
             
+            // ЗАДАЧА 1: Умный звуковой движок при финише крутки барабана
             if (!isMuted) {
-                winAudio.currentTime = 0;
-                winAudio.play().catch(() => {});
+                if (activeDropAudio) {
+                    activeDropAudio.pause();
+                    activeDropAudio.currentTime = 0;
+                }
+
+                if (isNew) {
+                    activeDropAudio = RARITY_SOUNDS[won.rarityKey] || RARITY_SOUNDS.common;
+                } else {
+                    const randomIdx = Math.floor(Math.random() * DUPLICATE_SOUNDS.length);
+                    activeDropAudio = DUPLICATE_SOUNDS[randomIdx];
+                }
+
+                if (activeDropAudio) {
+                    activeDropAudio.currentTime = 0;
+                    activeDropAudio.play().catch(() => {});
+                    activeDropAudio.onended = () => {
+                        activeDropAudio = null;
+                    };
+                }
             }
             
             showResult(won, isNew);
