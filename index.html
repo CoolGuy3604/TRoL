@@ -72,8 +72,21 @@
         .auth-btn-group {
             display: flex;
             flex-direction: column;
-            gap: 24px;
-            margin-top: 10px;
+            width: 100%;
+            margin-top: 10px !important;
+            gap: 0 !important;
+        }
+
+        #signUpBtn {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
+        #signInBtn {
+            font-size: 1.2rem; 
+            padding: 12px; 
+            margin: 15px 0 0 0 !important;
             width: 100%;
         }
 
@@ -817,23 +830,7 @@
             box-shadow: inset 0 0 15px rgba(255,200,0,0.1) !important;
         }
         
-        .test-admin-panel {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 15px;
-            background: rgba(255,255,255,0.05);
-            padding: 12px;
-            border-radius: 20px;
-            justify-content: center;
-        }
-        .test-admin-panel button {
-            border: none;
-            padding: 6px 12px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+        /* ЗАДАЧА 2: Удаляем стили .test-admin-panel, так как панель полностью убрана из HTML */
 
         /* ЗАДАЧА 2: Новый дизайн кнопки наверх без свечения */
         #scrollToTopBtn {
@@ -1024,14 +1021,7 @@
                 <!-- ПЛАШКА ВЕРДИКТОВ (ПОД КНОПКОЙ) -->
                 <div id="rollVerdictBlock" style="display: none; width: 100% !important; border-radius: 80px !important; padding: 16px 42px !important; font-size: 1.6rem !important; font-weight: bold !important; text-align: center !important; margin: 20px 0 !important; box-sizing: border-box !important;"></div>
             </div>
-            <div class="test-admin-panel">
-                <button onclick="window.testOpenCaseWithRarity('common')" style="background: #dee3f2; color: #000;">⚪ Common</button>
-                <button onclick="window.testOpenCaseWithRarity('rare')" style="background: #184cff; color: #fff;">🔵 Rare</button>
-                <button onclick="window.testOpenCaseWithRarity('superRare')" style="background: #8e18ff; color: #fff;">🟣 SuperRare</button>
-                <button onclick="window.testOpenCaseWithRarity('epic')" style="background: #ff18ab; color: #fff;">🩷 Epic</button>
-                <button onclick="window.testOpenCaseWithRarity('mythic')" style="background: #ff1414; color: #fff;">🔴 Mythic</button>
-                <button onclick="window.testOpenCaseWithRarity('legendary')" style="background: #ffc800; color: #000;">🟡 Legendary</button>
-            </div>
+            <!-- ЗАДАЧА 2: Панель тестирования полностью удалена -->
         </div>
 
         <div id="inventoryTab" class="tab-content">
@@ -1043,7 +1033,7 @@
         </div>
 
         <div id="statsTab" class="tab-content">
-            <button class="small-reset" id="resetProgressBtn" style="margin-bottom: 15px;">♻️ Сбросить прогресс</button>
+            <!-- ЗАДАЧА 3: Кнопка сброса прогресса удалена из HTML -->
             <div class="stats-panel-rows" id="globalStatsContainer" style="display: flex; flex-direction: column; gap: 20px; padding: 20px 10px; font-size: 1.15rem; color: #fff;"></div>
         </div>
     </div>
@@ -2226,6 +2216,7 @@
                     }
                 }
 
+                // ЗАДАЧА 3: Обновленный блок статистики БЕЗ кнопки сброса прогресса
                 statsContainer.innerHTML = `
                     <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 16px 20px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 12px; box-shadow: inset 0 0 15px rgba(0,0,0,0.2);">
                         <div style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: -4px; font-weight: bold;">ОСНОВНОЙ ПРОГРЕСС</div>
@@ -2242,7 +2233,7 @@
                     <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">1️⃣ Первый выпавший предмет: ${firstItemStyled}</div>
                     <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">🧱 Тяжелее всего дался: ${heavyItemStyled}</div>
                     <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 5px;">❤️ Любимый предмет: ${favoriteItemStyled}</div>
-                    <div style="padding-top: 5px;">⏩ Рекордная серия повторов: <span style="color: #fff; font-weight: bold;">${extendedStats.maxDryStreak}</span></div>
+                    <div style="padding-top: 5px; margin-bottom: 0 !important;">⏩ Рекордная серия повторов: <span style="color: #fff; font-weight: bold;">${extendedStats.maxDryStreak}</span></div>
                 `;
             }
             
@@ -2627,7 +2618,7 @@
                 }
             };
 
-            document.getElementById("resetProgressBtn").onclick = resetGame;
+            // ЗАДАЧА 3: Кнопка сброса прогресса полностью удалена
             
             refreshOpenButtonText();
             
