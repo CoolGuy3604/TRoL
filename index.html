@@ -2675,6 +2675,15 @@
             // ЗАДАЧА: Запуск фонового кэширования звуков
             warmUpAndCacheSounds();
             
+            // ===== ЗАДАЧА: Регистрация Service Worker для вечного кэширования картинок =====
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('sw.js')
+                        .then(reg => console.log('📦 Service Worker успешно зарегистрирован для кэша картинок!', reg.scope))
+                        .catch(err => console.error('🔴 Ошибка регистрации Service Worker:', err));
+                });
+            }
+            
             setInterval(() => {
                 if (currentUserUid && !isSpinning) {
                     console.log("⏱️ Таймер автосохранения: Запуск плановой синхронизации...");
