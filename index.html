@@ -1163,22 +1163,9 @@
             legendary: { name: "Легендарный", color: "#ffc800", totalChance: 0.012 }
         };
 
+        // ===== НОВЫЙ МАССИВ ITEMS: ПОЛНАЯ ОЧИСТКА ОТ СТАРЫХ ТЕСТОВЫХ ПРЕДМЕТОВ =====
         const ITEMS = [
-            { id: 0, name: "★ Нож-бабочка", img: "images/item3.png", rarityKey: "legendary", description: "Редчайший нож с уникальной анимацией осмотра. Мечта любого коллекционера." },
-            { id: 1, name: "AWP | Dragon Lore", img: "images/item3.png", rarityKey: "mythic", description: "Легендарная снайперская винтовка, украшенная рисунком огнедышащего дракона." },
-            { id: 2, name: "AK-47 | Fire Serpent", img: "images/item3.png", rarityKey: "mythic", description: "Автомат с изображением огненного змея из мифологии майя." },
-            { id: 3, name: "M4A4 | Howl", img: "images/item3.png", rarityKey: "mythic", description: "Засекреченная штурмовая винтовка с изображением свирепого волка." },
-            { id: 4, name: "Desert Eagle | Blaze", img: "images/item3.png", rarityKey: "epic", description: "Мощный пистолет с языками пламени, нанесенными на хромированную поверхность." },
-            { id: 5, name: "SSG 08 | Blood in the Water", img: "images/item3.png", rarityKey: "epic", description: "Еп твою мать! Это что вообще такое? Ты думаешь я ради этого покупал ее? Еп твою мать! Это что вообще такое? Ты думаешь я ради этого покупал ее? Еп твою мать! Это что вообще такое? Ты думаешь я ради этого покупал ее??" },
-            { id: 6, name: "USP-S | Kill Confirmed", img: "images/item3.png", rarityKey: "superRare", description: "Бесшумный пистолет со стильным рисунком пробитого черепа." },
-            { id: 7, name: "Glock-18 | Fade", img: "images/item3.png", rarityKey: "superRare", description: "Стандартный пистолет террористов с хромированным градиентным напылением." },
-            { id: 8, name: "P250 | Splash", img: "images/item3.png", rarityKey: "rare", description: "Простой и надежный пистолет с яркими брызгами краски на корпусе." },
-            { id: 9, name: "MP7 | Nemesis", img: "images/item3.png", rarityKey: "rare", description: "Пистолет-пулемет с геометрическим футуристическим паттерном монстра." },
-            { id: 10, name: "Galil AR | Chatterbox", img: "images/item3.png", rarityKey: "rare", description: "Грубо раскрашенный автомат с имитацией клацающей пасти на затворе." },
-            { id: 11, name: "Tec-9 | Ice Cap", img: "images/item3.png", rarityKey: "common", description: "Пистолет для ведения огня на ходу, покрытый узором арктического льда." },
-            { id: 12, name: "MAG-7 | Hazard", img: "images/item3.png", rarityKey: "common", description: "Дробовик в яркой промышленной окраске, предупреждающей об опасности." },
-            { id: 13, name: "Negev | Lionfish", img: "images/item3.png", rarityKey: "common", description: "Тяжелый пулемет с камуфляжем в стиле ядовитой рыбы-льва." },
-            { id: 14, name: "★ Перчатки (Crimson Web)", img: "images/item3.png", rarityKey: "legendary", description: "Стильные кожаные перчатки, покрытые узором из кровавой паутины." }
+            { id: 1, name: "Счастливы вместе", img: "images/schastlivivmeste.png", rarityKey: "legendary", description: "Тот самый вечер, когда Солнышко с Котеночком впервые ощутили на вкус каплю безграничной свободы и полного отсутствия в их жизнях родителей. А еще арендовали Вуш-самокаты и перекатали всю центральную набережную на**й" }
         ];
 
         const itemsCountByRarity = {};
@@ -1351,6 +1338,9 @@
                     if (!extendedStats.dailyCalendar) extendedStats.dailyCalendar = {};
                     if (!extendedStats.itemClicks) extendedStats.itemClicks = {};
                     if (!extendedStats.itemRollCounters) extendedStats.itemRollCounters = {};
+                    
+                    // 🔒 БРОНЕБОЙНАЯ ЗАЩИТА FIREBASE: Фильтрация инвентаря от старых ID, которых больше нет в ITEMS
+                    inventory = inventory.filter(invItem => ITEMS.some(actualItem => actualItem.id === invItem.id));
                     
                     console.log("🟢 Данные пользователя успешно загружены из облака Firebase.");
                     console.log("📊 Загружено предметов в инвентаре:", inventory.length);
